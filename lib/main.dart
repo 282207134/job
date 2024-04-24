@@ -257,7 +257,15 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ))),
             Center(child: Text("Bike")),
-            Center(child: Text("Boat")),
+            Container(
+                child: Center(
+                    child: Column(
+              children: [
+                Container(
+                  child: Text('Language'),
+                )
+              ],
+            ))),
           ],
         ),
         drawer: Drawer(
