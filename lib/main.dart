@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 
 void main() {
   runApp(MyApp());
@@ -100,7 +98,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _textController = TextEditingController();
   final List<String> _notes = [];
-
   @override
   Widget build(BuildContext context) {
     void _addNote() {
@@ -269,8 +266,25 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         drawer: Drawer(
-            // Drawer的内容省略，因为这部分没有问题
+            child: ListView(padding: EdgeInsets.zero, children: const <Widget>[
+          UserAccountsDrawerHeader(
+            //用户账户抽屉头
+            accountName: Text("Liu Yu"), //账户名称
+            accountEmail: Text("xxxxxxyahoo.co.jp"), //账户邮箱
+            currentAccountPicture: CircleAvatar(
+              //当前帐户图片:圈子头像
+              backgroundImage: AssetImage('images/panda.jpg'),
+              child: Text(
+                "A",
+                style: TextStyle(fontSize: 40.0),
+              ),
             ),
+          ),
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text("Home"),
+          ),
+        ])),
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
