@@ -273,11 +273,7 @@ class _HomePageState extends State<HomePage> {
             accountEmail: Text("xxxxxxyahoo.co.jp"), //账户邮箱
             currentAccountPicture: CircleAvatar(
               //当前帐户图片:圈子头像
-              backgroundImage: AssetImage('images/panda.jpg'),
-              child: Text(
-                "A",
-                style: TextStyle(fontSize: 40.0),
-              ),
+              backgroundImage: AssetImage('images/panda.png'),
             ),
           ),
           ListTile(
