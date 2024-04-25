@@ -27,12 +27,12 @@ class JobPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("工作管理界面"),
+        title: Text("仕事管理"),
       ),
       body: Center(
         child: ElevatedButton(
           style: ButtonStyle(),
-          child: Text('关闭'),
+          child: Text('閉じる'),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -49,12 +49,12 @@ class StaffPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("人员管理界面"),
+        title: Text("スタッフ管理"),
       ),
       body: Center(
         child: ElevatedButton(
           style: ButtonStyle(),
-          child: Text('关闭'),
+          child: Text('閉じる'),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -71,12 +71,12 @@ class TransactionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("事务管理界面"),
+        title: Text("事務管理"),
       ),
       body: Center(
         child: ElevatedButton(
           style: ButtonStyle(),
-          child: Text('关闭'),
+          child: Text('閉じる'),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           backgroundColor: Colors.blue,
-          title: Text('学生兼职管理系统'),
+          title: Text('学生アルバイト管理システム'),
           actions: [
             IconButton(icon: Icon(Icons.search), onPressed: () {}),
           ],
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                   child: Card(
                     child: Center(
                       child: Text(
-                        '信息管理',
+                        '情報管理',
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
@@ -155,11 +155,11 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.cyan,
                   child: TextButton(
                     onPressed: () {
-                      print('工作管理');
+                      print('仕事管理');
                       Navigator.of(context).pushNamed('/job');
                     },
                     child: Text(
-                      '工作管理',
+                      '仕事管理',
                       style: TextStyle(color: Colors.red, fontSize: 30),
                     ),
                   ),
@@ -172,11 +172,11 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.cyan,
                   child: TextButton(
                     onPressed: () {
-                      print('人员管理');
+                      print('スタッフ管理');
                       Navigator.of(context).pushNamed('/staff');
                     },
                     child: Text(
-                      '人员管理',
+                      'スタッフ管理',
                       style: TextStyle(color: Colors.red, fontSize: 30),
                     ),
                   ),
@@ -189,11 +189,11 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.cyan,
                   child: TextButton(
                     onPressed: () {
-                      print('事务管理');
+                      print('事務管理');
                       Navigator.of(context).pushNamed('/transaction');
                     },
                     child: Text(
-                      '事务管理',
+                      '事務管理',
                       style: TextStyle(color: Colors.red, fontSize: 30),
                     ),
                   ),
@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                       child: Card(
                         child: Center(
                           child: Text(
-                            '日志',
+                            'ログ',
                             style: TextStyle(fontSize: 20),
                           ),
                         ),
@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                         controller: _textController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: '在这输入:',
+                          labelText: 'ここで入力:',
                           suffixIcon: IconButton(
                             icon: Icon(Icons.add),
                             onPressed: _addNote,
@@ -280,45 +280,43 @@ class _HomePageState extends State<HomePage> {
             leading: Icon(Icons.home),
             title: Text("Home"),
           ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text("settings"),
+          ),
         ])),
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: "主页",
+              label: "ホーム",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.mail),
-              label: "消息",
+              label: "メッセージ",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.supervised_user_circle),
-              label: "个人信息",
+              label: "個人情報",
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            print('点击悬浮按钮');
+          },
+          backgroundColor: Colors.red,
+          splashColor: Colors.yellow,
+          foregroundColor: Colors.deepPurple,
+          hoverColor: Colors.green,
+          tooltip: "ここで新たなボタンを追加する",
+          label: Text('添付'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
       ),
-    );
-  }
-}
-
-class MyVolumeButton extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return MyVolumeButtonState();
-  }
-}
-
-class MyVolumeButtonState extends State<MyVolumeButton> {
-  bool volumeOn = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_mute),
-      onPressed: () {
-        setState(() => volumeOn = !volumeOn);
-      },
     );
   }
 }
