@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,7 +12,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(), // 修改此处为正确的类名
+      home: FlutterSplashScreen.fadeIn(
+        backgroundColor: Colors.cyan,
+        duration: Duration(seconds: 5),
+        animationDuration: Duration(seconds: 7),
+        onInit: () {
+          debugPrint("On Init");
+        },
+        onEnd: () {
+          debugPrint("On End");
+        },
+        childWidget: SizedBox(
+          height: double.infinity,
+          width: double.infinity,
+          child: Image.asset("assets/3.png"),
+        ),
+        onAnimationEnd: () => debugPrint("On Fade In End"),
+        nextScreen: LoginPage(),
+      ),
       routes: {
         '/login': (BuildContext context) => LoginPage(),
         '/home': (BuildContext context) => HomePage(), // 修改此处为正确的类名
