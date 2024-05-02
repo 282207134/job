@@ -13,22 +13,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: FlutterSplashScreen.fadeIn(
-        backgroundColor: Colors.cyan,
-        duration: Duration(seconds: 5),
-        animationDuration: Duration(seconds: 7),
+        backgroundColor: Colors.cyan, // 背景颜色设置为青色
+        duration: Duration(seconds: 5), // 启动屏幕持续时间为5秒
+        animationDuration: Duration(seconds: 7), // 淡入动画持续时间为7秒
         onInit: () {
-          debugPrint("On Init");
+          debugPrint("On Init"); // 在初始化时打印信息
         },
         onEnd: () {
-          debugPrint("On End");
+          debugPrint("On End"); // 在结束时打印信息
         },
         childWidget: SizedBox(
-          height: double.infinity,
-          width: double.infinity,
-          child: Image.asset("assets/3.png"),
+          height: double.infinity, // 子组件高度占满可用空间
+          width: double.infinity, // 子组件宽度占满可用空间
+          child: Image.asset("assets/3.png"), // 显示assets目录下的3.png图片
         ),
-        onAnimationEnd: () => debugPrint("On Fade In End"),
-        nextScreen: LoginPage(),
+        onAnimationEnd: () => debugPrint("On Fade In End"), // 当淡入动画结束时打印信息
+        nextScreen: LoginPage(), // 动画结束后导航到LoginPage页面
       ),
       routes: {
         '/login': (BuildContext context) => LoginPage(),
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("登録")),
+        title: Center(child: Text("ログイン")),
       ), // 页面顶部的应用栏
       body: Form(
         key: _formKey,
