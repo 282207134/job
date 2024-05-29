@@ -1,22 +1,30 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
-import 'package:introduction_screen/introduction_screen.dart'; // 导入引导屏幕包
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:job/providers/userProvider.dart';
+import 'package:job/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'LoginPageState.dart';
-import 'OnBoardingPageState.dart';
+import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
+import 'splashScreen/OnBoardingPageState.dart';
+import 'package:job/pages/job_page.dart';
+import 'package:job/pages/message.dart';
+import 'package:job/pages/staff_page.dart';
+import 'package:job/pages/transaction_page.dart';
+import 'package:job/screens/login_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyApp extends StatelessWidget {
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,7 +48,7 @@ class MyApp extends StatelessWidget {
         nextScreen: OnBoardingPage(),
       ),
       routes: {
-        '/login': (BuildContext context) => LoginPage(),
+        '/login': (BuildContext context) => SplashScreen(),
         '/home': (BuildContext context) => HomePage(), // 修改此处为正确的类名
         '/job': (BuildContext context) => JobPage(), //
         '/staff': (BuildContext context) => StaffPage(), //
@@ -50,72 +58,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class JobPage extends StatelessWidget {
-  //工作管理界面
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("仕事管理"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          style: ButtonStyle(),
-          child: Text('閉じる'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      backgroundColor: Colors.lightGreen[100],
-    );
-  }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(ChangeNotifierProvider(
+      create: (context) => UserProvider(), child: MyApp()));
 }
 
-class StaffPage extends StatelessWidget {
-  //人员管理界面
-
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("スタッフ管理"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          style: ButtonStyle(),
-          child: Text('閉じる'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      backgroundColor: Colors.lightGreen[100],
-    );
-  }
-}
-
-class TransactionPage extends StatelessWidget {
-  //事务管理界面
-
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("事務管理"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          style: ButtonStyle(),
-          child: Text('閉じる'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      backgroundColor: Colors.lightGreen[100],
-    );
-  }
-}
-
-// 类名应以大写字母开头
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -138,10 +87,12 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    var userProvider = Provider.of<UserProvider>(context);
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.cyanAccent,
         appBar: AppBar(
           bottom: TabBar(
             tabs: [
@@ -152,7 +103,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           backgroundColor: Colors.blue,
-          title: Text('学生アルバイト管理システム'),
+          title: Text('管理システム'),
           actions: [
             IconButton(icon: Icon(Icons.search), onPressed: () {}),
           ],
@@ -295,25 +246,47 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         drawer: Drawer(
-            child: ListView(padding: EdgeInsets.zero, children: const <Widget>[
-          UserAccountsDrawerHeader(
-            //用户账户抽屉头
-            accountName: Text("Liu Yu"), //账户名称
-            accountEmail: Text("xxxxxxyahoo.co.jp"), //账户邮箱
-            currentAccountPicture: CircleAvatar(
-              //当前帐户图片:圈子头像
-              backgroundImage: AssetImage('images/panda.png'),
-            ),
+            child: Container(
+                child: Column(children: [
+          SizedBox(height: 50),
+          ListTile(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ProfileScreen();
+              }));
+            },
+            leading: CircleAvatar(
+                child: Text(userProvider.userName.isNotEmpty
+                    ? userProvider.userName[0]
+                    : 'N')),
+            title: Text(
+                userProvider.userName.isNotEmpty
+                    ? userProvider.userName
+                    : 'No name available',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(userProvider.userEmail.isNotEmpty
+                ? userProvider.userEmail
+                : 'No email available'),
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text("Home"),
-          ),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ProfileScreen();
+                }));
+              },
+              leading: Icon(Icons.people),
+              title: Text("個人情報")),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text("settings"),
-          ),
-        ])),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(context,
+                    MaterialPageRoute(builder: (context) {
+                  return SplashScreen();
+                }), (route) => false);
+              },
+              leading: Icon(Icons.logout),
+              title: Text("Logout"))
+        ]))),
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
@@ -330,21 +303,21 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          icon: Icon(Icons.add),
-          onPressed: () {
-            print('点击悬浮按钮');
-          },
-          backgroundColor: Colors.red,
-          splashColor: Colors.yellow,
-          foregroundColor: Colors.deepPurple,
-          hoverColor: Colors.green,
-          tooltip: "ここで新たなボタンを追加する",
-          label: Text('添付'),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
+        // floatingActionButton: FloatingActionButton.extended(
+        //   icon: Icon(Icons.add),
+        //   onPressed: () {
+        //     print('点击悬浮按钮');
+        //   },
+        //   backgroundColor: Colors.red,
+        //   splashColor: Colors.yellow,
+        //   foregroundColor: Colors.deepPurple,
+        //   hoverColor: Colors.green,
+        //   tooltip: "ここで新たなボタンを追加する",
+        //   label: Text('添付'),
+        //   shape: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.circular(5),
+        //   ),
+        // ),
       ),
     );
   }

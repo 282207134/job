@@ -6,27 +6,31 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
-
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
+
+  cupertino_icons: ^1.0.2
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.17.5
+  provider: ^6.1.1
   introduction_screen: ^3.1.14
   intl: ^0.18.1
   another_flutter_splash_screen: ^1.2.0
-  firebase_core: ^2.31.0
-  firebase_auth: ^4.19.5
-  cloud_firestore: ^4.17.3
-  provider: ^6.1.2
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^3.0.0
-
+  flutter_lints: ^2.0.0
 flutter:
   uses-material-design: true
-
   assets:
+    - assets/images/
     - images/
     - assets/
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/poppins.ttf
