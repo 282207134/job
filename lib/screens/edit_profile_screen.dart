@@ -54,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile"), // 应用栏标题
+        title: Text("名前変更"), // 应用栏标题
         actions: [
           InkWell(
             onTap: () {
@@ -77,16 +77,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Form(
             key: editProfileForm, // 将全局键赋给Form小部件
             child: Column(children: [
-              TextFormField(
-                autovalidateMode:
-                    AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Name cannot be empty."; // 验证姓名输入是否为空
-                  }
-                },
-                controller: nameText, // 使用nameText控制器
-                decoration: InputDecoration(label: Text("Name")), // 名称输入框装饰
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                    textAlign: TextAlign.center,
+                    autovalidateMode:
+                        AutovalidateMode.onUserInteraction, // 用户交互时自动验证
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Name cannot be empty."; // 验证姓名输入是否为空
+                      }
+                    },
+                    controller: nameText, // 使用nameText控制器
+                    decoration: InputDecoration(
+                      label: Text("Name"), filled: true,
+                      fillColor: Colors.grey.shade100, // 名称输入框装饰
+                    )),
               )
             ]),
           ),
