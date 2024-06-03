@@ -24,7 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController name = TextEditingController();
-  TextEditingController country = TextEditingController();
+  TextEditingController staff_id = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +45,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       children: [
-                        // SizedBox(
-                        //     width: 100,
-                        //     child: Image.asset("images/panda.png")), // Logo图片
                         TextFormField(
                           autovalidateMode:
                               AutovalidateMode.onUserInteraction, // 用户交互时自动验证
@@ -93,14 +90,14 @@ class _SignupScreenState extends State<SignupScreen> {
                         TextFormField(
                           autovalidateMode:
                               AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                          controller: country, // 使用country控制器
+                          controller: staff_id, // 使用staff_id控制器
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Country is required"; // 验证国家输入
+                              return "staff id is required"; // 验证国家输入
                             }
                           },
-                          decoration: InputDecoration(
-                              label: Text("Country")), // 国家输入框装饰
+                          decoration:
+                              InputDecoration(label: Text("学籍番号")), // 国家输入框装饰
                         ),
                         SizedBox(height: 53),
                         Row(
@@ -123,7 +120,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           context: context,
                                           email: email.text,
                                           password: password.text,
-                                          country: country.text,
+                                          staff_id: staff_id.text,
                                           name: name.text);
                                     }
 

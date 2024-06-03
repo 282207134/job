@@ -11,7 +11,7 @@ class SignupController {
       required String email,
       required String password,
       required String name,
-      required String country}) async {
+      required String staff_id}) async {
     try {
       // 使用Firebase Auth创建用户账号
       await FirebaseAuth.instance
@@ -26,7 +26,7 @@ class SignupController {
       // 准备要保存到数据库的用户数据
       Map<String, dynamic> data = {
         "name": name,
-        "country": country,
+        "staff_id": staff_id,
         "email": email,
         "id": userId
       };
