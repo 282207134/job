@@ -2,49 +2,49 @@
 <html>
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    如果你的Web应用程序在根目录之外的路径中提供服务，请更改下面的href值以反映你提供服务的基本路径。
+    下面提供的路径必须以斜杠"/"开始和结束，才能正常工作。
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
+    更多详情：
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
 
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    这是一个占位符，将由`flutter build`提供的`--base-href`参数的值替换。
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="A new Flutter project."> <!-- 描述内容 -->
 
-  <!-- iOS meta tags & icons -->
+  <!-- iOS元标签和图标 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="job">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="job"> <!-- iOS应用标题 -->
+  <link rel="apple-touch-icon" href="icons/Icon-192.png"> <!-- iOS应用图标 -->
 
-  <!-- Favicon -->
+  <!-- Favicon图标 -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>job</title>
-  <link rel="manifest" href="manifest.json">
+  <title>job</title> <!-- 网页标题 -->
+  <link rel="manifest" href="manifest.json"> <!-- Web应用程序清单 -->
 
   <script>
-    // The value below is injected by flutter build, do not touch.
+    // 下面的值由flutter build注入，不要修改。
     const serviceWorkerVersion = null;
   </script>
-  <!-- This script adds the flutter initialization JS code -->
+  <!-- 这个脚本添加了Flutter初始化JS代码 -->
   <script src="flutter.js" defer></script>
+
+  <!-- 添加Google Maps API脚本 -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAlaZ8dCLV3v3efFcSJDueWS5Fo5haJ0A"></script> <!-- 修改点：添加Google Maps API脚本 -->
+
   <script type="module">
-  // Import the functions you need from the SDKs you need
+  // 从所需的SDK中导入所需的函数
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
+  // TODO: 添加你想使用的Firebase产品的SDK
   // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
+  // 你的Web应用的Firebase配置
   const firebaseConfig = {
     apiKey: "AIzaSyBYXITOYDIF6UoR-QYXEnGhi3yu_9gYAf0",
     authDomain: "job-test-b3034.firebaseapp.com",
@@ -55,20 +55,20 @@
     appId: "1:365204430823:web:4aecd03fcc391a987c2742"
   };
 
-  // Initialize Firebase
+  // 初始化Firebase
   const app = initializeApp(firebaseConfig);
 </script>
 </head>
 <body>
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
+<script>
+    window.addEventListener('load', function(ev) { <!-- 在页面加载时执行 -->
+      // 下载main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
+          engineInitializer.initializeEngine().then(function(appRunner) { <!-- 初始化Flutter引擎并运行应用 -->
             appRunner.runApp();
           });
         }
@@ -76,5 +76,4 @@
     });
   </script>
 </body>
-
 </html>
