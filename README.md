@@ -1,6 +1,7 @@
 # job
 Webでテスト
-![image](https://github.com/282207134/job/assets/83965106/cd56c47f-bb72-4a3e-8a71-ed98d896154d)
+![generate](https://github.com/282207134/job/assets/83965106/f1d11518-69c0-4eea-bb70-700d2877eb26)
+
 
 ## 練習制作　
 モバイル：
