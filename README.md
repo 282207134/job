@@ -1,6 +1,7 @@
 # job
 Webでテスト
-![https://job-test-b3034.web.app/](https://job-test-b3034.web.app/)
+![image](https://github.com/282207134/job/assets/83965106/cd56c47f-bb72-4a3e-8a71-ed98d896154d)
+
 ## 練習制作　
 モバイル：
 ##
