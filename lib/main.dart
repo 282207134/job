@@ -4,22 +4,26 @@ import 'package:flutter/material.dart'; // 导入Flutter材质设计组件库
 import 'package:flutter/src/widgets/framework.dart'; // 导入Flutter的基础widget框架
 import 'package:flutter/src/widgets/placeholder.dart'; // 导入Flutter的占位符组件库
 import 'package:firebase_core/firebase_core.dart'; // 导入Firebase核心库
-import 'package:job/pages/note.dart';
-import 'package:job/pages/notification.dart';
+import 'package:job/pages/googleMap/MyGoogleMap.dart';
+// import 'package:job/pages/GoogleMap/MyGoogleMap.dart';
+import 'package:job/pages/managementTools/management_tools.dart';
+import 'package:job/pages/managementTools/timer.dart';
+import 'package:job/pages/managementTools/note.dart';
+import 'package:job/pages/notification/notification.dart';
 import 'package:job/providers/userProvider.dart'; // 导入自定义的用户状态管理库
 import 'package:job/screens/chatroom_screen.dart';
 import 'package:job/screens/profile_screen.dart'; // 导入用户资料页面
 import 'package:provider/provider.dart'; // 导入状态管理库
-import 'button/note_button.dart';
+// import 'button/note_button.dart';
 import 'firebase_options.dart'; // 导入Firebase配置选项
 import 'screens/splash_screen.dart'; // 导入应用的启动屏页面
 import 'screens/login_screen.dart'; // 导入登录页面
 import 'splashScreen/OnBoardingPageState.dart'; // 导入引导页面状态
-import 'package:job/pages/job_page.dart'; // 导入工作页面
-import 'package:job/pages/staff_page.dart'; // 导入员工页面
-import 'package:job/pages/transaction_page.dart'; // 导入交易页面
-import 'package:job/pages/home.dart';
-import 'package:job/pages/messages.dart';
+import 'package:job/pages/jobPage/job_page.dart'; // 导入工作页面
+import 'package:job/pages/staffPage/staff_page.dart'; // 导入员工页面
+// import 'package:job/pages/transaction_page.dart'; // 导入交易页面
+import 'package:job/pages/home/home.dart';
+// import 'package:job/pages/messages.dart';
 import 'package:job/screens/login_screen.dart'; // 重复导入登录页面（注意可能的重复导入）
 
 class MyApp extends StatefulWidget {
@@ -63,8 +67,9 @@ class _MyAppState extends State<MyApp> {
         '/home': (BuildContext context) => HomePage(), // 首页路由
         '/job': (BuildContext context) => JobPage(), // 工作页面路由
         '/staff': (BuildContext context) => StaffPage(), // 员工页面路由
-        '/transaction': (BuildContext context) => TransactionPage(), // 交易页面路由
+        '/management_tools': (BuildContext context) => management_tools(), // 交易页面路由
         '/note': (BuildContext context) => note(),
+        '/timer': (BuildContext context) => timer(),
       },
     );
   }
@@ -76,7 +81,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform); // 初始化Firebase
   runApp(ChangeNotifierProvider(
-      // 运行应用
+    // 运行应用
       create: (context) => UserProvider(), // 创建用户状态管理
       child: MyApp())); // 应用的主Widget
 }
@@ -131,7 +136,12 @@ class _HomePageState extends State<HomePage> {
             ),
             NavigationDestination(
               icon:
-                  Badge(child: Icon(Icons.notifications_sharp)), // 使用徽章包裹的通知图标。
+              Badge(child: Icon(Icons.map_outlined)), // 使用徽章包裹的通知图标。
+              label: 'GoogleMap', // 标签。
+            ),
+            NavigationDestination(
+              icon:
+              Badge(child: Icon(Icons.notifications_sharp)), // 使用徽章包裹的通知图标。
               label: 'Notifications', // 标签。
             ),
             NavigationDestination(
@@ -146,6 +156,8 @@ class _HomePageState extends State<HomePage> {
 
         body: <Widget>[
           home(),
+          MyGoogleMap(),
+
           notification(),
           ChatroomScreen(
             chatroomName: '',
@@ -156,46 +168,46 @@ class _HomePageState extends State<HomePage> {
         drawer: Drawer(
             child: Container(
                 child: Column(children: [
-          SizedBox(height: 50), // 大小盒子
-          ListTile(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ProfileScreen(); // 导航至个人资料页面
-              }));
-            },
-            leading: CircleAvatar(
-                child: Text(userProvider.userName.isNotEmpty
-                    ? userProvider.userName[0]
-                    : 'N')), // 圆形头像
-            title: Text(
-                userProvider.userName.isNotEmpty
-                    ? userProvider.userName
-                    : 'No name available', // 名称文本
-                style: TextStyle(fontWeight: FontWeight.bold)), // 文本样式
-            subtitle: Text(userProvider.userEmail.isNotEmpty
-                ? userProvider.userEmail
-                : 'No email available'), // 邮件文本
-          ),
-          ListTile(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ProfileScreen(); // 导航至个人资料页面
-                }));
-              },
-              leading: Icon(Icons.people), // 图标
-              title: Text("個人情報")), // 标题文本
+                  SizedBox(height: 50), // 大小盒子
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return ProfileScreen(); // 导航至个人资料页面
+                      }));
+                    },
+                    leading: CircleAvatar(
+                        child: Text(userProvider.userName.isNotEmpty
+                            ? userProvider.userName[0]
+                            : 'N')), // 圆形头像
+                    title: Text(
+                        userProvider.userName.isNotEmpty
+                            ? userProvider.userName
+                            : 'No name available', // 名称文本
+                        style: TextStyle(fontWeight: FontWeight.bold)), // 文本样式
+                    subtitle: Text(userProvider.userEmail.isNotEmpty
+                        ? userProvider.userEmail
+                        : 'No email available'), // 邮件文本
+                  ),
+                  ListTile(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return ProfileScreen(); // 导航至个人资料页面
+                        }));
+                      },
+                      leading: Icon(Icons.people), // 图标
+                      title: Text("個人情報")), // 标题文本
 
-          ListTile(
-              onTap: () async {
-                await FirebaseAuth.instance.signOut(); // Firebase登出
-                Navigator.pushAndRemoveUntil(context,
-                    MaterialPageRoute(builder: (context) {
-                  return SplashScreen(); // 导航至启动屏
-                }), (route) => false);
-              },
-              leading: Icon(Icons.logout), // 图标
-              title: Text("Logout")) // 标题文本
-        ]))),
+                  ListTile(
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut(); // Firebase登出
+                        Navigator.pushAndRemoveUntil(context,
+                            MaterialPageRoute(builder: (context) {
+                              return SplashScreen(); // 导航至启动屏
+                            }), (route) => false);
+                      },
+                      leading: Icon(Icons.logout), // 图标
+                      title: Text("Logout")) // 标题文本
+                ]))),
 
         // floatingActionButton: Draggable(
         //   feedback: FloatingActionButton.extended(
