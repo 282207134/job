@@ -45,12 +45,12 @@ class _timerState extends State<timer> {
     Alert(
       context: context,
       type: AlertType.success,
-      title: "完成",
-      desc: "倒计时结束。",
+      title: "終了",
+      desc: "カウントダウン終了",
       buttons: [
         DialogButton(
           child: Text(
-            "返回",
+            "戻る",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
           onPressed: () async {
@@ -83,7 +83,13 @@ class _timerState extends State<timer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('倒计时工具'), // 页面顶部的标题
+        title: Text('カウントダウン'), // 页面顶部的标题
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back), // 设置返回图标
+          onPressed: () {
+            Navigator.pop(context); // 返回上一个页面
+          },
+        ),
       ),
       body: Center(
         child: Column(
@@ -92,23 +98,23 @@ class _timerState extends State<timer> {
             Container(
                 width: 120,
                 child: TextField(
+                  textAlign: TextAlign.center, // 文字居中对齐
                   controller: _controller, // 绑定控制器，用于管理输入框文本
                   keyboardType: TextInputType.number, // 设置键盘类型为数字，适用于输入时间
                   decoration: InputDecoration(
-                    hintText: '请输入时间', // 当输入框未被选中且为空时显示的提示文本
+                    hintText: '時間(秒数)', // 当输入框未被选中且为空时显示的提示文本
                   ),
                 )),
             ElevatedButton(
               onPressed: () {
                 if (_controller.text.isNotEmpty) {
                   setState(() {
-                    _start = int.tryParse(_controller.text) ??
-                        30; // 尝试解析输入值，如果失败则保持默认
+                    _start = int.tryParse(_controller.text) ?? 30; // 尝试解析输入值，如果失败则保持默认
                     _controller.clear(); // 清空输入框
                   });
                 }
               },
-              child: Text('设置倒计时'), // 按钮文本
+              child: Text('カウントダウンを設定する'), // 按钮文本
             ),
             Text(
               '$_start', // 显示倒计时时间
@@ -116,11 +122,11 @@ class _timerState extends State<timer> {
             ),
             ElevatedButton(
               onPressed: startTimer, // 开始倒计时
-              child: Text('开始倒计时'), // 按钮文本
+              child: Text('カウントダウン開始'), // 按钮文本
             ),
             ElevatedButton(
               onPressed: stopTimer, // 停止倒计时
-              child: Text('停止倒计时'), // 按钮文本
+              child: Text('カウントダウン停止'), // 按钮文本
             ),
           ],
         ),

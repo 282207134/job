@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "job-test-b3034"
-  }
+    "default": "job-test-b3034",
+    "\t": "job-test-b3034"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }

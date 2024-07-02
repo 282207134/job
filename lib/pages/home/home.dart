@@ -25,20 +25,20 @@ class _homeState extends State<home> {
               child: Column(
 // 竖直排列的子组件
             children: [
-              Container(
-                width: 200,
-                height: 50,
-                margin: EdgeInsets.only(top: 10),
-                child: Card(
-                  child: Center(
-                    child: Text(
-                      '情報管理', // 文本内容
-                      style: TextStyle(fontSize: 20), // 文本样式
-                    ),
-                  ),
-                  color: Colors.yellow, // 卡片颜色
-                ),
-              ),
+              // Container(
+              //   width: 200,
+              //   height: 50,
+              //   margin: EdgeInsets.only(top: 10),
+              //   child: Card(
+              //     child: Center(
+              //       child: Text(
+              //         '情報管理', // 文本内容
+              //         style: TextStyle(fontSize: 20), // 文本样式
+              //       ),
+              //     ),
+              //     color: Colors.yellow, // 卡片颜色
+              //   ),
+              // ),
               Container(
                 padding: EdgeInsets.all(20), // 内边距
                 margin: EdgeInsets.all(15), // 外边距

@@ -20,7 +20,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> { // 定义MyGoogleMap的状�
   GoogleMapController? controllerGoogleMap; // 定义GoogleMapController
   String? mapStyle; // 地图样式字符串
   static const CameraPosition _initialPosition = CameraPosition( // 定义初始相机位置
-    target: LatLng(35.637807, 140.203048),
+    target: LatLng(35.6378, 140.2038),
     zoom: 17,
   );
 
