@@ -137,7 +137,7 @@ class management_tools extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    "抽選",
+                    "ピアノ",
                     style: TextStyle(color: Colors.black, fontSize: 20),
                   ),
                 )
