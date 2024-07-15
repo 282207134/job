@@ -19,7 +19,6 @@ class DashboardScreen extends StatefulWidget {
   @override
   State<DashboardScreen> createState() => _DashboardScreenState(); // 创建状态
 }
-
 // 定义_DashboardScreenState类，是DashboardScreen的状态
 class _DashboardScreenState extends State<DashboardScreen> {
   var user = FirebaseAuth.instance.currentUser; // 获取当前用户
