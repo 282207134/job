@@ -52,7 +52,7 @@ class _RandomPersonPickerPageState extends State<RandomPersonPickerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(backgroundColor: Colors.lightBlue.shade100,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // 设置返回图标

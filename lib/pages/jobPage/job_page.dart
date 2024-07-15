@@ -9,9 +9,33 @@ class JobPage extends StatelessWidget {
         appBar: AppBar(
           title: Text("仕事管理"),
         ),
-        body: GridView.count(crossAxisCount: 2, mainAxisSpacing: 2, children: [
+        body: GridView.count(crossAxisCount: 2, mainAxisSpacing: 0, children: [
           Container(
             color: Colors.greenAccent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: IconButton(
+                    onPressed: () {
+                      print('カレンダー'); // 控制台输出
+                      Navigator.of(context).pushNamed('/calendar'); // 导航至工作页面
+                    },
+                    icon: Icon(
+                      Icons.calendar_month,
+                      color: Colors.pink,
+                      size: 100.0,
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    "カレンダー",
+                    style: TextStyle(color: Colors.pink, fontSize: 20),
+                  ),
+                )
+              ],
+            ),
           ),
           Container(
             color: Colors.red,

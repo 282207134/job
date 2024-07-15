@@ -93,11 +93,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           controller: staff_id, // 使用staff_id控制器
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "staff id is required"; // 验证国家输入
+                              return "staff id is required"; // 验证学籍番号
                             }
                           },
                           decoration:
-                              InputDecoration(label: Text("学籍番号")), // 国家输入框装饰
+                              InputDecoration(label: Text("学籍番号")), // 学籍番号输入框装饰
                         ),
                         SizedBox(height: 53),
                         Row(

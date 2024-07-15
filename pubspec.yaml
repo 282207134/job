@@ -1,51 +1,52 @@
-name: job
-description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-version: 1.0.0+1
-
+name: job # 项目名称
+description: "A new Flutter project." # 项目描述
+publish_to: 'none' # 不发布到pub.dev
+version: 1.0.0+1 # 版本号
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.3.4 <4.0.0' # SDK版本
 dependencies:
-
-
   flutter:
-    sdk: flutter
-  google_maps_flutter: ^2.5.3
-  geolocator: ^8.0.0
-
-  cupertino_icons: ^1.0.2
-  firebase_core: ^2.32.0
-  firebase_auth: ^4.16.0
-  cloud_firestore: ^4.17.5
-  provider: ^6.1.1
-  introduction_screen: ^3.1.14
-  intl: ^0.18.1
-  another_flutter_splash_screen: ^1.2.0
-  rflutter_alert: ^2.0.7
-  audioplayers: ^6.0.0
-  permission_handler:
-  flutter_lints: ^2.0.0
-
-  shared_preferences: ^2.2.3
-  sqflite: ^2.3.3+1
-  path: ^1.9.0
-
+    sdk: flutter # Flutter SDK
+  google_maps_flutter: ^2.5.3 # 谷歌地图插件
+  geolocator: ^8.0.0 # 地理定位插件
+  cupertino_icons: ^1.0.2 # iOS风格图标
+  firebase_core: ^2.32.0 # Firebase核心
+  firebase_auth: ^4.16.0 # Firebase认证
+  cloud_firestore: ^4.17.5 # Firebase Firestore数据库
+  provider: ^6.1.1 # 状态管理
+  introduction_screen: ^3.1.14 # 引导页插件
+  intl: ^0.18.1 # 国际化支持
+  another_flutter_splash_screen: ^1.2.0 # 启动屏幕插件
+  rflutter_alert: ^2.0.7 # 弹窗插件
+  audioplayers: ^6.0.0 # 音频播放插件
+  permission_handler: # 权限管理插件
+  flutter_lints: ^2.0.0 # Flutter代码规范检查
+  flutter_colorpicker: ^1.1.0 # 颜色选择器插件
+#  calendar_view:
+#    path: ../ # 本地 calendar_view 依赖
+  shared_preferences: ^2.2.3 # 本地存储插件
+  sqflite: ^2.3.3+1 # SQLite数据库插件
+  path: ^1.9.0 # 路径管理插件
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
+    sdk: flutter # Flutter测试框架
+  flutter_lints: ^2.0.0 # Flutter代码规范检查
+  lints: # 代码风格和静态分析规则
+  build_runner: ^2.0.6 # 代码生成器
+  build_web_compilers: ^3.0.0 # Web 编译器
+
 flutter:
-  uses-material-design: true
-  assets:
-    - assets/images/
-    - assets/piano/
-    - images/
-    - images/dice/
-    - assets/
+  uses-material-design: true # 使用Material设计
+  assets: # 资源文件
+    - assets/images/ # 图片资源
+    - assets/piano/ # 钢琴音频资源
+    - images/ # 图片资源
+    - images/dice/ # 骰子图片资源
+    - assets/ # 其他资源
     - themes/ # 主题资源目录
-  fonts:
+
+  fonts: # 字体配置
     - family: Poppins
       fonts:
-        - asset: assets/fonts/poppins.ttf
+        - asset: assets/fonts/poppins.ttf # Poppins字体

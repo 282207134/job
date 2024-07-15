@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // 引入Cloud Firestore库
 import 'package:flutter/material.dart'; // 引入Flutter材料设计库
-import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
-import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
 import 'package:provider/provider.dart';
 
 import '../providers/userProvider.dart'; // 引入状态管理库
@@ -13,8 +11,8 @@ class ChatroomScreen extends StatefulWidget {
 
   ChatroomScreen(
       {super.key,
-      required this.chatroomName,
-      required this.chatroomId}); // 构造函数
+        required this.chatroomName,
+        required this.chatroomId}); // 构造函数
 
   @override
   State<ChatroomScreen> createState() => _ChatroomScreenState(); // 创建状态
@@ -34,9 +32,9 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
     Map<String, dynamic> messageToSend = {
       "text": messageText.text, // 消息文本
       "sender_name":
-          Provider.of<UserProvider>(context, listen: false).userName, // 发送者姓名
+      Provider.of<UserProvider>(context, listen: false).userName, // 发送者姓名
       "sender_id":
-          Provider.of<UserProvider>(context, listen: false).userId, // 发送者ID
+      Provider.of<UserProvider>(context, listen: false).userId, // 发送者ID
       "chatroom_id": widget.chatroomId, // 聊天室ID
       "timestamp": FieldValue.serverTimestamp(), // 消息时间戳
     };
@@ -50,13 +48,16 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
   // 定义单条聊天消息的布局
   Widget singleChatItem(
       {required String sender_name,
-      required String text,
-      required String sender_id}) {
+        required String text,
+        required String sender_id,
+        required Timestamp? timestamp}) {
+    DateTime dateTime = timestamp?.toDate() ?? DateTime.now();
+    String formattedTime = "${dateTime.hour}:${dateTime.minute}";
     return Column(
       crossAxisAlignment:
-          sender_id == Provider.of<UserProvider>(context, listen: false).userId
-              ? CrossAxisAlignment.end // 如果消息是由当前用户发送，右对齐
-              : CrossAxisAlignment.start, // 如果消息是由他人发送，左对齐
+      sender_id == Provider.of<UserProvider>(context, listen: false).userId
+          ? CrossAxisAlignment.end // 如果消息是由当前用户发送，右对齐
+          : CrossAxisAlignment.start, // 如果消息是由他人发送，左对齐
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 6.0, right: 6),
@@ -66,19 +67,33 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
         Container(
             decoration: BoxDecoration(
                 color: sender_id ==
-                        Provider.of<UserProvider>(context, listen: false).userId
+                    Provider.of<UserProvider>(context, listen: false).userId
                     ? Colors.grey[300] // 当前用户消息背景
                     : Colors.blueGrey[900], // 其他用户消息背景
                 borderRadius: BorderRadius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Text(text,
-                  style: TextStyle(
-                      color: sender_id ==
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(text,
+                      style: TextStyle(
+                          color: sender_id ==
                               Provider.of<UserProvider>(context, listen: false)
                                   .userId
-                          ? Colors.black // 当前用户消息文本颜色
-                          : Colors.white)), // 其他用户消息文本颜色
+                              ? Colors.black // 当前用户消息文本颜色
+                              : Colors.white)), // 其他用户消息文本颜色
+                  SizedBox(height: 5),
+                  Text(formattedTime, // 显示消息时间
+                      style: TextStyle(
+                          color: sender_id ==
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .userId
+                              ? Colors.black54
+                              : Colors.white70,
+                          fontSize: 10)),
+                ],
+              ),
             )),
         SizedBox(
           height: 8,
@@ -95,37 +110,39 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
           children: [
             Expanded(
                 child: StreamBuilder(
-              stream: db
-                  .collection("messages")
-                  .where("chatroom_id", isEqualTo: widget.chatroomId)
-                  .limit(100)
-                  .orderBy("timestamp", descending: true)
-                  .snapshots(), // 从Firestore订阅消息数据
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return Text("Some error has occured!"); // 显示错误信息
-                }
+                  stream: db
+                      .collection("messages")
+                      .where("chatroom_id", isEqualTo: widget.chatroomId)
+                      .limit(100)
+                      .orderBy("timestamp", descending: true)
+                      .snapshots(), // 从Firestore订阅消息数据
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Text("Some error has occurred!"); // 显示错误信息
+                    }
 
-                var allMessages = snapshot.data?.docs ?? [];
+                    var allMessages = snapshot.data?.docs ?? [];
 
-                if (allMessages.length < 1) {
-                  return Center(child: Text("No messages here")); // 没有消息时显示
-                }
-                return ListView.builder(
-                    reverse: true, // 消息列表反向排序，新消息在下
-                    itemCount: allMessages.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: singleChatItem(
-                            sender_name: allMessages[index]["sender_name"],
-                            text: allMessages[index]["text"],
-                            sender_id: allMessages[index]["sender_id"]),
-                      );
-                    });
-              },
-            )),
+                    if (allMessages.length < 1) {
+                      return Center(child: Text("No messages here")); // 没有消息时显示
+                    }
+                    return ListView.builder(
+                        reverse: true, // 消息列表反向排序，新消息在下
+                        itemCount: allMessages.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          var message = allMessages[index].data() as Map<String, dynamic>;
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: singleChatItem(
+                                sender_name: message["sender_name"],
+                                text: message["text"],
+                                sender_id: message["sender_id"],
+                                timestamp: message["timestamp"]),
+                          );
+                        });
+                  },
+                )),
             Container(
               color: Colors.grey[200],
               child: Padding(
@@ -133,11 +150,11 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
                 child: Row(children: [
                   Expanded(
                       child: TextField(
-                    controller: messageText,
-                    decoration: InputDecoration(
-                        hintText: "Write message here...", // 消息输入提示
-                        border: InputBorder.none),
-                  )),
+                        controller: messageText,
+                        decoration: InputDecoration(
+                            hintText: "Write message here...", // 消息输入提示
+                            border: InputBorder.none),
+                      )),
                   InkWell(onTap: sendMessage, child: Icon(Icons.send)) // 发送按钮
                 ]),
               ),

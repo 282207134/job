@@ -2,6 +2,7 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:job/pages/calendarView/calendar.dart';
 import 'package:job/pages/googleMap/MyGoogleMap.dart';
 import 'package:job/pages/managementTools/Xylophone.dart';
 import 'package:job/pages/managementTools/account.dart';
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
         '/piano':(BuildContext context)=>XylophoneApp (),
         '/account':(BuildContext context)=>accounting (),
         '/draw':(BuildContext context)=>RandomPersonPickerPage (),
-
+        '/calendar':(BuildContext context)=>calendar (),
       },
     );
   }
@@ -100,12 +101,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
-  Offset floatingButtonPosition = Offset(30, 500); // 初始位置
+  Offset floatingButtonPosition = Offset(0, 0); // 初始位置
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        final screenSize = MediaQuery.of(context).size;
+        floatingButtonPosition = Offset(screenSize.width - 80, screenSize.height - 150); // 设置为右下角
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = Provider.of<UserProvider>(context);
-    final ThemeData theme = Theme.of(context);
+    var userProvider = Provider.of<UserProvider>(context); // 获取用户提供者实例
+    final ThemeData theme = Theme.of(context); // 获取当前主题
 
     return DefaultTabController(
       length: 4,
@@ -162,6 +174,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ][currentPageIndex],
         drawer: Drawer(
+          backgroundColor: Colors.white.withOpacity(0.7), // 设置抽屉背景颜色
+          width: 200, // 设置抽屉宽度
           child: Container(
             child: Column(children: [
               SizedBox(height: 50),
@@ -172,9 +186,12 @@ class _HomePageState extends State<HomePage> {
                   }));
                 },
                 leading: CircleAvatar(
-                    child: Text(userProvider.userName.isNotEmpty
-                        ? userProvider.userName[0]
-                        : 'N')),
+                  child: Text(userProvider.userName.isNotEmpty
+                      ? userProvider.userName[0]
+                      : 'N'),
+                ),
+              ),
+              ListTile(
                 title: Text(
                     userProvider.userName.isNotEmpty
                         ? userProvider.userName
@@ -209,36 +226,39 @@ class _HomePageState extends State<HomePage> {
         ),
         floatingActionButton: Stack(
           children: [
+            // 使用Positioned小部件来定位浮动按钮的位置
             Positioned(
-              left: floatingButtonPosition.dx,
-              top: floatingButtonPosition.dy,
+              left: floatingButtonPosition.dx, // 设置浮动按钮的水平位置
+              top: floatingButtonPosition.dy, // 设置浮动按钮的垂直位置
               child: Draggable(
+                // 拖动时显示的浮动按钮
                 feedback: FloatingActionButton.extended(
-                  icon: Icon(Icons.add),
-                  label: Text('ノート'),
+                  icon: Icon(Icons.add), // 浮动按钮的图标
+                  label: Text(''), // 浮动按钮的文本标签
                   onPressed: () {
-                    print('点击悬浮按钮');
-                    Navigator.of(context).pushNamed('/note');
+                    print('点击悬浮按钮'); // 点击浮动按钮时输出日志
+                    Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
                   },
                   backgroundColor:
-                  Colors.red.withOpacity(0.5), // 设置半透明背景
-                  foregroundColor: Colors.deepPurple,
+                  Colors.red.withOpacity(0.5), // 设置浮动按钮半透明的背景颜色
+                  foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
                 ),
-                childWhenDragging: Container(), // 拖动时显示空容器
+                childWhenDragging: Container(), // 拖动时显示的空容器
+                // 默认情况下显示的浮动按钮
                 child: FloatingActionButton.extended(
-                  icon: Icon(Icons.note),
-                  label: Text('ノート'),
+                  icon: Icon(Icons.note), // 浮动按钮的图标
+                  label: Text(''), // 浮动按钮的文本标签
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/note');
+                    Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
                   },
                   backgroundColor:
-                  Colors.red.withOpacity(0.5), // 设置半透明背景
-                  foregroundColor: Colors.deepPurple,
+                  Colors.red.withOpacity(0.2), // 设置浮动按钮半透明的背景颜色
+                  foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
                 ),
                 onDragEnd: (details) {
                   setState(() {
-                    // 确保位置不受其他因素影响
-                    floatingButtonPosition = details.offset;
+                    // 更新浮动按钮的位置
+                    floatingButtonPosition = details.offset; // 确保位置不受其他因素影响
                   });
                 },
               ),

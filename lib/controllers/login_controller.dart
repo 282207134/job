@@ -8,8 +8,8 @@ class LoginController {
   // 定义一个静态方法login，用于处理登录操作
   static Future<void> login(
       {required BuildContext context,
-      required String email,
-      required String password}) async {
+        required String email,
+        required String password}) async {
     try {
       // 使用Firebase Auth进行邮箱和密码的验证
       await FirebaseAuth.instance
@@ -18,14 +18,14 @@ class LoginController {
       // 登录成功后，跳转到SplashScreen页面，并清除之前所有的路由栈
       Navigator.pushAndRemoveUntil(context,
           MaterialPageRoute(builder: (context) {
-        return SplashScreen();
-      }), (route) => false);
+            return SplashScreen();
+          }), (route) => false);
 
       print("Login successfully!"); // 控制台打印登录成功的消息
     } catch (e) {
       // 如果登录过程中出现异常，显示一个红色背景的SnackBar提示错误信息
       SnackBar messageSnackBar =
-          SnackBar(backgroundColor: Colors.red, content: Text(e.toString()));
+      SnackBar(backgroundColor: Colors.red, content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(messageSnackBar);
 
       print(e); // 控制台打印异常信息
