@@ -2,7 +2,8 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:job/pages/calendarView/calendar.dart';
+import 'package:job/pages/jobPage/calendarView/calendar.dart';
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:job/pages/googleMap/MyGoogleMap.dart';
 import 'package:job/pages/managementTools/Xylophone.dart';
 import 'package:job/pages/managementTools/account.dart';

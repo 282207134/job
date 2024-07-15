@@ -1,8 +1,7 @@
 import 'dart:ui'; // 导入 dart:ui 包
-import 'package:job/pages/calendarView/calendar_view.dart'; // 导入 calendar_view 包
-
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
-import 'pages/home_page.dart'; // 导入 pages/home_page.dart 文件
+import 'pages/CalendarPage.dart'; // 导入 pages/CalendarPage.dart 文件
 DateTime get _now => DateTime.now(); // 获取当前日期时间的快捷方法
 
 class calendar extends StatelessWidget {
@@ -22,7 +21,8 @@ class calendar extends StatelessWidget {
             PointerDeviceKind.touch,
           }, // 允许不同类型的指针设备进行滚动
         ),
-        home: HomePage(), // 设置主页为 HomePage 小部件
+        home: CalendarPage(), // 设置主页为 CalendarPage 小部件
+
       ),
     );
   }

@@ -30,7 +30,7 @@ class JobPage extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    "カレンダー",
+                    "シフト管理",
                     style: TextStyle(color: Colors.pink, fontSize: 20),
                   ),
                 )

@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入Flutter的材料设计包
-import 'package:job/pages/calendarView/calendar_view.dart';
 
-import '../extension.dart';
-import '../src/calendar_constants.dart'; // 导入扩展
+import '../extension.dart'; // 导入扩展
 
 typedef Validator = String? Function(String? value); // 定义验证器类型
 

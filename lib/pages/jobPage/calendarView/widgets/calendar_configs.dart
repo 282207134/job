@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入Flutter的材料设计包
 
 import '../app_colors.dart'; // 导入应用程序颜色
 import '../enumerations.dart'; // 导入枚举
 import '../extension.dart'; // 导入扩展
-import '../src/calendar_controller_provider.dart';
 import 'add_event_form.dart'; // 导入添加事件表单
 
 class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConfig的无状态小部件

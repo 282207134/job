@@ -10,7 +10,6 @@ class MobileHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Flutter Calendar Page"), // 应用栏标题
         centerTitle: true, // 标题居中
       ),
       body: Center(

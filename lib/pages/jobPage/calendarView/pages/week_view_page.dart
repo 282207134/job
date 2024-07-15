@@ -17,17 +17,28 @@ class WeekViewDemo extends StatefulWidget {
 class _WeekViewDemoState extends State<WeekViewDemo> {
   @override
   Widget build(BuildContext context) {
-    return ResponsiveWidget(
-      webWidget: WebHomePage(
-        selectedView: CalendarView.week, // 设置选中的视图为周视图
+    return Scaffold(appBar: AppBar(
+      centerTitle: true,
+      title: Text("week View"), // 应用栏标题
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back), // 设置返回图标
+        onPressed: () {
+          Navigator.pop(context); // 返回上一个页面
+        },
       ),
-      mobileWidget: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), // 添加图标
-          elevation: 8, // 阴影高度
-          onPressed: () => context.pushRoute(CreateEventPage()), // 按钮点击跳转到创建事件页面
+    ),
+      body: ResponsiveWidget(
+        webWidget: WebHomePage(
+          selectedView: CalendarView.week, // 设置选中的视图为周视图
         ),
-        body: WeekViewWidget(), // 周视图小部件
+        mobileWidget: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add), // 添加图标
+            elevation: 8, // 阴影高度
+            onPressed: () => context.pushRoute(CreateEventPage()), // 按钮点击跳转到创建事件页面
+          ),
+          body: WeekViewWidget(), // 周视图小部件
+        ),
       ),
     );
   }

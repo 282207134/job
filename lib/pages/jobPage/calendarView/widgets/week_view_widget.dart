@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart';
 
 import '../pages/event_details_page.dart';
-import '../src/modals.dart';
-import '../src/week_view/week_view.dart';
 
 class WeekViewWidget extends StatelessWidget {
   final GlobalKey<WeekViewState>? state;
