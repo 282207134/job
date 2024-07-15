@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 class JobPage extends StatelessWidget {
   //工作管理界面
   Widget build(BuildContext context) {
