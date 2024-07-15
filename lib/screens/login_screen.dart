@@ -37,9 +37,9 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    height: 80,
-                    width: 80,
-                    child: Image.asset("images/panda.png")), // Logo图片
+                    height:180,
+                    width:180,
+                    child: Image.asset("images/logo.png")), // Logo图片
                 SizedBox(
                   height: 20,
                 ),

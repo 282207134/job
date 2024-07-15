@@ -45,7 +45,7 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
     } catch (e) {} // 捕获并忽略任何错误
   }
 
-  // 定义单条聊天消息的布局
+// 定义单条聊天消息的布局
   Widget singleChatItem(
       {required String sender_name,
         required String text,
@@ -76,14 +76,6 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(text,
-                      style: TextStyle(
-                          color: sender_id ==
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .userId
-                              ? Colors.black // 当前用户消息文本颜色
-                              : Colors.white)), // 其他用户消息文本颜色
-                  SizedBox(height: 5),
                   Text(formattedTime, // 显示消息时间
                       style: TextStyle(
                           color: sender_id ==
@@ -92,6 +84,14 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
                               ? Colors.black54
                               : Colors.white70,
                           fontSize: 10)),
+                  SizedBox(height: 5),
+                  Text(text,
+                      style: TextStyle(
+                          color: sender_id ==
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .userId
+                              ? Colors.black // 当前用户消息文本颜色
+                              : Colors.white)), // 其他用户消息文本颜色
                 ],
               ),
             )),
@@ -101,6 +101,7 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
       ],
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
