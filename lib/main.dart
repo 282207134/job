@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         backgroundColor: Colors.cyanAccent,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.blue.shade200,
           title: Text('管理システム'),
           actions: [
             IconButton(icon: Icon(Icons.search), onPressed: () {}),

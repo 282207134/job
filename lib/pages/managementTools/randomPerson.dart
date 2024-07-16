@@ -16,7 +16,7 @@ class _RandomPersonPickerPageState extends State<RandomPersonPickerPage> {
     {'name': '鎌形奏汰', 'staff_id': 'J22111'},
     {'name': '工藤丈朋', 'staff_id': 'J22141'},
     {'name': '佐瀬元一', 'staff_id': 'J22194'},
-    {'name': 'シ　サイトウ', 'staff_id': 'J22206'},
+    {'name': 'シ サイトウ', 'staff_id': 'J22206'},
     {'name': '田川 天真', 'staff_id': 'J22264'},
     {'name': '多田裕志', 'staff_id': 'J22276'},
     {'name': '西脇　諒', 'staff_id': 'J22346'},

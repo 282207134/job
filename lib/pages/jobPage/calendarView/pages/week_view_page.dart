@@ -17,16 +17,7 @@ class WeekViewDemo extends StatefulWidget {
 class _WeekViewDemoState extends State<WeekViewDemo> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      centerTitle: true,
-      title: Text("week View"), // 应用栏标题
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back), // 设置返回图标
-        onPressed: () {
-          Navigator.pop(context); // 返回上一个页面
-        },
-      ),
-    ),
+    return Scaffold(
       body: ResponsiveWidget(
         webWidget: WebHomePage(
           selectedView: CalendarView.week, // 设置选中的视图为周视图

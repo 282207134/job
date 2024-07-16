@@ -1,7 +1,3 @@
-// Copyright (c) 2021 Simform Solutions. All rights reserved.
-// Use of this source code is governed by a MIT-style license
-// that can be found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
 import '../calendar_view.dart';
@@ -10,6 +6,9 @@ import '../calendar_view.dart';
 
 /// {@macro calendar_event_data_doc}
 class CalendarEventData<T extends Object?> {
+  /// Unique identifier for the event.
+  final String? id;
+
   /// Specifies date on which all these events are.
   final DateTime date;
 
@@ -46,6 +45,7 @@ class CalendarEventData<T extends Object?> {
 
   /// {@macro calendar_event_data_doc}
   CalendarEventData({
+    this.id,
     required this.title,
     required DateTime date,
     this.description,
@@ -93,20 +93,38 @@ class CalendarEventData<T extends Object?> {
 
   /// Returns event data in [Map<String, dynamic>] format.
   ///
-  Map<String, dynamic> toJson() => {
-        "date": date,
-        "startTime": startTime,
-        "endTime": endTime,
-        "event": event,
-        "title": title,
-        "description": description,
-        "endDate": endDate,
-      };
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    "date": date.toIso8601String(),
+    "startTime": startTime?.toIso8601String(),
+    "endTime": endTime?.toIso8601String(),
+    "event": event,
+    "title": title,
+    "description": description,
+    "color": color.value,
+    "endDate": endDate.toIso8601String(),
+  };
+
+  /// Constructs an instance of [CalendarEventData] from a [Map<String, dynamic>].
+  factory CalendarEventData.fromMap(Map<String, dynamic> map) {
+    return CalendarEventData(
+      id: map['id'],
+      title: map['title'],
+      date: DateTime.parse(map['date']),
+      startTime: map['startTime'] != null ? DateTime.parse(map['startTime']) : null,
+      endTime: map['endTime'] != null ? DateTime.parse(map['endTime']) : null,
+      description: map['description'],
+      color: Color(map['color']),
+      endDate: map['endDate'] != null ? DateTime.parse(map['endDate']) : null,
+      event: map['event'],
+    );
+  }
 
   /// Returns new object of [CalendarEventData] with the updated values defined
   /// as the arguments.
   ///
   CalendarEventData<T> copyWith({
+    String? id,
     String? title,
     String? description,
     T? event,
@@ -119,6 +137,7 @@ class CalendarEventData<T extends Object?> {
     DateTime? date,
   }) {
     return CalendarEventData(
+      id: id ?? this.id,
       title: title ?? this.title,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
@@ -133,11 +152,12 @@ class CalendarEventData<T extends Object?> {
   }
 
   @override
-  String toString() => '${toJson()}';
+  String toString() => '${toMap()}';
 
   @override
   bool operator ==(Object other) {
     return other is CalendarEventData<T> &&
+        id == other.id &&
         date.compareWithoutTime(other.date) &&
         endDate.compareWithoutTime(other.endDate) &&
         ((event == null && other.event == null) ||
@@ -159,6 +179,7 @@ class CalendarEventData<T extends Object?> {
 
   @override
   int get hashCode =>
+      id.hashCode ^
       description.hashCode ^
       descriptionStyle.hashCode ^
       titleStyle.hashCode ^

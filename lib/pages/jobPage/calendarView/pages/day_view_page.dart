@@ -17,16 +17,7 @@ class DayViewPageDemo extends StatefulWidget {
 class _DayViewPageDemoState extends State<DayViewPageDemo> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      centerTitle: true,
-      title: Text("day View"), // 应用栏标题
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back), // 设置返回图标
-        onPressed: () {
-          Navigator.pop(context); // 返回上一个页面
-        },
-      ),
-    ),
+    return Scaffold(
       body: ResponsiveWidget(
         webWidget: WebHomePage(
           selectedView: CalendarView.day, // 设置选中的视图为日视图

@@ -10,16 +10,7 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Calendar Page"), // 应用栏标题
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back), // 设置返回图标
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //   },
-        // ),
-      ),
+
       body: ResponsiveWidget(
         mobileWidget: MobileHomePage(), // 移动端小部件
         webWidget: WebHomePage(), // Web端小部件

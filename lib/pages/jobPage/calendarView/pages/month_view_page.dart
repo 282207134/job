@@ -19,16 +19,7 @@ class MonthViewPageDemo extends StatefulWidget {
 class _MonthViewPageDemoState extends State<MonthViewPageDemo> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      centerTitle: true,
-      title: Text("Month View"), // 应用栏标题
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back), // 设置返回图标
-        onPressed: () {
-          Navigator.pop(context); // 返回上一个页面
-        },
-      ),
-    ),
+    return Scaffold(
       body: ResponsiveWidget(
         webWidget: WebHomePage(
           selectedView: CalendarView.month, // 设置选中的视图为月视图
