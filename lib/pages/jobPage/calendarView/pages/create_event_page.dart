@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 包
+import 'package:flutter/material.dart'; // 导入 Flutter Material 包
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 
-import '../app_colors.dart';
-import '../extension.dart';
-import '../widgets/add_event_form.dart';
+import '../app_colors.dart'; // 导入自定义颜色配置文件
+import '../extension.dart'; // 导入扩展方法文件
+import '../widgets/add_event_form.dart'; // 导入添加事件表单文件
 
 class CreateEventPage extends StatelessWidget {
   const CreateEventPage({super.key, this.event});
@@ -40,22 +40,24 @@ class CreateEventPage extends StatelessWidget {
           padding: EdgeInsets.all(20.0),
           child: AddOrEditEventForm(
             onEventAdd: (newEvent) async {
-              if (this.event != null) {
-                // 更新 Firestore 中的事件
+              final controller = CalendarControllerProvider.of(context).controller;
+
+              if (event != null) {
+                // 如果是编辑现有事件，更新 Firestore 和本地控制器中的事件
                 await FirebaseFirestore.instance
                     .collection('events')
-                    .doc(this.event!.id)
+                    .doc(event!.id)
                     .update(newEvent.toMap());
-                CalendarControllerProvider.of(context)
-                    .controller
-                    .update(this.event!, newEvent);
+                controller.update(event!, newEvent);
               } else {
-                // 添加新的事件到 Firestore
+                // 如果是添加新事件，创建新文档并更新本地控制器中的事件
                 DocumentReference docRef = await FirebaseFirestore.instance
                     .collection('events')
                     .add(newEvent.toMap());
                 newEvent = newEvent.copyWith(id: docRef.id);
-                CalendarControllerProvider.of(context).controller.add(newEvent);
+                if (!controller.allEvents.any((e) => e.id == newEvent.id)) {
+                  controller.add(newEvent);
+                }
               }
 
               context.pop(true);

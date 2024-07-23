@@ -38,6 +38,8 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
   late final _titleNode = FocusNode(); // 标题焦点节点
   late final _descriptionNode = FocusNode(); // 描述焦点节点
 
+  bool _isColorPickerVisible = false; // 用于控制颜色选择器显示的布尔值
+
   @override
   void initState() {
     super.initState();
@@ -245,7 +247,11 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                 ),
               ),
               GestureDetector(
-                onTap: _displayColorPicker, // 显示颜色选择器
+                onTap: () {
+                  setState(() {
+                    _isColorPickerVisible = true;
+                  });
+                }, // 显示颜色选择器
                 child: CircleAvatar(
                   radius: 15,
                   backgroundColor: _color, // 显示当前选择的颜色
@@ -260,6 +266,8 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
             onTap: _createEvent, // 创建或更新事件
             title: widget.event == null ? "Add Event" : "Update Event", // 按钮文本
           ),
+          if (_isColorPickerVisible)
+            _displayColorPicker(), // 显示颜色选择器
         ],
       ),
     );
@@ -309,57 +317,50 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
     }
   }
 
-  void _displayColorPicker() {
+  Widget _displayColorPicker() {
     var color = _color; // 获取当前颜色
-    showDialog(
-      context: context,
-      useSafeArea: true, // 使用安全区域
-      barrierColor: Colors.black26, // 设置背景颜色
-      builder: (_) => SimpleDialog(
-        clipBehavior: Clip.hardEdge, // 裁剪行为
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0), // 设置圆角
-        ),
-        contentPadding: EdgeInsets.all(20.0), // 设置内容内边距
-        children: [
-          Text(
-            "Select event color",
-            style: TextStyle(
-              color: AppColors.black, // 文字颜色
-              fontSize: 25.0, // 字体大小
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 20.0), // 设置外边距
-            height: 1.0, // 设置高度
-            color: AppColors.bluishGrey, // 设置颜色
-          ),
-          ColorPicker(
-            displayThumbColor: true, // 显示拇指颜色
-            enableAlpha: false, // 禁用 Alpha 通道
-            pickerColor: _color, // 初始颜色
-            onColorChanged: (c) {
-              color = c; // 颜色变化时设置颜色
-            },
-          ),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: 50.0, bottom: 30.0), // 设置内边距
-              child: CustomButton(
-                title: "Select", // 按钮文本
-                onTap: () {
-                  if (mounted) {
-                    setState(() {
-                      _color = color; // 更新颜色
-                    });
-                  }
-                  context.pop(); // 关闭对话框
-                },
-              ),
-            ),
-          ),
-        ],
+    return SimpleDialog(
+      clipBehavior: Clip.hardEdge, // 裁剪行为
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0), // 设置圆角
       ),
+      contentPadding: EdgeInsets.all(20.0), // 设置内容内边距
+      children: [
+        Text(
+          "Select event color",
+          style: TextStyle(
+            color: AppColors.black, // 文字颜色
+            fontSize: 25.0, // 字体大小
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 20.0), // 设置外边距
+          height: 1.0, // 设置高度
+          color: AppColors.bluishGrey, // 设置颜色
+        ),
+        ColorPicker(
+          displayThumbColor: true, // 显示拇指颜色
+          enableAlpha: false, // 禁用 Alpha 通道
+          pickerColor: _color, // 初始颜色
+          onColorChanged: (c) {
+            color = c; // 颜色变化时设置颜色
+          },
+        ),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 50.0, bottom: 30.0), // 设置内边距
+            child: CustomButton(
+              title: "Select", // 按钮文本
+              onTap: () {
+                setState(() {
+                  _color = color; // 更新颜色
+                  _isColorPickerVisible = false; // 隐藏颜色选择器
+                });
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

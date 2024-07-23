@@ -1,5 +1,6 @@
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 包
 import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
+import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 
 import '../extension.dart'; // 导入 extension.dart 文件
 import 'create_event_page.dart'; // 导入 create_event_page.dart 文件
@@ -91,10 +92,18 @@ class DetailsPage extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    // 删除 Firestore 中的事件
+                    await FirebaseFirestore.instance
+                        .collection('events')
+                        .doc(event.id)
+                        .delete();
+
+                    // 删除本地控制器中的事件
                     CalendarControllerProvider.of(context)
                         .controller
-                        .remove(event); // 删除事件
+                        .remove(event);
+
                     Navigator.of(context).pop(); // 返回上一级页面
                   },
                   child: Text('Delete Event'), // 删除事件按钮文字
@@ -112,7 +121,7 @@ class DetailsPage extends StatelessWidget {
                       ),
                     );
 
-                    if (result) {
+                    if (result == true) {
                       Navigator.of(context).pop(); // 如果编辑成功，返回上一级页面
                     }
                   },

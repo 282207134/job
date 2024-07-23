@@ -113,7 +113,7 @@ class _ChatroomScreenState extends State<ChatroomScreen> {
                   .collection("messages") // 指定消息集合
                   .where("chatroom_id",
                       isEqualTo: widget.chatroomId) // 过滤条件，指定聊天室ID
-                  .limit(100) // 限制消息数量为100条
+                  .limit(100) // 限制显示消息数量为最近100条,
                   .orderBy("timestamp", descending: true) // 按时间戳降序排列
                   .snapshots(), // 从Firestore订阅消息数据
 
