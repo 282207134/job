@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class JobPage extends StatelessWidget {
   //工作管理界面
   Widget build(BuildContext context) {
@@ -37,16 +38,67 @@ class JobPage extends StatelessWidget {
             ),
           ),
           Container(
-            color: Colors.red,
+            color: Colors.white,
           ),
           Container(
-            color: Colors.white,
+            color: Colors.green,
           ),
           Container(
             color: Colors.amber,
           ),
           Container(
-            color: Colors.deepPurple,
+            color: Colors.lightBlue,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: IconButton(
+                    onPressed: () {
+                      print('TestPage2'); // 控制台输出
+                      Navigator.of(context).pushNamed('/testpage2'); // 导航至工作页面
+                    },
+                    icon: Icon(
+                      Icons.add_to_drive,
+                      color: Colors.red,
+                      size: 100.0,
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    "testpage2",
+                    style: TextStyle(color: Colors.pink, fontSize: 20),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.lightBlue,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: IconButton(
+                    onPressed: () {
+                      print('TestPage'); // 控制台输出
+                      Navigator.of(context).pushNamed('/testpage'); // 导航至工作页面
+                    },
+                    icon: Icon(
+                      Icons.add_to_drive,
+                      color: Colors.red,
+                      size: 100.0,
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    "testpage",
+                    style: TextStyle(color: Colors.pink, fontSize: 20),
+                  ),
+                )
+              ],
+            ),
           ),
           Container(
             color: Colors.cyanAccent,

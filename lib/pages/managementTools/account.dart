@@ -68,9 +68,9 @@ class _accountingState extends State<accounting> {
           height: double.infinity,
           width: double.infinity,
           child: Column(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+
+
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text("営業収入:"),
                   SizedBox(height: 50),
@@ -174,10 +174,10 @@ class _accountingState extends State<accounting> {
                   ),
                 ],
               ),
-            ],
+
           ),
         ),
-      ),
+
     );
   }
 }

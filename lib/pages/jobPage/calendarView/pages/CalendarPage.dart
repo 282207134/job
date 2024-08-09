@@ -10,7 +10,6 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: ResponsiveWidget(
         mobileWidget: MobileHomePage(), // 移动端小部件
         webWidget: WebHomePage(), // Web端小部件

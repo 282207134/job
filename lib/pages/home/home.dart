@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-
 class home extends StatefulWidget {
   const home({super.key});
-
   @override
   State<home> createState() => _homeState();
 }
-
 class _homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-
     return Container(
       child:
-
           /// Home page
           Card(
         shadowColor: Colors.transparent, // 卡片阴影颜色。

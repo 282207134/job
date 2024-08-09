@@ -161,11 +161,13 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   initialDateTime: _startTime, // 初始开始时间
                   minimumDateTime: CalendarConstants.epochDate, // 最小日期时间
                   onSelect: (date) {
-                    if (_endTime != null &&
-                        date.totalMinutes > _endTime!.totalMinutes) {
-                      _endTime = date.add(Duration(minutes: 1)); // 设置结束时间
-                    }
                     _startTime = date; // 设置开始时间
+                    if (_endTime != null && _startTime != null) {
+                      // 处理跨午夜的情况
+                      if (_endTime!.isBefore(_startTime!)) {
+                        _endDate = _startDate.add(Duration(days: 1)); // 结束日期加1天
+                      }
+                    }
                     if (mounted) {
                       setState(() {}); // 更新状态
                     }
@@ -186,13 +188,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   ),
                   initialDateTime: _endTime, // 初始结束时间
                   onSelect: (date) {
-                    if (_startTime != null &&
-                        date.totalMinutes < _startTime!.totalMinutes) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('End time is less than start time.'), // 提示结束时间早于开始时间
-                      ));
-                    } else {
-                      _endTime = date; // 设置结束时间
+                    _endTime = date; // 设置结束时间
+                    if (_startTime != null && _endTime != null) {
+                      // 处理跨午夜的情况
+                      if (_endTime!.isBefore(_startTime!)) {
+                        _endDate = _startDate.add(Duration(days: 1)); // 结束日期加1天
+                      }
                     }
                     if (mounted) {
                       setState(() {}); // 更新状态

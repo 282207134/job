@@ -28,7 +28,9 @@ class _MonthViewPageDemoState extends State<MonthViewPageDemo> {
           floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add), // 添加图标
             elevation: 8, // 阴影高度
+            // onPressed: () => context.pushRoute(CreateEventPage()), // 按钮点击跳转到创建事件页面
             onPressed: () => context.pushRoute(CreateEventPage()), // 按钮点击跳转到创建事件页面
+
           ),
           body: MonthViewWidget(), // 月视图小部件
         ),

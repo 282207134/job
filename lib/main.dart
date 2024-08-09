@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:job/pages/jobPage/calendarView/calendar.dart';
 import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:job/pages/googleMap/MyGoogleMap.dart';
+import 'package:job/pages/jobPage/testPage.dart';
+import 'package:job/pages/jobPage/testPage2.dart';
 import 'package:job/pages/managementTools/Xylophone.dart';
 import 'package:job/pages/managementTools/account.dart';
 import 'package:job/pages/managementTools/dicee.dart';
@@ -79,6 +81,10 @@ class _MyAppState extends State<MyApp> {
         '/account':(BuildContext context)=>accounting (),
         '/draw':(BuildContext context)=>RandomPersonPickerPage (),
         '/calendar':(BuildContext context)=>calendar (),
+        '/testpage':(BuildContext context)=>testPage(),
+        '/testpage2':(BuildContext context)=>testPage2(),
+
+
       },
     );
   }

@@ -72,7 +72,8 @@ class CalendarEventData<T extends Object?> {
       description: map['description'],
       color: Color(map['color']),
       endDate: map['endDate'] != null ? DateTime.parse(map['endDate']) : null,
-      event: map['event'],
+      event: map['event']
+
     );
   }
 
