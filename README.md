@@ -21,4 +21,7 @@
 ![image](https://github.com/282207134/job/assets/83965106/6d13efef-5f27-43c3-aac3-541de3745301)
 # 管理ツール
 ![image](https://github.com/user-attachments/assets/139f3fb1-e7f6-4c81-b9d4-85c72b7a3821)
+## ===========================================================================================================================
+## flutterの勉強メモ
+https://www.edrawsoft.cn/viewer/public/s/37d64047986522
 
