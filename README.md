@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/c816b8b2-78aa-4b45-a17c-cb53e9b5c729)![image](https://github.com/user-attachments/assets/8d1a7d16-957c-42f1-977d-407be3efd3f2)このアプリケーションはフロントエンドはflutter、バックエンドはfirebaseで開発されました。
+このアプリケーションはフロントエンドはflutter、バックエンドはfirebaseで開発されました。
 # job
 以下のQRコードをスキャンするとWebでテストできます
 #
