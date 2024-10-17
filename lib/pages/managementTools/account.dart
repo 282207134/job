@@ -68,8 +68,6 @@ class _accountingState extends State<accounting> {
           height: double.infinity,
           width: double.infinity,
           child: Column(
-
-
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text("営業収入:"),

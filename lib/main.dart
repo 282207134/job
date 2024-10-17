@@ -12,6 +12,7 @@ import 'package:job/pages/managementTools/account.dart';
 import 'package:job/pages/managementTools/dicee.dart';
 import 'package:job/pages/managementTools/management_tools.dart';
 import 'package:job/pages/managementTools/randomPerson.dart';
+import 'package:job/pages/managementTools/schoolFestivalAccount.dart';
 import 'package:job/pages/managementTools/timer.dart';
 import 'package:job/pages/managementTools/note.dart';
 import 'package:job/pages/notification/notification.dart';
@@ -79,6 +80,7 @@ class _MyAppState extends State<MyApp> {
         '/dicee':(BuildContext context)=>DicePage (),
         '/piano':(BuildContext context)=>XylophoneApp (),
         '/account':(BuildContext context)=>accounting (),
+        '/schoolFestivalAccount':(BuildContext context)=>SchoolFestivalAccount (),
         '/draw':(BuildContext context)=>RandomPersonPickerPage (),
         '/calendar':(BuildContext context)=>calendar (),
         '/testpage':(BuildContext context)=>testPage(),

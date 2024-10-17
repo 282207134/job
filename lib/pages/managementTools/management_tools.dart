@@ -8,34 +8,60 @@ class management_tools extends StatelessWidget {
         appBar: AppBar(
           title: Text("管理ツール"),
         ),
-        body: GridView.count(crossAxisCount: 2, children: [
-          Container(
-            color: Colors.amber,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: IconButton(
-                    onPressed: () {
-                      print('会計'); // 控制台输出
-                      Navigator.of(context).pushNamed('/account'); // 导航至工作页面
-                    },
-                    icon: Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: Colors.lightBlue,
-                      size: 100.0,
-                    ),
+        body: GridView.count(crossAxisCount: 2, children: [          Container(
+          color: Colors.amber,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: IconButton(
+                  onPressed: () {
+                    print('学園祭用会計'); // 控制台输出
+                    Navigator.of(context).pushNamed('/schoolFestivalAccount'); // 导航至工作页面
+                  },
+                  icon: Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: Colors.lightBlue,
+                    size: 100.0,
                   ),
                 ),
-                Center(
-                  child: Text(
-                    "会計",
-                    style: TextStyle(color: Colors.lightBlue, fontSize: 20),
-                  ),
-                )
-              ],
-            ),
+              ),
+              Center(
+                child: Text(
+                  "学園祭用会計",
+                  style: TextStyle(color: Colors.lightBlue, fontSize: 20),
+                ),
+              )
+            ],
           ),
+        ),
+          // Container(
+          //   color: Colors.amber,
+          //   child: Column(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       Center(
+          //         child: IconButton(
+          //           onPressed: () {
+          //             print('会計'); // 控制台输出
+          //             Navigator.of(context).pushNamed('/account'); // 导航至工作页面
+          //           },
+          //           icon: Icon(
+          //             Icons.account_balance_wallet_outlined,
+          //             color: Colors.lightBlue,
+          //             size: 100.0,
+          //           ),
+          //         ),
+          //       ),
+          //       Center(
+          //         child: Text(
+          //           "会計",
+          //           style: TextStyle(color: Colors.lightBlue, fontSize: 20),
+          //         ),
+          //       )
+          //     ],
+          //   ),
+          // ),
           Container(
             color: Colors.greenAccent,
             child: Column(
@@ -171,9 +197,7 @@ class management_tools extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            color: Colors.cyanAccent,
-          ),
+
           Container(
             color: Colors.red,
           ),
