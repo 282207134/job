@@ -19,7 +19,7 @@ dependencies:
   another_flutter_splash_screen: ^1.2.0 # 启动屏幕插件
   rflutter_alert: ^2.0.7 # 弹窗插件
   audioplayers: ^6.0.0 # 音频播放插件
-  permission_handler: # 权限管理插件
+  permission_handler: ^11.3.1 # 权限管理插件
   flutter_lints: ^2.0.0 # Flutter代码规范检查
   flutter_colorpicker: ^1.1.0 # 颜色选择器插件
 #  calendar_view:
