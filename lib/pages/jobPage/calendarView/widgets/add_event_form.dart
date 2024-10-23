@@ -4,7 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // 导入 flutter
 
 import '../app_colors.dart'; // 导入 app_colors.dart 文件
 import '../constants.dart'; // 导入 constants.dart 文件
-import '../extension.dart'; // 导入 extension.dart 文件
+import '../pages/CalendarPage.dart';
 import 'custom_button.dart'; // 导入 custom_button.dart 文件
 import 'date_time_selector.dart'; // 导入 date_time_selector.dart 文件
 
@@ -290,7 +290,16 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
     );
 
     widget.onEventAdd?.call(event); // 调用回调函数
-    _resetForm(); // 重置表单
+
+    // 显示事件添加成功的消息
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("カレンダーに追加しました")),
+    );
+
+    // 导航到 CalendarPage
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => CalendarPage()),
+    );
   }
 
   void _setDefaults() {
