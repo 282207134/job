@@ -334,13 +334,13 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0), // 设置圆角
       ),
-      contentPadding: EdgeInsets.all(20.0), // 设置内容内边距
+      contentPadding: EdgeInsets.all(5.0), // 设置内容内边距
       children: [
         Text(
           "Select event color",
           style: TextStyle(
             color: AppColors.black, // 文字颜色
-            fontSize: 25.0, // 字体大小
+            fontSize: 15.0, // 字体大小
           ),
         ),
         Container(

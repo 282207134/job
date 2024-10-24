@@ -21,7 +21,7 @@ class DetailsPage extends StatelessWidget {
           event.title, // 事件标题
           style: TextStyle(
             color: event.color.accentColor, // 文字颜色为事件颜色的强调色
-            fontSize: 20.0, // 字体大小为 20.0
+            fontSize: 10.0, // 字体大小为 20.0
             fontWeight: FontWeight.bold, // 字体加粗
           ),
         ),

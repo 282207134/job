@@ -1,13 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 包
 import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
-import 'package:flutter/material.dart'; // 导入Flutter的材料设计包
+import 'package:flutter/material.dart'; // 导入 Flutter 的材料设计包
 
 import '../app_colors.dart'; // 导入应用程序颜色
 import '../enumerations.dart'; // 导入枚举
 import '../extension.dart'; // 导入扩展
 import 'add_event_form.dart'; // 导入添加事件表单
 
-class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConfig的无状态小部件
+class CalendarConfig extends StatelessWidget { // 定义一个名为 CalendarConfig 的无状态小部件
   final void Function(CalendarView view) onViewChange; // 定义一个回调函数用于视图更改
   final CalendarView currentView; // 定义当前视图
   final CalendarEventData? event; // 新增一个可选的 event 参数
@@ -20,7 +20,7 @@ class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConf
   });
 
   @override
-  Widget build(BuildContext context) { // 构建部件的UI
+  Widget build(BuildContext context) { // 构建部件的 UI
     return Column( // 返回一个列部件
       mainAxisSize: MainAxisSize.min, // 设置主轴尺寸为最小
       crossAxisAlignment: CrossAxisAlignment.start, // 设置交叉轴对齐方式为左对齐
@@ -40,7 +40,7 @@ class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConf
         ),
         Expanded( // 扩展以填充剩余空间
           child: SingleChildScrollView( // 单子项滚动视图
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20), // 设置填充值
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10), // 设置填充值
             child: Column( // 嵌套列部件
               mainAxisSize: MainAxisSize.min, // 设置主轴尺寸为最小
               crossAxisAlignment: CrossAxisAlignment.start, // 设置交叉轴对齐方式为左对齐
@@ -52,7 +52,7 @@ class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConf
                     color: AppColors.black, // 设置文字颜色
                   ),
                 ),
-                Wrap( // 使用Wrap包裹视图选项
+                Wrap( // 使用 Wrap 包裹视图选项
                   children: List.generate( // 生成视图选项列表
                     CalendarView.values.length, // 根据视图选项数量生成
                         (index) {
@@ -63,11 +63,11 @@ class CalendarConfig extends StatelessWidget { // 定义一个名为CalendarConf
                           padding: EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: 40,
-                          ),
+                          ), // 设置内边距
                           margin: EdgeInsets.only(
                             right: 20,
                             top: 20,
-                          ),
+                          ), // 设置外边距
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(7), // 设置圆角
                             color: view == currentView // 根据当前视图设置颜色

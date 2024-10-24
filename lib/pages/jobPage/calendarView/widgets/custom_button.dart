@@ -33,7 +33,7 @@ class CustomButton extends StatelessWidget { // 定义一个名为CustomButton�
           title, // 显示标题
           style: TextStyle(
             color: AppColors.white, // 文字颜色
-            fontSize: 20, // 字体大小
+            fontSize: 10, // 字体大小
           ),
         ),
       ),

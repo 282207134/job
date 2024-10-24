@@ -73,7 +73,7 @@ class calendar extends StatelessWidget {
           return CalendarControllerProvider(
             controller: EventController()..addAll(events), // 创建事件控制器并添加所有事件
             child: MaterialApp( // 返回 Material 应用
-              title: 'Flutter Calendar Page Demo', // 应用标题
+              // title: 'Flutter Calendar Page Demo', // 应用标题
               debugShowCheckedModeBanner: false, // 不显示调试模式横幅
               theme: ThemeData.light(), // 应用主题
               scrollBehavior: ScrollBehavior().copyWith( // 自定义滚动行为
