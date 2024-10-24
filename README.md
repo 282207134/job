@@ -3,7 +3,8 @@
 以下のQRコードをスキャンするとWebでテストできます
 #
 ![generate](https://github.com/282207134/job/assets/83965106/f1d11518-69c0-4eea-bb70-700d2877eb26)
-
+#
+https://job-test-b3034.web.app/
 # 登録機能を追加しました
 ![image](https://github.com/282207134/job/assets/83965106/65d29cbc-e270-46df-8760-8f4b9ed3466a)
 # 改名機能を追加しました
