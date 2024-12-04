@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import '../pages/jobPage/job_page.dart';
 import '../pages/managementTools/timer.dart';
-import '../pages/staffPage/staff_page.dart';
+import '../pages/jobPage/staff_page.dart';
 import '../pages/managementTools/management_tools.dart';
 import 'OnBoardingPageState.dart';
 

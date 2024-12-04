@@ -93,6 +93,7 @@ class RoundedEventTile extends StatelessWidget {
                   style: descriptionStyle ?? // 使用自定义描述样式，若未提供则使用默认样式
                       TextStyle(
                         fontSize: 15, // 设置字体大小
+
                         color: backgroundColor.accent.withAlpha(200), // 设置字体颜色
                       ),
                 ),

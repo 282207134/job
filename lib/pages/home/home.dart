@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 class home extends StatefulWidget {
   const home({super.key});
+
   @override
   State<home> createState() => _homeState();
 }
@@ -11,6 +13,7 @@ class _homeState extends State<home> {
     final ThemeData theme = Theme.of(context);
     return Container(
       child:
+
           /// Home page
           Card(
         shadowColor: Colors.transparent, // 卡片阴影颜色。
@@ -36,11 +39,16 @@ class _homeState extends State<home> {
               //   ),
               // ),
               Container(
-                padding: EdgeInsets.all(20), // 内边距
-                margin: EdgeInsets.all(15), // 外边距
-                height: 100, // 高度
-                width: double.infinity, // 宽度
-                color: Colors.cyan, // 背景颜色
+                padding: EdgeInsets.all(20),
+                // 内边距
+                margin: EdgeInsets.all(15),
+                // 外边距
+                height: 100,
+                // 高度
+                width: double.infinity,
+                // 宽度
+                color: Colors.cyan,
+                // 背景颜色
                 child: TextButton(
                   onPressed: () {
                     print('仕事管理'); // 控制台输出
@@ -52,29 +60,18 @@ class _homeState extends State<home> {
                   ),
                 ),
               ),
+
               Container(
-                padding: EdgeInsets.all(20), // 内边距
-                margin: EdgeInsets.all(15), // 外边距
-                height: 100, // 高度
-                width: double.infinity, // 宽度
-                color: Colors.cyan, // 背景颜色
-                child: TextButton(
-                  onPressed: () {
-                    print('スタッフ管理'); // 控制台输出
-                    Navigator.of(context).pushNamed('/staff'); // 导航至员工页面
-                  },
-                  child: Text(
-                    'スタッフ管理', // 按钮文本
-                    style: TextStyle(color: Colors.red, fontSize: 30), // 文本样式
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(20), // 内边距
-                margin: EdgeInsets.all(15), // 外边距
-                height: 100, // 高度
-                width: double.infinity, // 宽度
-                color: Colors.cyan, // 背景颜色
+                padding: EdgeInsets.all(20),
+                // 内边距
+                margin: EdgeInsets.all(15),
+                // 外边距
+                height: 100,
+                // 高度
+                width: double.infinity,
+                // 宽度
+                color: Colors.cyan,
+                // 背景颜色
                 child: TextButton(
                   onPressed: () {
                     print('管理ツール'); // 控制台输出
@@ -86,7 +83,29 @@ class _homeState extends State<home> {
                     style: TextStyle(color: Colors.red, fontSize: 30), // 文本样式
                   ),
                 ),
-              )
+              ),
+              Container(
+                padding: EdgeInsets.all(20),
+                // 内边距
+                margin: EdgeInsets.all(15),
+                // 外边距
+                height: 100,
+                // 高度
+                width: double.infinity,
+                // 宽度
+                color: Colors.cyan,
+                // 背景颜色
+                child: TextButton(
+                  onPressed: () {
+                    print('そのほか'); // 控制台输出
+                    Navigator.of(context).pushNamed('/othersApplication'); // 导航至员工页面
+                  },
+                  child: Text(
+                    'そのほか', // 按钮文本
+                    style: TextStyle(color: Colors.red, fontSize: 30), // 文本样式
+                  ),
+                ),
+              ),
             ],
           )),
         ),

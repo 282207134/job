@@ -5,17 +5,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:job/pages/jobPage/calendarView/calendar.dart';
 import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:job/pages/googleMap/MyGoogleMap.dart';
-import 'package:job/pages/jobPage/testPage.dart';
-import 'package:job/pages/jobPage/testPage2.dart';
-import 'package:job/pages/managementTools/Xylophone.dart';
+import 'package:job/pages/othersApplication/futureVision/quizzler.dart';
+import 'package:job/pages/othersApplication/randomPerson.dart';
+import 'package:job/pages/othersApplication/testPage.dart';
+import 'package:job/pages/othersApplication/testPage2.dart';
+import 'package:job/pages/othersApplication/Xylophone.dart';
 import 'package:job/pages/managementTools/account.dart';
-import 'package:job/pages/managementTools/dicee.dart';
+import 'package:job/pages/othersApplication/dicee.dart';
 import 'package:job/pages/managementTools/management_tools.dart';
-import 'package:job/pages/managementTools/randomPerson.dart';
+import 'package:job/pages/othersApplication/randomPerson.dart';
 import 'package:job/pages/managementTools/schoolFestivalAccount.dart';
 import 'package:job/pages/managementTools/timer.dart';
 import 'package:job/pages/managementTools/note.dart';
 import 'package:job/pages/notification/notification.dart';
+import 'package:job/pages/othersApplication/others_application.dart';
 import 'package:job/providers/userProvider.dart';
 import 'package:job/screens/chatroom_screen.dart';
 import 'package:job/screens/profile_screen.dart';
@@ -25,7 +28,7 @@ import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'splashScreen/OnBoardingPageState.dart';
 import 'package:job/pages/jobPage/job_page.dart';
-import 'package:job/pages/staffPage/staff_page.dart';
+import 'package:job/pages/jobPage/staff_page.dart';
 import 'package:job/pages/home/home.dart';
 
 class MyApp extends StatefulWidget {
@@ -77,16 +80,17 @@ class _MyAppState extends State<MyApp> {
         '/management_tools': (BuildContext context) => management_tools(),
         '/note': (BuildContext context) => note(),
         '/timer': (BuildContext context) => timer(),
-        '/dicee':(BuildContext context)=>DicePage (),
-        '/piano':(BuildContext context)=>XylophoneApp (),
-        '/account':(BuildContext context)=>accounting (),
-        '/schoolFestivalAccount':(BuildContext context)=>SchoolFestivalAccount (),
-        '/draw':(BuildContext context)=>RandomPersonPickerPage (),
-        '/calendar':(BuildContext context)=>calendar (),
-        '/testpage':(BuildContext context)=>testPage(),
-        '/testpage2':(BuildContext context)=>testPage2(),
-
-
+        '/account': (BuildContext context) => accounting(),
+        '/schoolFestivalAccount': (BuildContext context) =>
+            SchoolFestivalAccount(),
+        '/calendar': (BuildContext context) => calendar(),
+        '/othersApplication': (BuildContext context) => othersApplication(),
+        '/testpage': (BuildContext context) => testPage(),
+        '/testpage2': (BuildContext context) => testPage2(),
+        '/draw': (BuildContext context) => RandomPersonPickerPage(),
+        '/dicee': (BuildContext context) => DicePage(),
+        '/piano': (BuildContext context) => XylophoneApp(),
+        '/futureVision': (BuildContext context) => Quizzler(),
       },
     );
   }
@@ -118,7 +122,8 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         final screenSize = MediaQuery.of(context).size;
-        floatingButtonPosition = Offset(screenSize.width - 80, screenSize.height - 150); // 设置为右下角
+        floatingButtonPosition =
+            Offset(screenSize.width - 80, screenSize.height - 150); // 设置为右下角
       });
     });
   }
@@ -224,8 +229,8 @@ class _HomePageState extends State<HomePage> {
                   await FirebaseAuth.instance.signOut();
                   Navigator.pushAndRemoveUntil(context,
                       MaterialPageRoute(builder: (context) {
-                        return SplashScreen();
-                      }), (route) => false);
+                    return SplashScreen();
+                  }), (route) => false);
                 },
                 leading: Icon(Icons.logout),
                 title: Text("Logout"),
@@ -242,26 +247,30 @@ class _HomePageState extends State<HomePage> {
               child: Draggable(
                 // 拖动时显示的浮动按钮
                 feedback: FloatingActionButton.extended(
-                  icon: Icon(Icons.add), // 浮动按钮的图标
-                  label: Text(''), // 浮动按钮的文本标签
+                  icon: Icon(Icons.add),
+                  // 浮动按钮的图标
+                  label: Text(''),
+                  // 浮动按钮的文本标签
                   onPressed: () {
                     print('点击悬浮按钮'); // 点击浮动按钮时输出日志
                     Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
                   },
-                  backgroundColor:
-                  Colors.red.withOpacity(0.5), // 设置浮动按钮半透明的背景颜色
+                  backgroundColor: Colors.red.withOpacity(0.5),
+                  // 设置浮动按钮半透明的背景颜色
                   foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
                 ),
                 childWhenDragging: Container(), // 拖动时显示的空容器
                 // 默认情况下显示的浮动按钮
                 child: FloatingActionButton.extended(
-                  icon: Icon(Icons.note), // 浮动按钮的图标
-                  label: Text(''), // 浮动按钮的文本标签
+                  icon: Icon(Icons.note),
+                  // 浮动按钮的图标
+                  label: Text(''),
+                  // 浮动按钮的文本标签
                   onPressed: () {
                     Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
                   },
-                  backgroundColor:
-                  Colors.red.withOpacity(0.2), // 设置浮动按钮半透明的背景颜色
+                  backgroundColor: Colors.red.withOpacity(0.2),
+                  // 设置浮动按钮半透明的背景颜色
                   foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
                 ),
                 onDragEnd: (details) {

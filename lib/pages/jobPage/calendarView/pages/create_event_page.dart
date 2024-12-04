@@ -27,7 +27,7 @@ class CreateEventPage extends StatelessWidget {
           ),
         ),
         title: Text( // 设置应用栏的标题
-          event == null ? "Create New Event" : "Update Event", // 根据是否有事件来决定标题
+          event == null ? "新規イベント作成" : "イベント更新", // 根据是否有事件来决定标题
           style: TextStyle(
             color: AppColors.black, // 设置标题文本的颜色
             fontSize: 20.0, // 设置字体大小
