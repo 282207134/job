@@ -45,7 +45,7 @@ class JobPage extends StatelessWidget {
                   child: IconButton(
                     onPressed: () {
                       print('スタッフ管理'); // 控制台输出
-                      Navigator.of(context).pushNamed('/futureVision'); // 导航至工作页面
+                      Navigator.of(context).pushNamed('/staff'); // 导航至工作页面
                     },
                     icon: Icon(
                       Icons.perm_contact_cal,
