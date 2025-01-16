@@ -1,4 +1,4 @@
-import 'package:job/pages/othersApplication/futureVision/quizzler.dart';
+import 'package:kantankanri/pages/othersApplication/futureVision/quizzler.dart';
 
 import 'question.dart';
 

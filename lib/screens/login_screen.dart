@@ -2,7 +2,7 @@ import 'package:flutter/material.dart'; // 引入Flutter材料设计库
 import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
 import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:job/screens/signup_screen.dart';
+import 'package:kantankanri/screens/signup_screen.dart';
 
 import '../controllers/login_controller.dart'; // 引入Firebase认证库
 

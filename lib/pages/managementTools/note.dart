@@ -55,7 +55,7 @@ class _noteState extends State<note> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('メモ'),
+        title: Text('ノート'),
       ),
       body: Container(
         color: Colors.yellow.shade100,

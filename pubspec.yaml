@@ -1,47 +1,46 @@
-name: job # 项目名称
+name: kantankanri # 项目名称
 description: "A new Flutter project." # 项目描述
 publish_to: 'none' # 不发布到pub.dev
 version: 1.0.0+1 # 版本号
+
 environment:
   sdk: '>=3.3.4 <4.0.0' # SDK版本
+
 dependencies:
   flutter:
     sdk: flutter # Flutter SDK
-  google_maps_flutter: ^2.5.3 # 谷歌地图插件
-  geolocator: ^8.0.0 # 地理定位插件
+  google_maps_flutter: ^2.10.0 # 更新谷歌地图插件
+  geolocator: ^13.0.2 # 更新地理定位插件
   cupertino_icons: ^1.0.2 # iOS风格图标
-  firebase_core: ^2.32.0 # Firebase核心
-  firebase_auth: ^4.16.0 # Firebase认证
-  cloud_firestore: ^4.17.5 # Firebase Firestore数据库
+  firebase_core: ^3.10.0 # Firebase核心
+  firebase_auth: ^5.4.0 # Firebase认证
+  cloud_firestore: ^5.6.1 # Firebase Firestore数据库
   provider: ^6.1.1 # 状态管理
   introduction_screen: ^3.1.14 # 引导页插件
-  intl: ^0.18.1 # 国际化支持
+  intl: ^0.20.1 # 更新国际化支持
   another_flutter_splash_screen: ^1.2.0 # 启动屏幕插件
   rflutter_alert: ^2.0.7 # 弹窗插件
-  audioplayers: ^6.0.0 # 音频播放插件
-  permission_handler: ^11.3.1 # 权限管理插件
+  audioplayers: ^6.1.0 # 更新音频播放插件
+  permission_handler: ^11.3.1 # 更新权限管理插件
   flutter_lints: ^2.0.0 # Flutter代码规范检查
   flutter_colorpicker: ^1.1.0 # 颜色选择器插件
-#  calendar_view:
-#    path: ../ # 本地 calendar_view 依赖
-  shared_preferences: ^2.2.3 # 本地存储插件
-  sqflite: ^2.3.3+1 # SQLite数据库插件
-  path: ^1.9.0 # 路径管理插件
-############获取手机文件照片的库
-  image_picker: ^1.1.2
-  camera: ^0.11.0+1
-  flutter_image_compress: ^2.3.0
-  path_provider: ^2.1.3
-  image_cropper: ^7.1.0
-#########################
-  excel: ^4.0.6
+  shared_preferences: ^2.3.5 # 更新本地存储插件
+  sqflite: ^2.4.1 # 更新SQLite数据库插件
+  path: ^1.9.0 # 更新路径管理插件
+  image_picker: ^1.1.2 # 更新获取手机文件照片的库
+  camera: ^0.11.0+2 # 更新摄像头插件
+  flutter_image_compress: ^2.4.0 # 更新图像压缩库
+  path_provider: ^2.1.5 # 更新路径提供者插件
+  image_cropper: ^8.1.0 # 更新图片裁剪插件
+  excel: ^4.0.6 # Excel 操作库
+
 dev_dependencies:
   flutter_test:
     sdk: flutter # Flutter测试框架
   flutter_lints: ^2.0.0 # Flutter代码规范检查
-  lints: # 代码风格和静态分析规则
   build_runner: ^2.0.6 # 代码生成器
   build_web_compilers: ^3.0.0 # Web 编译器
+  adaptive_theme: ^3.5.0  # 主题插件
 
 flutter:
   uses-material-design: true # 使用Material设计

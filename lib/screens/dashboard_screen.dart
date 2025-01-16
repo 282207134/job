@@ -5,7 +5,7 @@ import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
 import 'package:firebase_auth/firebase_auth.dart'; // 引入Firebase认证库
 
 import 'package:cloud_firestore/cloud_firestore.dart'; // 引入Cloud Firestore库
-import 'package:job/screens/profile_screen.dart';
+import 'package:kantankanri/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/userProvider.dart';

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 包，用于与 Firebase Firestore 实现数据交互
 import 'package:flutter/material.dart'; // 导入 Flutter 的 Material 包，提供 Material Design 组件
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包，包含日历视图相关内容
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包，包含日历视图相关内容
 import '../app_colors.dart';
 import '../widgets/add_event_form.dart'; // 导入自定义颜色配置文件
 

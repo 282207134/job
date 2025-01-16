@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart';
 
 @immutable
 class CalendarEventData<T extends Object?> {

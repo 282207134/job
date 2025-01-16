@@ -1,4 +1,4 @@
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入Flutter的材料设计包
 
 import '../extension.dart'; // 导入扩展

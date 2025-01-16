@@ -26,6 +26,8 @@ class _testPage2State extends State<testPage2> {
 ////////////////////////////
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(), body: Container());
+    return Scaffold(appBar: AppBar(), body: Container(
+
+    ));
   }
 }

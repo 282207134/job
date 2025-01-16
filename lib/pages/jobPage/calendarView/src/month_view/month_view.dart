@@ -642,23 +642,21 @@ class MonthViewState<T extends Object?> extends State<MonthView<T>> {
   /// Returns the current visible date in month view.
   DateTime get currentDate => DateTime(_currentDate.year, _currentDate.month);
 }
-
-/// A single month page.
 class _MonthPageBuilder<T> extends StatelessWidget {
-  final double cellRatio;
-  final bool showBorder;
-  final double borderSize;
-  final Color borderColor;
-  final CellBuilder<T> cellBuilder;
-  final DateTime date;
-  final EventController<T> controller;
-  final double width;
-  final double height;
-  final CellTapCallback<T>? onCellTap;
-  final DatePressCallback? onDateLongPress;
-  final WeekDays startDay;
-  final ScrollPhysics physics;
-  final bool hideDaysNotInMonth;
+  final double cellRatio; // 单元格的宽高比
+  final bool showBorder; // 是否显示边框
+  final double borderSize; // 边框大小
+  final Color borderColor; // 边框颜色
+  final CellBuilder<T> cellBuilder; // 单元格构建器
+  final DateTime date; // 当前月份
+  final EventController<T> controller; // 事件控制器
+  final double width; // 月视图的宽度
+  final double height; // 月视图的高度
+  final CellTapCallback<T>? onCellTap; // 单元格点击回调
+  final DatePressCallback? onDateLongPress; // 日期长按回调
+  final WeekDays startDay; // 周的开始日
+  final ScrollPhysics physics; // 滚动物理特性
+  final bool hideDaysNotInMonth; // 隐藏不在当前月的天数
 
   const _MonthPageBuilder({
     Key? key,
@@ -680,43 +678,45 @@ class _MonthPageBuilder<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monthDays = date.datesOfMonths(startDay: startDay);
-    return Container(
-      width: width,
-      height: height,
-      child: GridView.builder(
-        padding: EdgeInsets.zero,
-        physics: physics,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7,
-          childAspectRatio: cellRatio,
+    final monthDays = date.datesOfMonths(startDay: startDay); // 获取当前月的日期
+
+    return SafeArea(
+      child: Container(
+        width: width,
+        height: height,
+        child: GridView.builder( // 使用网格视图构建日历
+          padding: EdgeInsets.zero,
+          physics: physics,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7, // 每行显示 7 个格子
+            childAspectRatio: cellRatio, // 设置单元格宽高比
+          ),
+          itemCount: monthDays.length, // 设置项数为当前月的天数
+          itemBuilder: (context, index) {
+            final events = controller.getEventsOnDay(monthDays[index]); // 获取当天的事件
+            return GestureDetector(
+              onTap: () => onCellTap?.call(events, monthDays[index]), // 单击时调用回调
+              onLongPress: () => onDateLongPress?.call(monthDays[index]), // 长按时调用回调
+              child: Container(
+                decoration: BoxDecoration(
+                  border: showBorder
+                      ? Border.all(
+                    color: borderColor, // 设置边框颜色
+                    width: borderSize, // 设置边框大小
+                  )
+                      : null, // 如果不显示边框则为 null
+                ),
+                child: cellBuilder( // 调用单元格构建器构建单元格
+                  monthDays[index],
+                  events,
+                  monthDays[index].compareWithoutTime(DateTime.now()),
+                  monthDays[index].month == date.month,
+                  hideDaysNotInMonth,
+                ),
+              ),
+            );
+          },
         ),
-        itemCount: 42,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final events = controller.getEventsOnDay(monthDays[index]);
-          return GestureDetector(
-            onTap: () => onCellTap?.call(events, monthDays[index]),
-            onLongPress: () => onDateLongPress?.call(monthDays[index]),
-            child: Container(
-              decoration: BoxDecoration(
-                border: showBorder
-                    ? Border.all(
-                        color: borderColor,
-                        width: borderSize,
-                      )
-                    : null,
-              ),
-              child: cellBuilder(
-                monthDays[index],
-                events,
-                monthDays[index].compareWithoutTime(DateTime.now()),
-                monthDays[index].month == date.month,
-                hideDaysNotInMonth,
-              ),
-            ),
-          );
-        },
       ),
     );
   }

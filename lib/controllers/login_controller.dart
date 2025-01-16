@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart'; // 引入Firebase认证库
 import 'package:flutter/material.dart'; // 引入Flutter材料设计库
-import 'package:job/screens/dashboard_screen.dart';
+import 'package:kantankanri/screens/dashboard_screen.dart';
 
 import '../screens/splash_screen.dart'; // 引入仪表板屏幕组件
 

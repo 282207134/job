@@ -2,34 +2,36 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:job/pages/jobPage/calendarView/calendar.dart';
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
-import 'package:job/pages/googleMap/MyGoogleMap.dart';
-import 'package:job/pages/othersApplication/futureVision/quizzler.dart';
-import 'package:job/pages/othersApplication/randomPerson.dart';
-import 'package:job/pages/othersApplication/testPage.dart';
-import 'package:job/pages/othersApplication/testPage2.dart';
-import 'package:job/pages/othersApplication/Xylophone.dart';
-import 'package:job/pages/managementTools/account.dart';
-import 'package:job/pages/othersApplication/dicee.dart';
-import 'package:job/pages/managementTools/management_tools.dart';
-import 'package:job/pages/othersApplication/randomPerson.dart';
-import 'package:job/pages/managementTools/schoolFestivalAccount.dart';
-import 'package:job/pages/managementTools/timer.dart';
-import 'package:job/pages/managementTools/note.dart';
-import 'package:job/pages/notification/notification.dart';
-import 'package:job/pages/othersApplication/others_application.dart';
-import 'package:job/providers/userProvider.dart';
-import 'package:job/screens/chatroom_screen.dart';
-import 'package:job/screens/profile_screen.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
+import 'package:kantankanri/pages/googleMap/MyGoogleMap.dart';
+import 'package:kantankanri/pages/othersApplication/futureVision/quizzler.dart';
+import 'package:kantankanri/pages/othersApplication/randomPerson.dart';
+import 'package:kantankanri/pages/othersApplication/testPage.dart';
+import 'package:kantankanri/pages/othersApplication/testPage2.dart';
+import 'package:kantankanri/pages/othersApplication/Xylophone.dart';
+import 'package:kantankanri/pages/managementTools/account.dart';
+import 'package:kantankanri/pages/othersApplication/dicee.dart';
+import 'package:kantankanri/pages/managementTools/management_tools.dart';
+import 'package:kantankanri/pages/othersApplication/randomPerson.dart';
+import 'package:kantankanri/pages/managementTools/schoolFestivalAccount.dart';
+import 'package:kantankanri/pages/managementTools/timer.dart';
+import 'package:kantankanri/pages/managementTools/note.dart';
+import 'package:kantankanri/pages/notification/notification.dart';
+import 'package:kantankanri/pages/othersApplication/others_application.dart';
+import 'package:kantankanri/providers/userProvider.dart';
+import 'package:kantankanri/screens/chatroom_screen.dart';
+import 'package:kantankanri/screens/profile_screen.dart';
+import 'package:kantankanri/providers/userProvider.dart';
 import 'package:provider/provider.dart';
+import 'cupertino_example.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'splashScreen/OnBoardingPageState.dart';
-import 'package:job/pages/jobPage/job_page.dart';
-import 'package:job/pages/jobPage/staff_page.dart';
-import 'package:job/pages/home/home.dart';
+import 'package:kantankanri/pages/jobPage/job_page.dart';
+import 'package:kantankanri/pages/jobPage/staff_page.dart';
+import 'package:kantankanri/pages/home/home.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -134,14 +136,17 @@ class _HomePageState extends State<HomePage> {
     final ThemeData theme = Theme.of(context); // 获取当前主题
 
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         backgroundColor: Colors.cyanAccent,
         appBar: AppBar(
           backgroundColor: Colors.blue.shade200,
-          title: Text('管理システム'),
+          title: Text('スケジュール管理'),
           actions: [
-            IconButton(icon: Icon(Icons.search), onPressed: () {}),
+            IconButton(icon: Icon(Icons.search), onPressed: () {
+
+
+            }),
           ],
         ),
         bottomNavigationBar: NavigationBar(
@@ -154,19 +159,19 @@ class _HomePageState extends State<HomePage> {
           selectedIndex: currentPageIndex,
           destinations: const <Widget>[
             NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
+              selectedIcon: Icon(Icons.calendar_month),
+              icon: Icon(Icons.calendar_month),
+              label: 'calendar',
             ),
             NavigationDestination(
-              selectedIcon: Icon(Icons.map),
-              icon: Icon(Icons.map_outlined),
-              label: 'GoogleMap',
+              selectedIcon: Icon(Icons.note_alt),
+              icon: Icon(Icons.note_alt_outlined),
+              label: 'note',
             ),
             NavigationDestination(
-              selectedIcon: Icon(Icons.notifications_sharp),
-              icon: Badge(child: Icon(Icons.notifications_none)),
-              label: 'Notifications',
+              selectedIcon: Icon(Icons.timer),
+              icon: Badge(child: Icon(Icons.timer_outlined)),
+              label: 'timer',
             ),
             NavigationDestination(
               selectedIcon: Icon(Icons.message_sharp),
@@ -176,16 +181,24 @@ class _HomePageState extends State<HomePage> {
               ),
               label: 'Messages',
             ),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.business_center_rounded),
+              icon: Badge(
+                child: Icon(Icons.business_center_outlined),
+              ),
+              label: 'others',
+            ),
           ],
         ),
         body: <Widget>[
-          home(),
-          MyGoogleMap(),
-          notification(),
+          calendar(),
+          note(),
+          timer(),
           ChatroomScreen(
             chatroomName: '',
             chatroomId: '',
           ),
+          othersApplication(),
         ][currentPageIndex],
         drawer: Drawer(
           backgroundColor: Colors.white.withOpacity(0.7), // 设置抽屉背景颜色
@@ -241,46 +254,46 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: Stack(
           children: [
             // 使用Positioned小部件来定位浮动按钮的位置
-            Positioned(
-              left: floatingButtonPosition.dx, // 设置浮动按钮的水平位置
-              top: floatingButtonPosition.dy, // 设置浮动按钮的垂直位置
-              child: Draggable(
-                // 拖动时显示的浮动按钮
-                feedback: FloatingActionButton.extended(
-                  icon: Icon(Icons.add),
-                  // 浮动按钮的图标
-                  label: Text(''),
-                  // 浮动按钮的文本标签
-                  onPressed: () {
-                    print('点击悬浮按钮'); // 点击浮动按钮时输出日志
-                    Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
-                  },
-                  backgroundColor: Colors.red.withOpacity(0.5),
-                  // 设置浮动按钮半透明的背景颜色
-                  foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
-                ),
-                childWhenDragging: Container(), // 拖动时显示的空容器
-                // 默认情况下显示的浮动按钮
-                child: FloatingActionButton.extended(
-                  icon: Icon(Icons.note),
-                  // 浮动按钮的图标
-                  label: Text(''),
-                  // 浮动按钮的文本标签
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
-                  },
-                  backgroundColor: Colors.red.withOpacity(0.2),
-                  // 设置浮动按钮半透明的背景颜色
-                  foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
-                ),
-                onDragEnd: (details) {
-                  setState(() {
-                    // 更新浮动按钮的位置
-                    floatingButtonPosition = details.offset; // 确保位置不受其他因素影响
-                  });
-                },
-              ),
-            ),
+            // Positioned(
+            //   left: floatingButtonPosition.dx, // 设置浮动按钮的水平位置
+            //   top: floatingButtonPosition.dy, // 设置浮动按钮的垂直位置
+            //   child: Draggable(
+            //     // 拖动时显示的浮动按钮
+            //     feedback: FloatingActionButton.extended(
+            //       icon: Icon(Icons.add),
+            //       // 浮动按钮的图标
+            //       label: Text(''),
+            //       // 浮动按钮的文本标签
+            //       onPressed: () {
+            //         print('点击悬浮按钮'); // 点击浮动按钮时输出日志
+            //         Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
+            //       },
+            //       backgroundColor: Colors.red.withOpacity(0.5),
+            //       // 设置浮动按钮半透明的背景颜色
+            //       foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
+            //     ),
+            //     childWhenDragging: Container(), // 拖动时显示的空容器
+            //     // 默认情况下显示的浮动按钮
+            //     child: FloatingActionButton.extended(
+            //       icon: Icon(Icons.note),
+            //       // 浮动按钮的图标
+            //       label: Text(''),
+            //       // 浮动按钮的文本标签
+            //       onPressed: () {
+            //         Navigator.of(context).pushNamed('/note'); // 导航到"/note"页面
+            //       },
+            //       backgroundColor: Colors.red.withOpacity(0.2),
+            //       // 设置浮动按钮半透明的背景颜色
+            //       foregroundColor: Colors.deepPurple, // 设置浮动按钮的前景颜色
+            //     ),
+            //     onDragEnd: (details) {
+            //       setState(() {
+            //         // 更新浮动按钮的位置
+            //         floatingButtonPosition = details.offset; // 确保位置不受其他因素影响
+            //       });
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),

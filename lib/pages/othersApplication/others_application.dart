@@ -156,6 +156,21 @@ class othersApplication extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+                Center(
+                  child: Text(
+                    "testpage2",
+                    style: TextStyle(color: Colors.pink, fontSize: 20),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.lightBlue,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 Center(
                   child: IconButton(
                     onPressed: () {

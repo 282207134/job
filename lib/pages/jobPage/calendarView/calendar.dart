@@ -2,7 +2,8 @@ import 'dart:ui'; // 导入 Dart 的 UI 库
 
 import 'package:flutter/material.dart'; // 导入 Flutter 的 Material 组件库
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 库，用于与 Firebase Firestore 进行数据交互
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入日历视图组件
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入日历视图组件
+import 'package:kantankanri/pages/jobPage/calendarView/src/calendar_event_data.dart';
 import 'pages/CalendarPage.dart'; // 导入日历页面
 
 // 获取当前时间
@@ -13,16 +14,6 @@ class calendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold( // 返回一个脚手架组件，提供基本的视觉结构
-      appBar: AppBar( // 应用栏组件
-        centerTitle: true, // 标题居中
-        title: Text("カレンダー"), // 设置应用栏标题
-        leading: IconButton( // 返回按钮
-          icon: Icon(Icons.arrow_back), // 返回图标
-          onPressed: () { // 点击返回按钮时的回调
-            Navigator.pop(context); // 返回上一个页面
-          },
-        ),
-      ),
       body: StreamBuilder<QuerySnapshot>( // 使用 StreamBuilder 监听 Firestore 数据流
         stream: FirebaseFirestore.instance.collection('events').snapshots(), // 监听 'events' 集合的快照
         builder: (context, snapshot) { // 构建方法，根据快照状态更新 UI

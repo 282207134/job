@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 包
 import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 
 import '../extension.dart'; // 导入 extension.dart 文件
 import 'create_event_page.dart'; // 导入 create_event_page.dart 文件
@@ -21,7 +21,7 @@ class DetailsPage extends StatelessWidget {
           event.title, // 事件标题
           style: TextStyle(
             color: event.color.accentColor, // 文字颜色为事件颜色的强调色
-            fontSize: 10.0, // 字体大小为 20.0
+            fontSize: 20.0, // 字体大小为 20.0
             fontWeight: FontWeight.bold, // 字体加粗
           ),
         ),
@@ -34,13 +34,13 @@ class DetailsPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20.0), // 内边距为 20.0
+        padding: const EdgeInsets.all(5.0), // 内边距为 20.0
         children: [
           Text(
-            "Date: ${event.date.dateToStringWithFormat(format: "dd/MM/yyyy")}", // 显示事件日期
+            "日付: ${event.date.dateToStringWithFormat(format: "dd/MM/yyyy")}", // 显示事件日期
           ),
           SizedBox(
-            height: 15.0, // 间隔高度为 15.0
+            height: 10.0, // 间隔高度为 15.0
           ),
           if (event.startTime != null && event.endTime != null) ...[
             Row(
@@ -50,7 +50,7 @@ class DetailsPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start, // 左对齐
                     children: [
-                      Text("From"), // 开始时间标签
+                      Text("開始時間"), // 开始时间标签
                       Text(
                         event.startTime
                             ?.getTimeInFormat(TimeStampFormat.parse_12) ??
@@ -64,7 +64,7 @@ class DetailsPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start, // 左对齐
                     children: [
-                      Text("To"), // 结束时间标签
+                      Text("終了時間"), // 结束时间标签
                       Text(
                         event.endTime
                             ?.getTimeInFormat(TimeStampFormat.parse_12) ??
@@ -81,7 +81,7 @@ class DetailsPage extends StatelessWidget {
           ],
           if (event.description?.isNotEmpty ?? false) ...[
             Divider(), // 分隔线
-            Text("Description"), // 描述标签
+            Text("内容"), // 描述标签
             SizedBox(
               height: 10.0, // 间隔高度为 10.0
             ),
@@ -106,7 +106,7 @@ class DetailsPage extends StatelessWidget {
 
                     Navigator.of(context).pop(); // 返回上一级页面
                   },
-                  child: Text('Delete Event'), // 删除事件按钮文字
+                  child: Text('イベント削除'), // 删除事件按钮文字
                 ),
               ),
               SizedBox(width: 30), // 按钮之间的间隔
@@ -125,7 +125,7 @@ class DetailsPage extends StatelessWidget {
                       Navigator.of(context).pop(); // 如果编辑成功，返回上一级页面
                     }
                   },
-                  child: Text('Edit Event'), // 编辑事件按钮文字
+                  child: Text('イベント編集'), // 编辑事件按钮文字
                 ),
               ),
             ],

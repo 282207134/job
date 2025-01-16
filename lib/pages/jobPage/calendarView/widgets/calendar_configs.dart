@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 包
-import 'package:job/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入 Flutter 的材料设计包
 
 import '../app_colors.dart'; // 导入应用程序颜色
