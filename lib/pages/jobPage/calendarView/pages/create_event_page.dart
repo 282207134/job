@@ -6,9 +6,10 @@ import '../widgets/add_event_form.dart'; // 导入自定义颜色配置文件
 
 // 创建事件页面类，继承 StatelessWidget
 class CreateEventPage extends StatelessWidget {
-  const CreateEventPage({super.key, this.event}); // 构造函数，接受一个可选的事件参数
+  const CreateEventPage({super.key, this.event, this.selectedDate}); // 构造函数，接受一个可选的事件参数和选中的日期
 
   final CalendarEventData? event; // 可选的事件数据
+  final DateTime? selectedDate; // 可选的选中日期
 
   @override
   Widget build(BuildContext context) { // 构建 UI 的方法
@@ -78,6 +79,7 @@ class CreateEventPage extends StatelessWidget {
               }
             },
             event: event, // 将事件参数传递给表单
+            selectedDate: selectedDate, // 将选中的日期传递给表单
           ),
         ),
       ),

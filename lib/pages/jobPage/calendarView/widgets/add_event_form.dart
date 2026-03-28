@@ -11,11 +11,13 @@ import 'date_time_selector.dart'; // 导入 date_time_selector.dart 文件
 class AddOrEditEventForm extends StatefulWidget {
   final void Function(CalendarEventData)? onEventAdd; // 事件添加回调函数
   final CalendarEventData? event; // 日历事件数据
+  final DateTime? selectedDate; // 选中的日期
 
   const AddOrEditEventForm({
     super.key,
     this.onEventAdd,
     this.event,
+    this.selectedDate,
   }); // 构造函数
 
   @override
@@ -43,6 +45,11 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
   @override
   void initState() {
     super.initState();
+    // 如果有选中的日期，使用选中的日期作为开始和结束日期
+    if (widget.selectedDate != null) {
+      _startDate = widget.selectedDate!.withoutTime;
+      _endDate = widget.selectedDate!.withoutTime;
+    }
     _setDefaults(); // 初始化默认值
   }
 

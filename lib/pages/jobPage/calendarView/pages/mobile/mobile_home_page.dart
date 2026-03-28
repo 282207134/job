@@ -13,11 +13,6 @@ class MobileHomePage extends StatelessWidget {
     return DefaultTabController( // 使用默认的 TabController，管理选项卡
       length: 3, // 设置选项卡的数量
       child: Scaffold( // 返回一个脚手架组件
-        floatingActionButton: FloatingActionButton( // 浮动操作按钮
-          child: Icon(Icons.add), // 按钮图标为添加图标
-          elevation:5, // 设置按钮阴影高度
-          onPressed: () => context.pushRoute(CreateEventPage()), // 按钮点击时跳转到创建事件页面
-        ),
         appBar: AppBar( // 应用栏组件
           bottom: PreferredSize( // 设置自定义的底部高度
             preferredSize: Size.fromHeight(0), // 设置 TabBar 的高度为 0
