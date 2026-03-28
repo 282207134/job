@@ -52,18 +52,20 @@ class DefaultFirebaseOptions {
     appId: '1:365204430823:android:89f6a94b271deaaa7c2742',
     messagingSenderId: '365204430823',
     projectId: 'job-test-b3034',
-    storageBucket: 'job-test-b3034.appspot.com',
+    databaseURL: 'https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'job-test-b3034.firebasestorage.app',
   );
 
   // 针对Android平台的Firebase配置
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBKhHgO12tWtRG_HR5mEg5lv-E5JCCpkIM',
-    appId: '1:365204430823:ios:07203588e6c438277c2742',
+    appId: '1:365204430823:ios:647ef6d8a15f41fa7c2742',
     messagingSenderId: '365204430823',
     projectId: 'job-test-b3034',
-    storageBucket: 'job-test-b3034.appspot.com',
-    iosBundleId: 'com.example.job',
+    databaseURL: 'https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'job-test-b3034.firebasestorage.app',
+    iosBundleId: 'com.example.kantankanri',
   );
 
   // 针对iOS平台的Firebase配置
@@ -74,7 +76,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '365204430823',
     projectId: 'job-test-b3034',
     authDomain: 'job-test-b3034.firebaseapp.com',
-    storageBucket: 'job-test-b3034.appspot.com',
+    databaseURL: 'https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'job-test-b3034.firebasestorage.app',
   );
 
   // 针对Web平台的Firebase配置
@@ -84,19 +87,21 @@ class DefaultFirebaseOptions {
     appId: '1:365204430823:ios:07203588e6c438277c2742',
     messagingSenderId: '365204430823',
     projectId: 'job-test-b3034',
-    storageBucket: 'job-test-b3034.appspot.com',
+    databaseURL: 'https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'job-test-b3034.firebasestorage.app',
     iosBundleId: 'com.example.job',
   );
 
   // 针对macOS平台的Firebase配置
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBYXITOYDIF6UoR-QYXEnGhi3yu_9gYAf0',
-    appId: '1:365204430823:web:828c16f6bb9797a67c2742',
+    apiKey: 'AIzaSyDOlKCD8xu7yLURtoYjwCsQMK-6ghBLi9w',
+    appId: '1:365204430823:web:590733b179f9d9d57c2742',
     messagingSenderId: '365204430823',
     projectId: 'job-test-b3034',
     authDomain: 'job-test-b3034.firebaseapp.com',
-    storageBucket: 'job-test-b3034.appspot.com',
+    databaseURL: 'https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'job-test-b3034.firebasestorage.app',
   );
 
   // 针对Windows平台的Firebase配置

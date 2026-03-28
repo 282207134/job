@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "365204430823",
+    "firebase_url": "https://job-test-b3034-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "job-test-b3034",
-    "storage_bucket": "job-test-b3034.appspot.com"
+    "storage_bucket": "job-test-b3034.firebasestorage.app"
   },
   "client": [
     {
