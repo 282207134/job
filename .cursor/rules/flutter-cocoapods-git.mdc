@@ -1,0 +1,10 @@
+---
+description: Flutter iOS/macOS の Podfile コミットと push までの運用
+alwaysApply: true
+---
+
+# CocoaPods と Git（本プロジェクト）
+
+- `ios/` または `macos/` でプラグイン・ネイティブ依存を変えたら `pod install` を実行し、**`Podfile` と `Podfile.lock`** を必ずコミットする。CocoaPods が更新した **`Runner.xcworkspace/contents.xcworkspacedata`** や **`Runner.xcodeproj/project.pbxproj`** も同じコミットに含める。
+- このリポジトリの `origin` は **SSH**（`git@github.com:...`）。変更をコミットしたらユーザーが特に断らない限り **`git push origin`（現在のブランチ）** まで行う。
+- `ios/Flutter/*.xcconfig` のコメントは **`//`** を使い、行頭を **`#`** にしない（Xcode のプリプロセッサエラー回避）。
