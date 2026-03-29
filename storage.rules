@@ -1,0 +1,20 @@
+rules_version = '2';
+// Firebase Console → Storage → 规则 に貼り付けて「公開」すること（未公開だとアップロードは必ず失敗します）
+// パス例: directChats/{pairId}/{送信者UID}/images/xxx.jpg
+// {userId} は必ず request.auth.uid と一致させる（クライアントは FirebaseAuth の UID を使用）
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /users/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      // create / update / delete は write にまとめる（互換性のため）
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /directChats/{pairId}/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
