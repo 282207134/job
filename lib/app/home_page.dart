@@ -1,10 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
 import 'package:kantankanri/pages/othersApplication/others_application.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/userProvider.dart';
-import 'package:kantankanri/screens/chatroom_screen.dart';
+import 'package:kantankanri/screens/contacts_messages_screen.dart';
+import 'package:kantankanri/services/messaging_service.dart';
 import 'package:kantankanri/screens/profile_screen.dart';
 import 'package:kantankanri/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
@@ -48,12 +50,19 @@ class _HomePageState extends State<HomePage> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shadowColor: Colors.black12,
-        title: const Text('スケジュール管理'),
+        title: Text(navIndex == 2 ? '連絡先' : 'スケジュール管理'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
+          if (navIndex == 2)
+            IconButton(
+              icon: const Icon(Icons.person_add_alt_1_outlined),
+              onPressed: () =>
+                  ContactsMessagesScreen.showAddFriendDialog(context),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {},
+            ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -66,26 +75,23 @@ class _HomePageState extends State<HomePage> {
         },
         indicatorColor: Colors.grey.shade200,
         selectedIndex: navIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
+        destinations: <Widget>[
+          const NavigationDestination(
             selectedIcon: Icon(Icons.calendar_month),
             icon: Icon(Icons.calendar_month),
             label: 'calendar',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             selectedIcon: Icon(Icons.task_alt),
             icon: Icon(Icons.task_alt_outlined),
             label: 'Todo',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.message_sharp),
-            icon: Badge(
-              label: Text('2'),
-              child: Icon(Icons.message_outlined),
-            ),
-            label: 'Messages',
+            selectedIcon: const Icon(Icons.people_alt_rounded),
+            icon: const _MessagesNavIcon(),
+            label: '連絡先',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             selectedIcon: Icon(Icons.business_center_rounded),
             icon: Badge(
               child: Icon(Icons.business_center_outlined),
@@ -97,10 +103,7 @@ class _HomePageState extends State<HomePage> {
       body: <Widget>[
         calendar(),
         const todo_page(embedded: true),
-        ChatroomScreen(
-          chatroomName: '',
-          chatroomId: '',
-        ),
+        const ContactsMessagesScreen(),
         othersApplication(),
       ][navIndex],
       drawer: Drawer(
@@ -169,6 +172,36 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 受け取った友だち申請件数でバッジ表示
+class _MessagesNavIcon extends StatelessWidget {
+  const _MessagesNavIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      return const Icon(Icons.chat_bubble_outline_rounded);
+    }
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: MessagingService.friendLinksForUser(uid),
+      builder: (context, snap) {
+        final docs = snap.data?.docs ?? [];
+        final n = docs.where((d) {
+          final m = d.data();
+          return m['status'] == 'pending' && m['requested_by'] != uid;
+        }).length;
+        if (n <= 0) {
+          return const Icon(Icons.chat_bubble_outline_rounded);
+        }
+        return Badge(
+          label: Text('$n'),
+          child: const Icon(Icons.chat_bubble_outline_rounded),
+        );
+      },
     );
   }
 }

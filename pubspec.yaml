@@ -15,6 +15,7 @@ dependencies:
   firebase_core: ^3.10.0 # Firebase核心
   firebase_auth: ^5.4.0 # Firebase认证
   cloud_firestore: ^5.6.1 # Firebase Firestore数据库
+  firebase_storage: ^12.4.0 # Firebase Storage（チャット画像など）
   provider: ^6.1.1 # 状态管理
   introduction_screen: ^3.1.14 # 引导页插件
   intl: ^0.20.1 # 更新国际化支持

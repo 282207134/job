@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>チャットに送信する画像を選ぶためにフォトライブラリにアクセスします。</string>
 </dict>
 </plist>

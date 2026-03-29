@@ -20,9 +20,10 @@ class SignupController {
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final db = FirebaseFirestore.instance;
 
+      final emailNorm = email.trim().toLowerCase();
       final data = <String, dynamic>{
         'name': name,
-        'email': email,
+        'email': emailNorm,
         'id': userId,
       };
 
