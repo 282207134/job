@@ -1,6 +1,24 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb; // プラットフォーム判定
 import 'package:flutter/material.dart'; // 导入Flutter的材料设计包
 
 import '../constants.dart'; // 导入常量
+
+/// 真機 iOS / Android では常に [mobileWidget] を使い、横屏・大屏でも Web 用レイアウトに切り替わらないようにする。
+/// Web およびデスクトップ埋め込みでは従来どおり [breakPoint] で mobile / web を切り替える。
+bool _useMobileLayoutForContext(
+  BuildContext context,
+  double breakPoint,
+  double? overrideWidth,
+) {
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android)) {
+    return true;
+  }
+  final width = overrideWidth ?? MediaQuery.sizeOf(context).width;
+  return width < breakPoint;
+}
 
 class ResponsiveWidget extends StatelessWidget {
   final double? width; // 定义宽度属性
@@ -18,12 +36,9 @@ class ResponsiveWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = this.width ?? MediaQuery.of(context).size.width; // 获取当前设备的宽度
-
-    if (width < breakPoint) { // 如果宽度小于断点
-      return mobileWidget; // 返回移动端部件
-    } else { // 如果宽度大于或等于断点
-      return webWidget; // 返回Web端部件
+    if (_useMobileLayoutForContext(context, breakPoint, width)) {
+      return mobileWidget;
     }
+    return webWidget;
   }
 }

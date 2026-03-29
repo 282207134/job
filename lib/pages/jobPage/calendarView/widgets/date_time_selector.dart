@@ -100,18 +100,18 @@ class _DateTimeSelectorFormFieldState extends State<DateTimeSelectorFormField> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector( // 返回一个手势检测器
-      onTap: _showSelector, // 绑定点击事件，显示选择器
-      child: TextFormField( // 文本表单字段
-        focusNode: _focusNode, // 焦点节点
-        style: widget.textStyle, // 文本样式
-        controller: _textEditingController, // 控制器
-        validator: widget.validator, // 验证器
-        minLines: 1, // 最小行数
-        onSaved: (value) => widget.onSave?.call(_selectedDate), // 保存回调
-        enabled: false, // 禁用输入
-        decoration: widget.decoration, // 输入装饰
-      ),
+    return TextFormField(
+      focusNode: _focusNode,
+      style: widget.textStyle,
+      controller: _textEditingController,
+      validator: widget.validator,
+      minLines: 1,
+      onSaved: (value) => widget.onSave?.call(_selectedDate),
+      readOnly: true,
+      showCursor: false,
+      enableInteractiveSelection: false,
+      onTap: _showSelector,
+      decoration: widget.decoration,
     );
   }
 

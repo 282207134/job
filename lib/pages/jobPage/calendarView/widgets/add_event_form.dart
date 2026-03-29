@@ -73,6 +73,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
             controller: _titleController, // 绑定标题控制器
             decoration: AppConstants.inputDecoration.copyWith(
               labelText: "Event Title", // 标签文本
+              floatingLabelBehavior: FloatingLabelBehavior.always,
             ),
             style: TextStyle(
               color: AppColors.black, // 文字颜色
@@ -97,6 +98,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
                     labelText: "Start Date", // 开始日期标签文本
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    prefixIcon: const Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: AppColors.lightNavyBlue,
+                    ),
                   ),
                   initialDateTime: _startDate, // 初始日期时间
                   onSelect: (date) {
@@ -128,6 +135,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   initialDateTime: _endDate, // 初始结束日期
                   decoration: AppConstants.inputDecoration.copyWith(
                     labelText: "End Date", // 结束日期标签文本
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    prefixIcon: const Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: AppColors.lightNavyBlue,
+                    ),
                   ),
                   onSelect: (date) {
                     if (date.withoutTime.isBefore(_startDate.withoutTime)) {
@@ -164,6 +177,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
                     labelText: "Start Time", // 开始时间标签文本
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    prefixIcon: const Icon(
+                      Icons.schedule_rounded,
+                      size: 22,
+                      color: AppColors.lightNavyBlue,
+                    ),
                   ),
                   initialDateTime: _startTime, // 初始开始时间
                   minimumDateTime: CalendarConstants.epochDate, // 最小日期时间
@@ -192,6 +211,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
                     labelText: "End Time", // 结束时间标签文本
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    prefixIcon: const Icon(
+                      Icons.schedule_rounded,
+                      size: 22,
+                      color: AppColors.lightNavyBlue,
+                    ),
                   ),
                   initialDateTime: _endTime, // 初始结束时间
                   onSelect: (date) {
@@ -240,6 +265,10 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
             },
             decoration: AppConstants.inputDecoration.copyWith(
               hintText: "Event Description", // 提示文本
+              hintStyle: TextStyle(
+                color: AppColors.black,
+                fontSize: 17,
+              ),
             ),
           ),
           SizedBox(

@@ -25,11 +25,6 @@ class AppConstants {
     enabledBorder: inputBorder, // 启用时的边框
     focusedBorder: inputBorder, // 聚焦时的边框
     focusedErrorBorder: inputBorder, // 聚焦且出错时的边框
-    hintText: "Event Title", // 提示文本
-    hintStyle: TextStyle(
-      color: AppColors.black, // 提示文本颜色为黑色
-      fontSize: 17, // 提示文本字体大小为 17
-    ),
     labelStyle: TextStyle(
       color: AppColors.black, // 标签文本颜色为黑色
       fontSize: 17, // 标签文本字体大小为 17
