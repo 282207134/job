@@ -1,150 +1,267 @@
-//注册界面
-import 'package:flutter/material.dart'; // 引入Flutter材料设计库
-import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
-import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-import '../controllers/signup_controller.dart'; // 引入Firebase认证库
+import '../controllers/signup_controller.dart';
 
-// 定义SignupScreen类，一个有状态的小部件
+/// 新規登録（白ベース・カード型レイアウト）
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key}); // 构造函数
+  const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState(); // 创建状态
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-// 定义_SignupScreenState类，是SignupScreen的状态
 class _SignupScreenState extends State<SignupScreen> {
-  var userForm = GlobalKey<FormState>(); // 创建一个全局键用于表单状态
+  final _formKey = GlobalKey<FormState>();
+  final _confirmPasswordFieldKey = GlobalKey<FormFieldState<String>>();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
+  final _name = TextEditingController();
 
-  bool isLoading = false; // 加载状态标识
+  bool _isLoading = false;
 
-  // 创建输入控制器
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-  TextEditingController name = TextEditingController();
-  TextEditingController staff_id = TextEditingController();
+  void _revalidateConfirmPassword() {
+    if (_confirmPassword.text.isEmpty) return;
+    _confirmPasswordFieldKey.currentState?.validate();
+  }
+
+  static const _radius = 14.0;
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    required IconData icon,
+    String? hint,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon, size: 22),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(_radius),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(_radius),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(_radius),
+        borderSide: const BorderSide(color: Color(0xFF5C6BC0), width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(_radius),
+        borderSide: BorderSide(color: Colors.red.shade300),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _password.addListener(_revalidateConfirmPassword);
+  }
+
+  @override
+  void dispose() {
+    _password.removeListener(_revalidateConfirmPassword);
+    _email.dispose();
+    _password.dispose();
+    _confirmPassword.dispose();
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _isLoading = true);
+    try {
+      await SignupController.createAccount(
+        context: context,
+        email: _email.text.trim(),
+        password: _password.text,
+        name: _name.text.trim(),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // 构建UI界面
+    final theme = Theme.of(context);
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text(""),
-          backgroundColor: Colors.blue.shade100,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
-        backgroundColor: Colors.blue.shade100,
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Form(
-                  key: userForm, // 将全局键赋给Form小部件
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  'アカウント作成',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'メールとパスワードで登録してください',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Material(
+                  color: Colors.white,
+                  elevation: 2,
+                  shadowColor: Colors.black.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(22),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         TextFormField(
-                          autovalidateMode:
-                              AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                          controller: email, // 使用email控制器
+                          controller: _email,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: _fieldDecoration(
+                            label: 'メールアドレス',
+                            icon: Icons.mail_outline_rounded,
+                            hint: 'example@email.com',
+                          ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Email is required"; // 验证邮箱输入
-                            }
+                            final v = value?.trim() ?? '';
+                            if (v.isEmpty) return 'メールアドレスを入力してください';
+                            if (!v.contains('@')) return '有効なメール形式で入力してください';
+                            return null;
                           },
-                          decoration:
-                              InputDecoration(label: Text("Email")), // 邮箱输入框装饰
                         ),
-                        SizedBox(height: 23),
+                        const SizedBox(height: 18),
                         TextFormField(
-                          autovalidateMode:
-                              AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                          controller: password, // 使用password控制器
+                          controller: _password,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: _fieldDecoration(
+                            label: 'パスワード',
+                            icon: Icons.lock_outline_rounded,
+                            hint: '6文字以上を推奨',
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Password is required"; // 验证密码输入
+                              return 'パスワードを入力してください';
                             }
+                            if (value.length < 6) {
+                              return '6文字以上にしてください';
+                            }
+                            return null;
                           },
-                          obscureText: true, // 隐藏输入内容
-                          enableSuggestions: false, // 禁止建议
-                          autocorrect: false, // 禁止自动更正
-                          decoration: InputDecoration(
-                              label: Text("Password")), // 密码输入框装饰
                         ),
-                        SizedBox(height: 23),
+                        const SizedBox(height: 18),
                         TextFormField(
-                          autovalidateMode:
-                              AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                          controller: name, // 使用name控制器
+                          key: _confirmPasswordFieldKey,
+                          controller: _confirmPassword,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: _fieldDecoration(
+                            label: 'パスワード（確認）',
+                            icon: Icons.lock_person_outlined,
+                            hint: 'もう一度入力',
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Name is required"; // 验证名称输入
+                              return '確認用パスワードを入力してください';
                             }
+                            if (value != _password.text) {
+                              return 'パスワードが一致しません';
+                            }
+                            return null;
                           },
-                          decoration:
-                              InputDecoration(label: Text("Name")), // 名称输入框装饰
                         ),
-                        SizedBox(height: 23),
+                        const SizedBox(height: 18),
                         TextFormField(
-                          autovalidateMode:
-                              AutovalidateMode.onUserInteraction, // 用户交互时自动验证
-                          controller: staff_id, // 使用staff_id控制器
+                          controller: _name,
+                          textInputAction: TextInputAction.done,
+                          textCapitalization: TextCapitalization.words,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: _fieldDecoration(
+                            label: 'お名前',
+                            icon: Icons.person_outline_rounded,
+                          ),
+                          onFieldSubmitted: (_) => _submit(),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "staff id is required"; // 验证学籍番号
+                            if (value == null || value.trim().isEmpty) {
+                              return 'お名前を入力してください';
                             }
+                            return null;
                           },
-                          decoration:
-                              InputDecoration(label: Text("学籍番号")), // 学籍番号输入框装饰
                         ),
-                        SizedBox(height: 53),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      minimumSize: Size(0, 50),
-                                      foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent), // 按钮样式
-                                  onPressed: () async {
-                                    if (userForm.currentState!.validate()) {
-                                      // 如果表单验证通过
-                                      isLoading = true; // 开始加载
-                                      setState(() {}); // 刷新UI
-
-                                      // 创建账号
-                                      await SignupController.createAccount(
-                                          context: context,
-                                          email: email.text,
-                                          password: password.text,
-                                          staff_id: staff_id.text,
-                                          name: name.text);
-                                    }
-
-                                    isLoading = false; // 停止加载
-                                    setState(() {}); // 刷新UI
-                                  },
-                                  child: isLoading
-                                      ? Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        ) // 显示加载中动画
-                                      : Text("ユーザ登録")), // 显示创建账号文本
+                        const SizedBox(height: 28),
+                        FilledButton(
+                          onPressed: _isLoading ? null : _submit,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF5C6BC0),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(_radius),
                             ),
-                          ],
-                        )
+                            elevation: 0,
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'ユーザ登録',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 24),
+              ],
             ),
-          ],
-        ));
+          ),
+        ),
+      ),
+    );
   }
 }

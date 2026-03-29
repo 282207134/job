@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                          return SignupScreen(); // 跳转到注册界面
+                          return const SignupScreen();
                         }));
                       },
                       child: Text("ここから登録する", // 提供注册链接
