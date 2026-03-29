@@ -4,7 +4,7 @@ import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符组件
 import 'package:firebase_auth/firebase_auth.dart'; // 引入Firebase认证库
 import 'package:provider/provider.dart';
 
-import '../main.dart';
+import 'package:kantankanri/app/home_page.dart';
 import '../providers/userProvider.dart';
 import 'login_screen.dart'; // 引入状态管理库
 
@@ -41,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
         .getUserDetails(); // 获取用户详情
     // 导航到仪表板界面，并替换当前页面
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(); //HomePage/DashboardScreen
+      return const HomePage();
     }));
   }
 

@@ -1,6 +1,6 @@
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import 'package:kantankanri/app/home_page.dart';
 import '../pages/jobPage/job_page.dart';
 import '../pages/managementTools/timer.dart';
 import '../pages/jobPage/staff_page.dart';

@@ -10,6 +10,72 @@ class othersApplication extends StatelessWidget {
         ),
         body: GridView.count(crossAxisCount: 2, mainAxisSpacing: 0, children: [
           Container(
+            color: Colors.teal.shade100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/note');
+                  },
+                  icon: Icon(
+                    Icons.note_alt_outlined,
+                    color: Colors.teal.shade800,
+                    size: 100.0,
+                  ),
+                ),
+                Text(
+                  'メモ',
+                  style: TextStyle(color: Colors.teal.shade900, fontSize: 20),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.orange.shade100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/timer');
+                  },
+                  icon: Icon(
+                    Icons.timer_outlined,
+                    color: Colors.orange.shade800,
+                    size: 100.0,
+                  ),
+                ),
+                Text(
+                  'タイマー',
+                  style: TextStyle(color: Colors.orange.shade900, fontSize: 20),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.indigo.shade50,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/todo');
+                  },
+                  icon: Icon(
+                    Icons.task_alt,
+                    color: Colors.indigo.shade700,
+                    size: 100.0,
+                  ),
+                ),
+                Text(
+                  'Todo',
+                  style: TextStyle(color: Colors.indigo.shade900, fontSize: 20),
+                ),
+              ],
+            ),
+          ),
+          Container(
             color: Colors.yellow,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
