@@ -2,13 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
 import 'package:kantankanri/pages/othersApplication/others_application.dart';
+import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/chatroom_screen.dart';
 import 'package:kantankanri/screens/profile_screen.dart';
 import 'package:kantankanri/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
-/// ログイン後のメインシェル（下部ナビ：カレンダー / メッセージ / その他）
+/// ログイン後のメインシェル（下部ナビ：カレンダー / Todo / メッセージ / その他）
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
 
-  static const int _navLength = 3;
+  static const int _navLength = 4;
 
   @override
   void initState() {
@@ -40,9 +41,13 @@ class _HomePageState extends State<HomePage> {
     final navIndex = currentPageIndex.clamp(0, _navLength - 1);
 
     return Scaffold(
-      backgroundColor: Colors.cyanAccent,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade200,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shadowColor: Colors.black12,
         title: const Text('スケジュール管理'),
         actions: [
           IconButton(
@@ -52,16 +57,25 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black12,
+        elevation: 1,
         onDestinationSelected: (int index) {
           setState(() => currentPageIndex = index);
         },
-        indicatorColor: Colors.amber,
+        indicatorColor: Colors.grey.shade200,
         selectedIndex: navIndex,
         destinations: const <Widget>[
           NavigationDestination(
             selectedIcon: Icon(Icons.calendar_month),
             icon: Icon(Icons.calendar_month),
             label: 'calendar',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.task_alt),
+            icon: Icon(Icons.task_alt_outlined),
+            label: 'Todo',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.message_sharp),
@@ -82,6 +96,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: <Widget>[
         calendar(),
+        const todo_page(embedded: true),
         ChatroomScreen(
           chatroomName: '',
           chatroomId: '',
@@ -89,7 +104,7 @@ class _HomePageState extends State<HomePage> {
         othersApplication(),
       ][navIndex],
       drawer: Drawer(
-        backgroundColor: Colors.white.withValues(alpha: 0.7),
+        backgroundColor: Colors.white,
         width: 200,
         child: Column(
           children: [

@@ -5,8 +5,13 @@ class othersApplication extends StatelessWidget {
   //工作管理界面
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text("そのほかのアプリ"),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('そのほかのアプリ'),
         ),
         body: GridView.count(crossAxisCount: 2, mainAxisSpacing: 0, children: [
           Container(
@@ -49,28 +54,6 @@ class othersApplication extends StatelessWidget {
                 Text(
                   'タイマー',
                   style: TextStyle(color: Colors.orange.shade900, fontSize: 20),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.indigo.shade50,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/todo');
-                  },
-                  icon: Icon(
-                    Icons.task_alt,
-                    color: Colors.indigo.shade700,
-                    size: 100.0,
-                  ),
-                ),
-                Text(
-                  'Todo',
-                  style: TextStyle(color: Colors.indigo.shade900, fontSize: 20),
                 ),
               ],
             ),

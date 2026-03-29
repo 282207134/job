@@ -18,8 +18,11 @@ class TodoEntry {
 }
 
 /// ローカル保存のシンプルな Todo 一覧
+/// [embedded] が true のときは AppBar なし（ホームのタブ内用）
 class todo_page extends StatefulWidget {
-  const todo_page({super.key});
+  const todo_page({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   State<todo_page> createState() => _todo_pageState();
@@ -92,79 +95,87 @@ class _todo_pageState extends State<todo_page> {
     _save();
   }
 
+  Widget _buildList(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    labelText: '新しいタスク',
+                    border: OutlineInputBorder(),
+                  ),
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _add(),
+                ),
+              ),
+              IconButton(
+                onPressed: _add,
+                icon: const Icon(Icons.add_circle),
+                iconSize: 40,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _items.isEmpty
+              ? const Center(
+                  child: Text(
+                    'タスクがありません',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                )
+              : ListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  itemCount: _items.length,
+                  itemBuilder: (context, index) {
+                    final item = _items[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: Checkbox(
+                          value: item.done,
+                          onChanged: (_) => _toggle(index),
+                        ),
+                        title: Text(
+                          item.title,
+                          style: TextStyle(
+                            decoration: item.done
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                            color: item.done ? Colors.grey : null,
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => _remove(index),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.embedded) {
+      return _buildList(context);
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: '新しいタスク',
-                      border: OutlineInputBorder(),
-                    ),
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _add(),
-                  ),
-                ),
-                IconButton(
-                  onPressed: _add,
-                  icon: const Icon(Icons.add_circle),
-                  iconSize: 40,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: _items.isEmpty
-                ? const Center(
-                    child: Text(
-                      'タスクがありません',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    itemCount: _items.length,
-                    itemBuilder: (context, index) {
-                      final item = _items[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: Checkbox(
-                            value: item.done,
-                            onChanged: (_) => _toggle(index),
-                          ),
-                          title: Text(
-                            item.title,
-                            style: TextStyle(
-                              decoration: item.done
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none,
-                              color: item.done ? Colors.grey : null,
-                            ),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () => _remove(index),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+      body: _buildList(context),
     );
   }
 }
