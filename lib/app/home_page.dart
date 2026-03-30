@@ -3,16 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
-import 'package:kantankanri/pages/othersApplication/others_application.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/contacts_messages_screen.dart';
+import 'package:kantankanri/screens/shared_calendar_sheet.dart';
 import 'package:kantankanri/services/messaging_service.dart';
+import 'package:kantankanri/services/shared_calendar_service.dart';
 import 'package:kantankanri/screens/profile_screen.dart';
 import 'package:kantankanri/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
-/// ログイン後のメインシェル（下部ナビ：カレンダー / Todo / メッセージ / その他）
+/// ログイン後のメインシェル（下部ナビ：カレンダー / Todo / 連絡先）
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -23,11 +24,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
 
-  static const int _navLength = 4;
+  static const int _navLength = 3;
 
   @override
   void initState() {
     super.initState();
+    SharedCalendarService.roomInvalidNoticeNotifier.addListener(_onRoomInvalidNotice);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (currentPageIndex >= _navLength) {
@@ -35,6 +37,35 @@ class _HomePageState extends State<HomePage> {
           currentPageIndex = currentPageIndex.clamp(0, _navLength - 1);
         });
       }
+    });
+  }
+
+  @override
+  void dispose() {
+    SharedCalendarService.roomInvalidNoticeNotifier
+        .removeListener(_onRoomInvalidNotice);
+    super.dispose();
+  }
+
+  void _onRoomInvalidNotice() {
+    final msg = SharedCalendarService.roomInvalidNoticeNotifier.value;
+    if (!mounted || msg == null || msg.isEmpty) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('共享日历提示'),
+          content: Text(msg),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('知道了'),
+            ),
+          ],
+        ),
+      );
+      SharedCalendarService.clearRoomInvalidNotice();
     });
   }
 
@@ -51,7 +82,12 @@ class _HomePageState extends State<HomePage> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shadowColor: Colors.black12,
-        title: Text(navIndex == 2 ? '連絡先' : 'スケジュール管理'),
+        title: navIndex == 0
+            ? ValueListenableBuilder<CalendarRoom>(
+                valueListenable: SharedCalendarService.selectedRoomNotifier,
+                builder: (context, room, _) => Text(room.titleText),
+              )
+            : Text(navIndex == 2 ? '連絡先' : 'スケジュール管理'),
         actions: [
           if (navIndex == 2)
             IconButton(
@@ -92,20 +128,12 @@ class _HomePageState extends State<HomePage> {
             icon: const _MessagesNavIcon(),
             label: '連絡先',
           ),
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.business_center_rounded),
-            icon: Badge(
-              child: Icon(Icons.business_center_outlined),
-            ),
-            label: 'others',
-          ),
         ],
       ),
       body: <Widget>[
         calendar(),
         const todo_page(embedded: true),
         const ContactsMessagesScreen(),
-        othersApplication(),
       ][navIndex],
       drawer: Drawer(
         backgroundColor: Colors.white,
@@ -162,6 +190,14 @@ class _HomePageState extends State<HomePage> {
               },
               leading: const Icon(Icons.celebration_outlined),
               title: const Text('节日设置'),
+            ),
+            ListTile(
+              onTap: () async {
+                Navigator.of(context).pop();
+                await SharedCalendarSheet.show(context);
+              },
+              leading: const Icon(Icons.edit_calendar_outlined),
+              title: const Text('共享日历'),
             ),
             ListTile(
               onTap: () async {

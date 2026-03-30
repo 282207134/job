@@ -36,6 +36,10 @@ class DetailsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(5.0), // 内边距为 20.0
         children: [
+          if (event.event is Map) ...[
+            Text('操作者: ${((event.event as Map)['updated_by_name'] ?? (event.event as Map)['created_by_name'] ?? '-') }'),
+            const SizedBox(height: 6),
+          ],
           Text(
             "日付: ${event.date.dateToStringWithFormat(format: "dd/MM/yyyy")}", // 显示事件日期
           ),

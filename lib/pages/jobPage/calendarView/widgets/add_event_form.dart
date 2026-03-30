@@ -354,7 +354,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
 
     final event = widget.event!;
     _startDate = event.date; // 设置开始日期
-    _endDate = event.endDate ?? _endDate; // 设置结束日期
+    _endDate = event.endDate; // 设置结束日期
     _startTime = event.startTime ?? _startTime; // 设置开始时间
     _endTime = event.endTime ?? _endTime; // 设置结束时间
     _titleController.text = event.title; // 设置标题

@@ -6,6 +6,7 @@ class UserProvider extends ChangeNotifier {
   String userName = "Dummy Name"; // 默认用户名
   String userEmail = "Dummy Email"; // 默认用户邮箱
   String userId = "Dummy UserID"; // 默认用户ID
+  String userAvatarUrl = ""; // 头像地址
 
   final FirebaseFirestore db = FirebaseFirestore.instance; // 获取Firestore的实例
 
@@ -26,6 +27,7 @@ class UserProvider extends ChangeNotifier {
           userName = dataSnapshot.data()?["name"] ?? "No Name"; // 从数据库获取用户名
           userEmail = dataSnapshot.data()?["email"] ?? "No Email"; // 从数据库获取用户邮箱
           userId = dataSnapshot.data()?["id"] ?? "No ID"; // 从数据库获取用户ID
+          userAvatarUrl = dataSnapshot.data()?["avatar_url"] ?? "";
           notifyListeners(); // 通知听众更新，这会触发依赖此数据的界面部分重新构建
         } else {
           print("User document does not exist");

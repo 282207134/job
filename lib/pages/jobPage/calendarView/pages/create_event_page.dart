@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 包，用于与 Firebase Firestore 实现数据交互
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // 导入 Flutter 的 Material 包，提供 Material Design 组件
 import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包，包含日历视图相关内容
+import 'package:kantankanri/services/shared_calendar_service.dart';
 import '../app_colors.dart';
 import '../widgets/add_event_form.dart'; // 导入自定义颜色配置文件
 
@@ -43,6 +45,28 @@ class CreateEventPage extends StatelessWidget {
           child: AddOrEditEventForm( // 添加或编辑事件表单组件
             onEventAdd: (newEvent) async { // 当添加事件时的回调函数
               final controller = CalendarControllerProvider.of(context).controller; // 获取日历控制器
+              final me = FirebaseAuth.instance.currentUser;
+              final uid = me?.uid ?? '';
+              final room = SharedCalendarService.selectedRoomNotifier.value;
+              final actorName = me?.displayName ?? me?.email ?? 'me';
+              final oldMap = event?.event is Map
+                  ? Map<String, dynamic>.from(event!.event as Map)
+                  : <String, dynamic>{};
+              final calendarId =
+                  '${oldMap['calendar_id'] ?? room.id}';
+              final calendarName =
+                  '${oldMap['calendar_name'] ?? room.name}';
+              final calendarType = oldMap['calendar_type'] ??
+                  (room.isPersonal ? 'personal' : 'shared');
+              final payload = {
+                ...newEvent.toMap(),
+                'calendar_id': calendarId,
+                'calendar_name': calendarName,
+                'calendar_type': calendarType,
+                'updated_by_uid': uid,
+                'updated_by_name': actorName,
+                'updated_at': FieldValue.serverTimestamp(),
+              };
 
               try {
                 if (event != null) { // 如果存在事件
@@ -50,13 +74,16 @@ class CreateEventPage extends StatelessWidget {
                   await FirebaseFirestore.instance
                       .collection('events') // 指定 Firestore 集合
                       .doc(event!.id) // 选择要更新的文档
-                      .update(newEvent.toMap()); // 更新文档数据
+                      .update(payload); // 更新文档数据
                   controller.update(event!, newEvent); // 更新本地控制器中的事件
                 } else {
                   // 如果是添加新事件，创建新文档并更新本地控制器中的事件
+                  payload['created_by_uid'] = uid;
+                  payload['created_by_name'] = actorName;
+                  payload['created_at'] = FieldValue.serverTimestamp();
                   DocumentReference docRef = await FirebaseFirestore.instance
                       .collection('events') // 指定 Firestore 集合
-                      .add(newEvent.toMap()); // 添加新文档
+                      .add(payload); // 添加新文档
                   newEvent = newEvent.copyWith(id: docRef.id); // 将新文档的 ID 赋给新事件
                   if (!controller.allEvents.any((e) => e.id == newEvent.id)) { // 检查本地控制器中是否已存在该事件
                     controller.add(newEvent); // 添加新事件到本地控制器
