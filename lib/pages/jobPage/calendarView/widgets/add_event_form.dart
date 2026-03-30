@@ -4,12 +4,11 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // 导入 flutter
 
 import '../app_colors.dart'; // 导入 app_colors.dart 文件
 import '../constants.dart'; // 导入 constants.dart 文件
-import '../pages/CalendarPage.dart';
 import 'custom_button.dart'; // 导入 custom_button.dart 文件
 import 'date_time_selector.dart'; // 导入 date_time_selector.dart 文件
 
 class AddOrEditEventForm extends StatefulWidget {
-  final void Function(CalendarEventData)? onEventAdd; // 事件添加回调函数
+  final Future<void> Function(CalendarEventData)? onEventAdd; // 事件添加回调函数
   final CalendarEventData? event; // 日历事件数据
   final DateTime? selectedDate; // 选中的日期
 
@@ -25,6 +24,15 @@ class AddOrEditEventForm extends StatefulWidget {
 }
 
 class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
+  static const List<Color> _presetColors = <Color>[
+    Color(0xFF1E88E5), // blue
+    Color(0xFFE53935), // red
+    Color(0xFF43A047), // green
+    Color(0xFFFFB300), // amber
+    Color(0xFF8E24AA), // purple
+    Color(0xFF6D4C41), // brown
+  ];
+
   late DateTime _startDate = DateTime.now().withoutTime; // 开始日期
   late DateTime _endDate = DateTime.now().withoutTime; // 结束日期
 
@@ -39,8 +47,6 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
   late final _titleController = TextEditingController(); // 标题控制器
   late final _titleNode = FocusNode(); // 标题焦点节点
   late final _descriptionNode = FocusNode(); // 描述焦点节点
-
-  bool _isColorPickerVisible = false; // 用于控制颜色选择器显示的布尔值
 
   @override
   void initState() {
@@ -283,15 +289,26 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   fontSize: 17,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isColorPickerVisible = true;
-                  });
-                }, // 显示颜色选择器
-                child: CircleAvatar(
-                  radius: 15,
-                  backgroundColor: _color, // 显示当前选择的颜色
+              const SizedBox(width: 8),
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ..._presetColors.map((c) => _buildColorDot(
+                          color: c,
+                          selected: _sameColor(_color, c),
+                          onTap: () {
+                            setState(() {
+                              _color = c;
+                            });
+                          },
+                        )),
+                    _buildPaletteDot(
+                      selected: !_presetColors.any((c) => _sameColor(c, _color)),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -299,18 +316,22 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
           SizedBox(
             height: 15,
           ),
-          CustomButton(
-            onTap: _createEvent, // 创建或更新事件
-            title: widget.event == null ? "Add Event" : "Update Event", // 按钮文本
+          SizedBox(
+            width: double.infinity,
+            child: CustomButton(
+              width: double.infinity,
+              height: 52,
+              fontSize: 17,
+              onTap: _createEvent, // 创建或更新事件
+              title: widget.event == null ? "Add Event" : "Update Event", // 按钮文本
+            ),
           ),
-          if (_isColorPickerVisible)
-            _displayColorPicker(), // 显示颜色选择器
         ],
       ),
     );
   }
 
-  void _createEvent() {
+  Future<void> _createEvent() async {
     if (!(_form.currentState?.validate() ?? true)) return; // 验证表单
 
     _form.currentState?.save(); // 保存表单
@@ -325,17 +346,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
       description: _descriptionController.text.trim(), // 设置事件描述
     );
 
-    widget.onEventAdd?.call(event); // 调用回调函数
-
-    // 显示事件添加成功的消息
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("カレンダーに追加しました")),
-    );
-
-    // 导航到 CalendarPage
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => CalendarPage()),
-    );
+    await widget.onEventAdd?.call(event); // 调用回调函数
   }
 
   void _setDefaults() {
@@ -348,6 +359,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
     _endTime = event.endTime ?? _endTime; // 设置结束时间
     _titleController.text = event.title; // 设置标题
     _descriptionController.text = event.description ?? ''; // 设置描述
+    _color = event.color; // 设置颜色
   }
 
   void _resetForm() {
@@ -363,7 +375,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
     }
   }
 
-  Widget _displayColorPicker() {
+  Widget _displayColorPicker(BuildContext dialogContext) {
     var color = _color; // 获取当前颜色
     return SimpleDialog(
       clipBehavior: Clip.hardEdge, // 裁剪行为
@@ -396,12 +408,15 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
           child: Padding(
             padding: EdgeInsets.only(top: 50.0, bottom: 30.0), // 设置内边距
             child: CustomButton(
+              width: 120,
+              height: 42,
+              fontSize: 14,
               title: "Select", // 按钮文本
               onTap: () {
                 setState(() {
                   _color = color; // 更新颜色
-                  _isColorPickerVisible = false; // 隐藏颜色选择器
                 });
+                Navigator.of(dialogContext).pop();
               },
             ),
           ),
@@ -409,4 +424,83 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
       ],
     );
   }
+
+  Future<void> _showColorPickerDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => _displayColorPicker(dialogContext),
+    );
+  }
+
+  Widget _buildColorDot({
+    required Color color,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: Border.all(
+            color: selected ? Colors.black87 : Colors.white,
+            width: selected ? 2 : 1,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaletteDot({required bool selected}) {
+    return GestureDetector(
+      onTap: _showColorPickerDialog,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const SweepGradient(
+            colors: [
+              Color(0xFFFF3B30),
+              Color(0xFFFF9500),
+              Color(0xFFFFCC00),
+              Color(0xFF34C759),
+              Color(0xFF0A84FF),
+              Color(0xFF5856D6),
+              Color(0xFFFF2D55),
+              Color(0xFFFF3B30),
+            ],
+          ),
+          border: Border.all(
+            color: selected ? Colors.black87 : Colors.white,
+            width: selected ? 2 : 1,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.palette_outlined,
+          size: 14,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  bool _sameColor(Color a, Color b) => a.toARGB32() == b.toARGB32();
 }

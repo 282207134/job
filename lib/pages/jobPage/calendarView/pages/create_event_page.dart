@@ -62,14 +62,8 @@ class CreateEventPage extends StatelessWidget {
                     controller.add(newEvent); // 添加新事件到本地控制器
                   }
                 }
-
-                // 成功添加事件后显示成功提示
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Event added successfully")),
-                );
-
-                // 刷新日历视图以显示新添加的事件
-                controller.notifyListeners();
+                if (!context.mounted) return;
+                Navigator.of(context).pop(true);
 
               } catch (e) {
                 // 处理任何错误并展示错误信息

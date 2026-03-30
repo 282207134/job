@@ -66,11 +66,21 @@ class _MonthViewWidgetState extends State<MonthViewWidget> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar); // 显示提示信息
       },
       onCellTap: (events, date) {
-        // 点击日期格子时跳转到创建事件页面
+        final normalEvents = events
+            .where((e) => !HolidayService.isHolidayEventData(e))
+            .toList();
+        if (normalEvents.isNotEmpty) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => DetailsPage(event: normalEvents.first),
+            ),
+          );
+          return;
+        }
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => CreateEventPage(
-              selectedDate: date, // 传递选中的日期
+              selectedDate: date,
             ),
           ),
         );
