@@ -34,6 +34,7 @@ dependencies:
   path_provider: ^2.1.5 # 更新路径提供者插件
   image_cropper: ^8.1.0 # 更新图片裁剪插件
   excel: ^4.0.6 # Excel 操作库
+  http: ^1.2.2 # 节日 API 请求
 
 dev_dependencies:
   flutter_test:

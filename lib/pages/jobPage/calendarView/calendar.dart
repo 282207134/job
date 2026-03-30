@@ -3,18 +3,19 @@ import 'dart:ui'; // 导入 Dart 的 UI 库
 import 'package:flutter/material.dart'; // 导入 Flutter 的 Material 组件库
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 库，用于与 Firebase Firestore 进行数据交互
 import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入日历视图组件
-import 'package:kantankanri/pages/jobPage/calendarView/src/calendar_event_data.dart';
+import 'package:kantankanri/services/holiday_service.dart';
 import 'pages/CalendarPage.dart'; // 导入日历页面
-
-// 获取当前时间
-DateTime get _now => DateTime.now();
 
 // 创建一个名为 calendar 的无状态组件
 class calendar extends StatelessWidget {
+  calendar({super.key}) {
+    HolidayService.getSelectedCountries();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold( // 返回一个脚手架组件，提供基本的视觉结构
-      body: StreamBuilder<QuerySnapshot>( // 使用 StreamBuilder 监听 Firestore 数据流
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>( // 使用 StreamBuilder 监听 Firestore 数据流
         stream: FirebaseFirestore.instance.collection('events').snapshots(), // 监听 'events' 集合的快照
         builder: (context, snapshot) { // 构建方法，根据快照状态更新 UI
           if (snapshot.connectionState == ConnectionState.waiting) { // 如果连接状态是等待中
@@ -27,6 +28,7 @@ class calendar extends StatelessWidget {
 
           // 将快照中的文档数据转换为 CalendarEventData 列表
           List<CalendarEventData> events = snapshot.data!.docs.map((doc) {
+            final raw = doc.data();
             // 日期时间转换函数
             DateTime? getDateTime(dynamic value) {
               if (value is Timestamp) { // 如果值是 Timestamp 类型
@@ -50,13 +52,14 @@ class calendar extends StatelessWidget {
             // 解析文档数据并创建 CalendarEventData 对象
             return CalendarEventData(
               id: doc.id, // 文档 ID
-              title: doc['title'], // 获取标题
-              description: doc['description'], // 获取描述
-              date: getDateTime(doc['date'])!, // 获取日期（确保不为 null）
-              startTime: getDateTime(doc['startTime']), // 获取开始时间
-              endTime: getDateTime(doc['endTime']), // 获取结束时间
-              color: getColor(doc['color']), // 获取颜色
-              endDate: getDateTime(doc['endDate']),  // 确保结束日期被解析
+              title: raw['title'], // 获取标题
+              description: raw['description'], // 获取描述
+              date: getDateTime(raw['date'])!, // 获取日期（确保不为 null）
+              startTime: getDateTime(raw['startTime']), // 获取开始时间
+              endTime: getDateTime(raw['endTime']), // 获取结束时间
+              color: getColor(raw['color']), // 获取颜色
+              endDate: getDateTime(raw['endDate']),  // 确保结束日期被解析
+              event: raw,
             );
           }).toList(); // 转换为列表
 

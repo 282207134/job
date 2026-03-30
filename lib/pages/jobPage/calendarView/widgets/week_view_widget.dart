@@ -2,6 +2,7 @@ import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // �
 import 'package:flutter/material.dart';
 
 import '../pages/event_details_page.dart';
+import '../../../../services/holiday_service.dart';
 
 class WeekViewWidget extends StatelessWidget {
   final GlobalKey<WeekViewState>? state;
@@ -22,11 +23,15 @@ class WeekViewWidget extends StatelessWidget {
         showTime: true, // 是否显示时间
       ),
       onEventTap: (events, date) {
+        final clickable = events
+            .where((e) => !HolidayService.isHolidayEventData(e))
+            .toList();
+        if (clickable.isEmpty) return;
         // 点击事件时的处理
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => DetailsPage(
-              event: events.first, // 传递第一个事件到详情页面
+              event: clickable.first, // 传递第一个事件到详情页面
             ),
           ),
         );

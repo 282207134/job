@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
 import 'package:kantankanri/pages/othersApplication/others_application.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/userProvider.dart';
@@ -153,6 +154,14 @@ class _HomePageState extends State<HomePage> {
               },
               leading: const Icon(Icons.people),
               title: const Text('個人情報'),
+            ),
+            ListTile(
+              onTap: () async {
+                Navigator.of(context).pop();
+                await HolidaySettingsSheet.show(context);
+              },
+              leading: const Icon(Icons.celebration_outlined),
+              title: const Text('节日设置'),
             ),
             ListTile(
               onTap: () async {
