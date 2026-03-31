@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/app_language_provider.dart';
 import '../providers/userProvider.dart';
 import '../services/shared_calendar_service.dart';
 
@@ -24,6 +25,7 @@ class SharedCalendarSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<UserProvider>(context, listen: false);
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Padding(
       padding: EdgeInsets.only(
         left: 16,
@@ -37,31 +39,31 @@ class SharedCalendarSheet extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '共享日历',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    t('shared_calendar'),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
-                  tooltip: '创建共享日历',
+                  tooltip: t('create_shared_calendar'),
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: () => _showCreateDialog(context, prov.userName),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const Text('我的日历房间'),
+            Text(t('my_calendar_rooms')),
             const SizedBox(height: 8),
             StreamBuilder<List<CalendarRoom>>(
               stream: SharedCalendarService.myRoomsStream(),
               builder: (context, snap) {
                 if (snap.hasError) {
-                  return Text('读取日历房间失败: ${snap.error}');
+                  return Text('${t('read_calendar_rooms_failed')}: ${snap.error}');
                 }
                 final rooms = snap.data ?? const <CalendarRoom>[];
                 if (rooms.isEmpty) {
-                  return const Text('暂无可用日历');
+                  return Text(t('no_shared_calendar_created'));
                 }
                 return ValueListenableBuilder<CalendarRoom>(
                   valueListenable: SharedCalendarService.selectedRoomNotifier,
@@ -75,7 +77,13 @@ class SharedCalendarSheet extends StatelessWidget {
                           leading: Icon(r.isPersonal
                               ? Icons.calendar_month_outlined
                               : Icons.group_add_outlined),
-                          title: Text(r.displayName),
+                          title: Text(
+                            r.isPersonal
+                                ? t('my_calendar')
+                                : (r.ownerName.trim().isEmpty
+                                      ? r.name
+                                      : '${r.ownerName.trim()} · ${r.name}'),
+                          ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -113,13 +121,22 @@ class SharedCalendarSheet extends StatelessWidget {
                                   itemBuilder: (ctx) {
                                     final isOwner = r.ownerUid == myUid;
                                     if (isOwner) {
-                                      return const [
-                                        PopupMenuItem(value: 'invite', child: Text('邀请成员')),
-                                        PopupMenuItem(value: 'delete', child: Text('删除共享日历')),
+                                      return [
+                                        PopupMenuItem(
+                                          value: 'invite',
+                                          child: Text(t('invite_member')),
+                                        ),
+                                        PopupMenuItem(
+                                          value: 'delete',
+                                          child: Text(t('delete_shared_calendar')),
+                                        ),
                                       ];
                                     }
-                                    return const [
-                                      PopupMenuItem(value: 'leave', child: Text('退出共享日历')),
+                                    return [
+                                      PopupMenuItem(
+                                        value: 'leave',
+                                        child: Text(t('leave_shared_calendar')),
+                                      ),
                                     ];
                                   },
                                 ),
@@ -134,12 +151,12 @@ class SharedCalendarSheet extends StatelessWidget {
                               showDialog<void>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  title: const Text('共享日历提示'),
+                                  title: Text(t('shared_calendar_notice')),
                                   content: Text('$e'.replaceFirst('Exception: ', '')),
                                   actions: [
                                     FilledButton(
                                       onPressed: () => Navigator.of(ctx).pop(),
-                                      child: const Text('知道了'),
+                                      child: Text(t('got_it')),
                                     ),
                                   ],
                                 ),
@@ -155,19 +172,19 @@ class SharedCalendarSheet extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Divider(),
-            const Text('收到的邀请'),
+            Text(t('incoming_invites')),
             const SizedBox(height: 8),
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: SharedCalendarService.pendingInvitesStream(),
               builder: (context, snap) {
                 if (snap.hasError) {
-                  return Text('读取邀请失败: ${snap.error}');
+                  return Text('${t('read_invites_failed')}: ${snap.error}');
                 }
                 final docs = (snap.data?.docs ?? [])
                     .where((d) => d.data()['status'] == 'pending')
                     .toList();
                 if (docs.isEmpty) {
-                  return const Text('暂无邀请');
+                  return Text(t('no_invites'));
                 }
                 return Column(
                   children: docs.map((d) {
@@ -179,7 +196,7 @@ class SharedCalendarSheet extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                '${m['from_name'] ?? ''} 邀请你加入：${m['room_name'] ?? ''}',
+                                '${m['from_name'] ?? ''} ${t('invite_message')}: ${m['room_name'] ?? ''}',
                               ),
                             ),
                             TextButton(
@@ -190,7 +207,7 @@ class SharedCalendarSheet extends StatelessWidget {
                                   myName: prov.userName,
                                 );
                               },
-                              child: const Text('拒绝'),
+                              child: Text(t('reject')),
                             ),
                             FilledButton(
                               onPressed: () async {
@@ -200,7 +217,7 @@ class SharedCalendarSheet extends StatelessWidget {
                                   myName: prov.userName,
                                 );
                               },
-                              child: const Text('加入'),
+                              child: Text(t('join')),
                             ),
                           ],
                         ),
@@ -217,21 +234,22 @@ class SharedCalendarSheet extends StatelessWidget {
   }
 
   Future<void> _showCreateDialog(BuildContext context, String myName) async {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     final ctrl = TextEditingController();
     try {
       await showDialog<void>(
         context: context,
         builder: (ctx) {
           return AlertDialog(
-            title: const Text('创建共享日历'),
+            title: Text(t('create_shared_calendar')),
             content: TextField(
               controller: ctrl,
-              decoration: const InputDecoration(hintText: '请输入房间名称'),
+              decoration: InputDecoration(hintText: t('enter_room_name')),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('取消'),
+                child: Text(t('cancel')),
               ),
               FilledButton(
                 onPressed: () async {
@@ -248,7 +266,7 @@ class SharedCalendarSheet extends StatelessWidget {
                     }
                   }
                 },
-                child: const Text('创建'),
+                child: Text(t('create_shared_calendar')),
               ),
             ],
           );
@@ -265,22 +283,23 @@ class SharedCalendarSheet extends StatelessWidget {
     required String roomName,
     required String myName,
   }) async {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     final ctrl = TextEditingController();
     try {
       await showDialog<void>(
         context: context,
         builder: (ctx) {
           return AlertDialog(
-            title: const Text('邀请成员'),
+            title: Text(t('invite_member')),
             content: TextField(
               controller: ctrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(hintText: '输入对方注册邮箱'),
+              decoration: InputDecoration(hintText: t('enter_registered_email')),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('取消'),
+                child: Text(t('cancel')),
               ),
               FilledButton(
                 onPressed: () async {
@@ -293,7 +312,7 @@ class SharedCalendarSheet extends StatelessWidget {
                     );
                     if (ctx.mounted) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(content: Text('邀请已发送')),
+                        SnackBar(content: Text(t('invite_sent'))),
                       );
                       Navigator.of(ctx).pop();
                     }
@@ -304,7 +323,7 @@ class SharedCalendarSheet extends StatelessWidget {
                     }
                   }
                 },
-                child: const Text('发送'),
+                child: Text(t('send')),
               ),
             ],
           );

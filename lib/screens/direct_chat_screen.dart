@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/userProvider.dart';
+import '../providers/app_language_provider.dart';
 import '../services/chat_media_service.dart';
 import '../services/messaging_service.dart';
 import '../services/shared_calendar_service.dart';
@@ -45,6 +46,9 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
+  String _t(String key) =>
+      Provider.of<AppLanguageProvider>(context, listen: false).tr(key);
+
   Future<void> _sendText() async {
     final text = _messageText.text;
     if (text.trim().isEmpty) return;
@@ -61,7 +65,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
         text: text,
       );
     } catch (e) {
-      _toast('送信に失敗しました: $e');
+      _toast('${_t('chat_send_failed')}: $e');
     }
   }
 
@@ -80,10 +84,10 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
         imageQuality: 85,
       );
     } on PlatformException catch (e) {
-      _toast('写真へのアクセスに失敗しました: ${e.message ?? e.code}');
+      _toast('${_t('photo_access_failed')}: ${e.message ?? e.code}');
       return;
     } catch (e) {
-      _toast('画像の選択に失敗しました: $e');
+      _toast('${_t('image_pick_failed')}: $e');
       return;
     }
     if (x == null) return;
@@ -106,7 +110,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
       } else {
         msg = ChatMediaService.messageForStorageError(e);
       }
-      _toast('画像の送信に失敗しました: $msg');
+      _toast('${_t('image_send_failed')}: $msg');
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -122,12 +126,12 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
   Future<void> _sendCalendarInvite() async {
     final myUid = FirebaseAuth.instance.currentUser?.uid;
     if (myUid == null) {
-      _toast('未登录');
+      _toast(_t('not_logged_in'));
       return;
     }
     final peerUid = _peerUid();
     if (peerUid.isEmpty) {
-      _toast('无法识别好友');
+      _toast(_t('unknown_friend'));
       return;
     }
 
@@ -137,12 +141,17 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
         .get();
     if (!mounted) return;
     if (roomsSnap.docs.isEmpty) {
-      _toast('你还没有创建共享日历');
+      _toast(_t('no_shared_calendar_created'));
       return;
     }
 
     final items = roomsSnap.docs
-        .map((d) => (id: d.id, name: '${d.data()['name'] ?? '共享日历'}'))
+        .map(
+          (d) => (
+            id: d.id,
+            name: '${d.data()['name'] ?? _t('default_shared_calendar_name')}',
+          ),
+        )
         .toList();
     String selectedRoomId = items.first.id;
 
@@ -152,11 +161,11 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
         return StatefulBuilder(
           builder: (ctx2, setState) {
             return AlertDialog(
-              title: Text('发送给 ${widget.peerName}'),
+              title: Text('${_t('send_to')} ${widget.peerName}'),
               content: DropdownButtonFormField<String>(
                 value: selectedRoomId,
-                decoration: const InputDecoration(
-                  labelText: '选择共享日历',
+                decoration: InputDecoration(
+                  labelText: _t('select_shared_calendar'),
                   border: OutlineInputBorder(),
                 ),
                 items: items
@@ -175,7 +184,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx2).pop(),
-                  child: const Text('取消'),
+                  child: Text(_t('cancel')),
                 ),
                 FilledButton(
                   onPressed: () async {
@@ -192,7 +201,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                       );
                       if (!ctx2.mounted) return;
                       Navigator.of(ctx2).pop();
-                      _toast('邀请已发送');
+                      _toast(_t('invite_sent'));
                     } catch (e) {
                       if (!ctx2.mounted) return;
                       ScaffoldMessenger.of(ctx2).showSnackBar(
@@ -200,7 +209,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                       );
                     }
                   },
-                  child: const Text('发送'),
+                  child: Text(_t('send')),
                 ),
               ],
             );
@@ -224,12 +233,12 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.image_outlined),
-              title: const Text('发送图片'),
+              title: Text(_t('send_image')),
               onTap: () => Navigator.of(ctx).pop('image'),
             ),
             ListTile(
               leading: const Icon(Icons.edit_calendar_outlined),
-              title: const Text('发送日历'),
+              title: Text(_t('send_calendar')),
               onTap: () => Navigator.of(ctx).pop('calendar'),
             ),
             const SizedBox(height: 8),
@@ -305,7 +314,7 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                         ),
                       );
                     },
-                    errorBuilder: (_, __, ___) => const Text('画像を表示できません'),
+                    errorBuilder: (_, __, ___) => Text(_t('image_display_failed')),
                   ),
                 ),
               if (hasImage && hasText) const SizedBox(height: 8),
@@ -348,14 +357,16 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('エラー: ${snapshot.error}'));
+                  return Center(
+                    child: Text('${_t('chat_error_prefix')}: ${snapshot.error}'),
+                  );
                 }
                 final docs = snapshot.data?.docs ?? [];
                 if (docs.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
-                      'メッセージがありません',
-                      style: TextStyle(color: Colors.grey),
+                      _t('no_messages'),
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   );
                 }
@@ -400,13 +411,13 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: _openPlusActions,
-                      tooltip: '更多',
+                      tooltip: _t('more'),
                     ),
                   Expanded(
                     child: TextField(
                       controller: _messageText,
-                      decoration: const InputDecoration(
-                        hintText: 'メッセージを入力…',
+                      decoration: InputDecoration(
+                        hintText: _t('message_input_hint'),
                         border: InputBorder.none,
                       ),
                       textInputAction: TextInputAction.send,

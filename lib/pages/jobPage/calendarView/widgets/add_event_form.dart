@@ -1,6 +1,8 @@
 import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入 calendar_view 包
 import 'package:flutter/material.dart'; // 导入 flutter/material.dart 包
 import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // 导入 flutter_colorpicker 包
+import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../app_colors.dart'; // 导入 app_colors.dart 文件
 import '../constants.dart'; // 导入 constants.dart 文件
@@ -70,6 +72,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Form(
       key: _form, // 绑定表单键
       child: Column(
@@ -78,7 +81,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
           TextFormField(
             controller: _titleController, // 绑定标题控制器
             decoration: AppConstants.inputDecoration.copyWith(
-              labelText: "Event Title", // 标签文本
+              labelText: t('event_title'), // 标签文本
               floatingLabelBehavior: FloatingLabelBehavior.always,
             ),
             style: TextStyle(
@@ -88,7 +91,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
             validator: (value) {
               final title = value?.trim(); // 去除标题的空格
               if (title == null || title == "") {
-                return "Please enter event title."; // 验证标题
+                return t('please_enter_event_title'); // 验证标题
               }
               return null;
             },
@@ -103,7 +106,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
               Expanded(
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
-                    labelText: "Start Date", // 开始日期标签文本
+                    labelText: t('start_date'), // 开始日期标签文本
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     prefixIcon: const Icon(
                       Icons.calendar_today_outlined,
@@ -123,7 +126,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   },
                   validator: (value) {
                     if (value == null || value == "") {
-                      return "Please select start date."; // 验证开始日期
+                      return t('please_select_start_date'); // 验证开始日期
                     }
                     return null;
                   },
@@ -140,7 +143,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                 child: DateTimeSelectorFormField(
                   initialDateTime: _endDate, // 初始结束日期
                   decoration: AppConstants.inputDecoration.copyWith(
-                    labelText: "End Date", // 结束日期标签文本
+                    labelText: t('end_date'), // 结束日期标签文本
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     prefixIcon: const Icon(
                       Icons.calendar_today_outlined,
@@ -151,7 +154,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   onSelect: (date) {
                     if (date.withoutTime.isBefore(_startDate.withoutTime)) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('End date occurs before start date.'), // 提示结束日期早于开始日期
+                        content: Text(t('end_date_before_start')), // 提示结束日期早于开始日期
                       ));
                     } else {
                       _endDate = date.withoutTime; // 设置结束日期
@@ -162,7 +165,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
                   },
                   validator: (value) {
                     if (value == null || value == "") {
-                      return "Please select end date."; // 验证结束日期
+                      return t('please_select_end_date'); // 验证结束日期
                     }
                     return null;
                   },
@@ -182,7 +185,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
               Expanded(
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
-                    labelText: "Start Time", // 开始时间标签文本
+                    labelText: t('start_time'), // 开始时间标签文本
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     prefixIcon: const Icon(
                       Icons.schedule_rounded,
@@ -216,7 +219,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
               Expanded(
                 child: DateTimeSelectorFormField(
                   decoration: AppConstants.inputDecoration.copyWith(
-                    labelText: "End Time", // 结束时间标签文本
+                    labelText: t('end_time'), // 结束时间标签文本
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     prefixIcon: const Icon(
                       Icons.schedule_rounded,
@@ -265,12 +268,12 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
             maxLength: 1000, // 最大长度
             validator: (value) {
               if (value == null || value.trim() == "") {
-                return "Please enter event description."; // 验证事件描述
+                return t('please_enter_event_description'); // 验证事件描述
               }
               return null;
             },
             decoration: AppConstants.inputDecoration.copyWith(
-              hintText: "Event Description", // 提示文本
+              hintText: t('event_description'), // 提示文本
               hintStyle: TextStyle(
                 color: AppColors.black,
                 fontSize: 17,
@@ -283,7 +286,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
           Row(
             children: [
               Text(
-                "Event Color: ",
+                '${t('event_color')}: ',
                 style: TextStyle(
                   color: AppColors.black, // 文字颜色
                   fontSize: 17,
@@ -323,7 +326,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
               height: 52,
               fontSize: 17,
               onTap: _createEvent, // 创建或更新事件
-              title: widget.event == null ? "Add Event" : "Update Event", // 按钮文本
+              title: widget.event == null ? t('add_event') : t('update_event'), // 按钮文本
             ),
           ),
         ],
@@ -362,20 +365,8 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
     _color = event.color; // 设置颜色
   }
 
-  void _resetForm() {
-    _form.currentState?.reset(); // 重置表单
-    _startDate = DateTime.now().withoutTime; // 重置开始日期
-    _endDate = DateTime.now().withoutTime; // 重置结束日期
-    _startTime = null; // 重置开始时间
-    _endTime = null; // 重置结束时间
-    _color = Colors.blue; // 重置颜色
-
-    if (mounted) {
-      setState(() {}); // 更新状态
-    }
-  }
-
   Widget _displayColorPicker(BuildContext dialogContext) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     var color = _color; // 获取当前颜色
     return SimpleDialog(
       clipBehavior: Clip.hardEdge, // 裁剪行为
@@ -385,7 +376,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
       contentPadding: EdgeInsets.all(5.0), // 设置内容内边距
       children: [
         Text(
-          "Select event color",
+          t('select_event_color'),
           style: TextStyle(
             color: AppColors.black, // 文字颜色
             fontSize: 15.0, // 字体大小
@@ -411,7 +402,7 @@ class _AddOrEditEventFormState extends State<AddOrEditEventForm> {
               width: 120,
               height: 42,
               fontSize: 14,
-              title: "Select", // 按钮文本
+              title: t('select'), // 按钮文本
               onTap: () {
                 setState(() {
                   _color = color; // 更新颜色

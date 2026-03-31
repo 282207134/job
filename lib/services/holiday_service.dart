@@ -39,13 +39,16 @@ class HolidayService {
     selectionVersion.value++;
   }
 
-  static String countryLabel(String code) {
+  static String countryLabel(
+    String code,
+    String Function(String)? t,
+  ) {
     switch (code) {
       case cn:
-        return '中国节日';
+        return t?.call('holiday_country_cn') ?? 'China Holidays';
       case jp:
       default:
-        return '日本祝日';
+        return t?.call('holiday_country_jp') ?? 'Japan Holidays';
     }
   }
 
@@ -131,7 +134,7 @@ class HolidayService {
       final ref = db.collection('events').doc(id);
       batch.set(ref, {
         'title': h.localName,
-        'description': '${countryLabel(country)}: ${h.englishName}',
+        'description': '${countryLabel(country, null)}: ${h.englishName}',
         'date': Timestamp.fromDate(day),
         'endDate': Timestamp.fromDate(day),
         'startTime': null,

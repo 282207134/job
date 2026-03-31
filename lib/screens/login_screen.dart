@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart'; // 引入Flutter材料设计库
 import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
-import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kantankanri/screens/signup_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../controllers/login_controller.dart'; // 引入Firebase认证库
+import '../providers/app_language_provider.dart';
 
 // 定义LoginScreen类，一个有状态的小部件
 class LoginScreen extends StatefulWidget {
@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Scaffold(
         backgroundColor: Colors.blue.shade300,
         // appBar: AppBar(title: Text("Login")), // 可以选择添加一个标题栏
@@ -49,11 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: email, // 使用email控制器
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Email is required"; // 验证邮箱输入
+                      return t('email_required'); // 验证邮箱输入
                     }
+                    return null;
                   },
                   decoration: InputDecoration(
-                      label: Text("Email"),
+                      label: Text(t('email')),
                       filled: true,
                       fillColor: Colors.white,
                       prefixIcon: Icon(Icons.mail),
@@ -70,14 +72,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: password, // 使用password控制器
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Password is required"; // 验证密码输入
+                      return t('password_required'); // 验证密码输入
                     }
+                    return null;
                   },
                   obscureText: true, // 隐藏输入内容
                   enableSuggestions: false, // 禁止建议
                   autocorrect: false, // 禁止自动更正
                   decoration: InputDecoration(
-                      label: Text("Password"),
+                      label: Text(t('password')),
                       filled: true,
                       fillColor: Colors.white,
                       prefixIcon: Icon(Icons.lock),
@@ -119,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: Colors.white,
                                   ),
                                 ) // 显示加载中动画
-                              : Text("Login")), // 显示登录文本
+                              : Text(t('login'))), // 显示登录文本
                     ),
                   ],
                 ),
@@ -127,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('ユーザを持っていない'), // 提示没有账户
+                    Text(t('no_account')), // 提示没有账户
                     SizedBox(width: 5),
                     InkWell(
                       onTap: () {
@@ -136,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           return const SignupScreen();
                         }));
                       },
-                      child: Text("ここから登録する", // 提供注册链接
+                      child: Text(t('register_here'), // 提供注册链接
                           style: TextStyle(
                               color: Colors.blue,
                               fontWeight: FontWeight.bold)), // 链接样式

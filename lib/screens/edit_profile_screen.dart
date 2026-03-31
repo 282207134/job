@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart'; // 引入Flutter材料设计库
 import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
-import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
 import 'package:provider/provider.dart'; // 引入状态管理库
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../providers/app_language_provider.dart';
 import '../providers/userProvider.dart'; // 引入Cloud Firestore库
 
 // 定义EditProfileScreen类，一个有状态的小部件
@@ -49,12 +49,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider =
-        Provider.of<UserProvider>(context); // 从Provider中获取UserProvider实例
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("名前変更"), // 应用栏标题
+        title: Text(t('edit_name')), // 应用栏标题
         actions: [
           InkWell(
             onTap: () {
@@ -85,12 +84,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         AutovalidateMode.onUserInteraction, // 用户交互时自动验证
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Name cannot be empty."; // 验证姓名输入是否为空
+                        return t('name_empty'); // 验证姓名输入是否为空
                       }
+                      return null;
                     },
                     controller: nameText, // 使用nameText控制器
                     decoration: InputDecoration(
-                      label: Text("Name"), filled: true,
+                      label: Text(t('name')), filled: true,
                       fillColor: Colors.grey.shade100, // 名称输入框装饰
                     )),
               )

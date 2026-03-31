@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../controllers/signup_controller.dart';
 
@@ -92,6 +94,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -115,7 +118,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'アカウント作成',
+                  t('create_account'),
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
@@ -124,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'メールとパスワードで登録してください',
+                  t('register_with_email_password'),
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: Colors.grey.shade600,
                     height: 1.4,
@@ -147,14 +150,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           textInputAction: TextInputAction.next,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: _fieldDecoration(
-                            label: 'メールアドレス',
+                            label: t('email_address'),
                             icon: Icons.mail_outline_rounded,
                             hint: 'example@email.com',
                           ),
                           validator: (value) {
                             final v = value?.trim() ?? '';
-                            if (v.isEmpty) return 'メールアドレスを入力してください';
-                            if (!v.contains('@')) return '有効なメール形式で入力してください';
+                            if (v.isEmpty) return t('email_required');
+                            if (!v.contains('@')) return t('valid_email_required');
                             return null;
                           },
                         ),
@@ -167,16 +170,16 @@ class _SignupScreenState extends State<SignupScreen> {
                           textInputAction: TextInputAction.next,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: _fieldDecoration(
-                            label: 'パスワード',
+                            label: t('password'),
                             icon: Icons.lock_outline_rounded,
-                            hint: '6文字以上を推奨',
+                            hint: t('password_hint_6'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'パスワードを入力してください';
+                              return t('password_required');
                             }
                             if (value.length < 6) {
-                              return '6文字以上にしてください';
+                              return t('password_min_6');
                             }
                             return null;
                           },
@@ -191,16 +194,16 @@ class _SignupScreenState extends State<SignupScreen> {
                           textInputAction: TextInputAction.next,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: _fieldDecoration(
-                            label: 'パスワード（確認）',
+                            label: t('confirm_password'),
                             icon: Icons.lock_person_outlined,
-                            hint: 'もう一度入力',
+                            hint: t('confirm_password_hint'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '確認用パスワードを入力してください';
+                              return t('confirm_password_required');
                             }
                             if (value != _password.text) {
-                              return 'パスワードが一致しません';
+                              return t('password_not_match');
                             }
                             return null;
                           },
@@ -212,13 +215,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           textCapitalization: TextCapitalization.words,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: _fieldDecoration(
-                            label: 'お名前',
+                            label: t('name'),
                             icon: Icons.person_outline_rounded,
                           ),
                           onFieldSubmitted: (_) => _submit(),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'お名前を入力してください';
+                              return t('enter_name');
                             }
                             return null;
                           },
@@ -244,8 +247,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text(
-                                  'ユーザ登録',
+                              : Text(
+                                  t('register_user'),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

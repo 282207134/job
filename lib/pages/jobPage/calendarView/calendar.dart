@@ -4,8 +4,11 @@ import 'package:flutter/material.dart'; // 导入 Flutter 的 Material 组件库
 import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Firestore 库，用于与 Firebase Firestore 进行数据交互
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入日历视图组件
+import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/src/constants.dart';
 import 'package:kantankanri/services/holiday_service.dart';
 import 'package:kantankanri/services/shared_calendar_service.dart';
+import 'package:provider/provider.dart';
 import 'pages/CalendarPage.dart'; // 导入日历页面
 
 // 创建一个名为 calendar 的无状态组件
@@ -17,6 +20,25 @@ class calendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<AppLanguageProvider>(context, listen: false);
+    final t = lang.tr;
+    switch (lang.language) {
+      case AppLanguage.zh:
+        Constants.weekTitles
+          ..clear()
+          ..addAll(const ['一', '二', '三', '四', '五', '六', '日']);
+        break;
+      case AppLanguage.ja:
+        Constants.weekTitles
+          ..clear()
+          ..addAll(const ['月', '火', '水', '木', '金', '土', '日']);
+        break;
+      case AppLanguage.en:
+        Constants.weekTitles
+          ..clear()
+          ..addAll(const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+        break;
+    }
     return Scaffold( // 返回一个脚手架组件，提供基本的视觉结构
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>( // 使用 StreamBuilder 监听 Firestore 数据流
         stream: FirebaseFirestore.instance.collection('events').snapshots(), // 监听 'events' 集合的快照
@@ -26,7 +48,7 @@ class calendar extends StatelessWidget {
           }
 
           if (snapshot.hasError) { // 如果发生错误
-            return Center(child: Text('Error: ${snapshot.error}')); // 显示错误信息
+            return Center(child: Text('${t('error')}: ${snapshot.error}')); // 显示错误信息
           }
 
           return ValueListenableBuilder<CalendarRoom>(

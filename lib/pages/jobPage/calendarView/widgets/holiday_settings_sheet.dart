@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../services/holiday_service.dart';
 
@@ -52,6 +54,7 @@ class _HolidaySettingsSheetState extends State<HolidaySettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
       child: _loading
@@ -64,7 +67,7 @@ class _HolidaySettingsSheetState extends State<HolidaySettingsSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '节日设置',
+                  t('holiday_settings'),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -73,12 +76,12 @@ class _HolidaySettingsSheetState extends State<HolidaySettingsSheet> {
                 CheckboxListTile(
                   value: _countries.contains(HolidayService.jp),
                   onChanged: (v) => _toggle(HolidayService.jp, v ?? false),
-                  title: const Text('日本祝日'),
+                  title: Text(HolidayService.countryLabel(HolidayService.jp, t)),
                 ),
                 CheckboxListTile(
                   value: _countries.contains(HolidayService.cn),
                   onChanged: (v) => _toggle(HolidayService.cn, v ?? false),
-                  title: const Text('中国节日'),
+                  title: Text(HolidayService.countryLabel(HolidayService.cn, t)),
                 ),
               ],
             ),

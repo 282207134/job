@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:provider/provider.dart';
 
+import '../providers/app_language_provider.dart';
 import '../providers/userProvider.dart';
 import '../services/profile_media_service.dart';
 import 'edit_profile_screen.dart'; // 引入状态管理库
@@ -24,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _uploadingAvatar = false;
 
   Future<void> _changeAvatar() async {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     if (_uploadingAvatar) return;
     final x = await ImagePicker().pickImage(
       source: ImageSource.gallery,
@@ -35,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final url = await ProfileMediaService.uploadAvatar(x);
       final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) throw Exception('未登录');
+      if (uid == null) throw Exception(t('not_logged_in'));
       await FirebaseFirestore.instance.collection('users').doc(uid).update({
         'avatar_url': url,
       });
@@ -43,12 +45,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await Provider.of<UserProvider>(context, listen: false).getUserDetails();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('头像已更新')),
+        SnackBar(content: Text(t('avatar_updated'))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('头像更新失败: $e')),
+        SnackBar(content: Text('${t('avatar_update_failed')}: $e')),
       );
     } finally {
       if (mounted) setState(() => _uploadingAvatar = false);
@@ -59,10 +61,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     var userProvider =
         Provider.of<UserProvider>(context); // 从Provider获取UserProvider实例
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("个人信息"), // 设置应用栏标题
+        title: Text(t('profile_info')), // 设置应用栏标题
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         surfaceTintColor: Colors.transparent,
@@ -106,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: const CircleBorder(),
                     elevation: 2,
                     child: IconButton(
-                      tooltip: '更换头像',
+                      tooltip: t('change_avatar'),
                       onPressed: _uploadingAvatar ? null : _changeAvatar,
                       icon: _uploadingAvatar
                           ? const SizedBox(
@@ -138,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }));
                 },
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text("修改姓名"),
+                label: Text(t('edit_name')),
               ),
             ],
               ),

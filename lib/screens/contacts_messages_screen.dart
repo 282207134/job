@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/app_language_provider.dart';
 import '../providers/userProvider.dart';
 import '../services/messaging_service.dart';
 import 'direct_chat_screen.dart';
@@ -25,9 +26,11 @@ class ContactsMessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<AppLanguageProvider>(context, listen: false);
+    String t(String key) => lang.tr(key);
     final authUid = FirebaseAuth.instance.currentUser?.uid;
     if (authUid == null) {
-      return const Center(child: Text('ログインが必要です'));
+      return Center(child: Text(t('contacts_login_required')));
     }
 
     return ColoredBox(
@@ -40,7 +43,7 @@ class ContactsMessagesScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  '読み込みエラー: ${snap.error}',
+                  '${t('contacts_load_error')}: ${snap.error}',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -71,7 +74,7 @@ class ContactsMessagesScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                   child: Text(
-                    '申請・友だち',
+                    t('contacts_section_requests_friends'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.w600,
@@ -79,21 +82,21 @@ class ContactsMessagesScreen extends StatelessWidget {
                   ),
                 ),
                 if (incoming.isNotEmpty) ...[
-                  const _SectionTitle('受け取った申請'),
+                  _SectionTitle(t('contacts_incoming_requests')),
                   ...incoming.map((d) => _IncomingTile(
                         docId: d.id,
                         data: d.data(),
                       )),
                 ],
                 if (outgoing.isNotEmpty) ...[
-                  const _SectionTitle('送った申請（承認待ち）'),
+                  _SectionTitle(t('contacts_outgoing_pending')),
                   ...outgoing.map((d) => _OutgoingTile(
                         docId: d.id,
                         data: d.data(),
                         myUid: authUid,
                       )),
                 ],
-                const _SectionTitle('友だち'),
+                _SectionTitle(t('contacts_friends')),
                 if (activeDocs.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -101,7 +104,7 @@ class ContactsMessagesScreen extends StatelessWidget {
                       vertical: 24,
                     ),
                     child: Text(
-                      '友だちがいません。右上の＋から追加できます。',
+                      t('contacts_empty_friends_hint'),
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   )
@@ -136,16 +139,15 @@ class _FriendChatListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: MessagingService.directChatLastMessageStream(pairId),
       builder: (context, msgSnap) {
-        var subtitle = 'メッセージがありません';
+        var subtitle = t('no_messages');
         if (msgSnap.hasError) {
-          subtitle = 'プレビューを読めません';
+          subtitle = t('contacts_preview_unavailable');
         } else if (msgSnap.hasData && msgSnap.data!.docs.isNotEmpty) {
-          subtitle = MessagingService.previewFromMessage(
-            msgSnap.data!.docs.first.data(),
-          );
+          subtitle = _previewFromMessage(msgSnap.data!.docs.first.data(), t);
         }
         return ListTile(
           leading: CircleAvatar(
@@ -174,6 +176,23 @@ class _FriendChatListTile extends StatelessWidget {
       },
     );
   }
+
+  String _previewFromMessage(
+    Map<String, dynamic> m,
+    String Function(String) t,
+  ) {
+    final kind = m['kind'] as String?;
+    if (kind == 'image') {
+      final cap = '${m['text'] ?? ''}'.trim();
+      if (cap.isNotEmpty) {
+        return cap.length > 40 ? '${cap.substring(0, 40)}…' : '${t('image')}: $cap';
+      }
+      return t('image');
+    }
+    final text = '${m['text'] ?? ''}'.trim();
+    if (text.isEmpty) return t('message');
+    return text.length > 50 ? '${text.substring(0, 50)}…' : text;
+  }
 }
 
 class _AddFriendBottomSheet extends StatefulWidget {
@@ -194,11 +213,12 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
   }
 
   Future<void> _submit() async {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     if (_busy) return;
     final email = _emailCtrl.text.trim();
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('メールを入力してください')),
+        SnackBar(content: Text(t('add_friend_email_required'))),
       );
       return;
     }
@@ -209,14 +229,14 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
       if (userSnap == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ユーザーが見つかりません')),
+            SnackBar(content: Text(t('user_not_found'))),
           );
         }
         return;
       }
       final data = userSnap.data()!;
       final targetUid = userSnap.id;
-      final targetName = '${data['name'] ?? 'ユーザー'}';
+      final targetName = '${data['name'] ?? t('user_default')}';
       if (!mounted) return;
       final prov = Provider.of<UserProvider>(context, listen: false);
       final err = await MessagingService.sendFriendRequest(
@@ -229,7 +249,7 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('送信しました')),
+          SnackBar(content: Text(t('request_sent'))),
         );
         Navigator.pop(context);
       }
@@ -240,6 +260,7 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Padding(
       padding: EdgeInsets.only(
         left: 24,
@@ -252,14 +273,14 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '友だちを追加',
+            t('add_friend'),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            '相手の登録メールアドレスを入力',
+            t('enter_registered_email'),
             style: TextStyle(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 16),
@@ -267,9 +288,9 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
             controller: _emailCtrl,
             enabled: !_busy,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'メールアドレス',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: t('email_address'),
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 20),
@@ -281,7 +302,7 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
                     width: 22,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('申請を送る'),
+                : Text(t('send_request')),
           ),
         ],
       ),
@@ -320,9 +341,10 @@ class _IncomingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     final from = data['requested_by'] as String? ?? '';
     final names = data['names'];
-    var fromName = 'ユーザー';
+    var fromName = t('user_default');
     if (names is Map && names[from] != null) fromName = '${names[from]}';
 
     return Card(
@@ -346,12 +368,12 @@ class _IncomingTile extends StatelessWidget {
                               .showSnackBar(SnackBar(content: Text(err)));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('承認しました')),
+                            SnackBar(content: Text(t('request_approved'))),
                           );
                         }
                       }
                     },
-                    child: const Text('承認'),
+                    child: Text(t('approve')),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -359,7 +381,7 @@ class _IncomingTile extends StatelessWidget {
                   child: TextButton(
                     onPressed: () =>
                         MessagingService.declineRequest(docId),
-                    child: const Text('却下'),
+                    child: Text(t('decline')),
                   ),
                 ),
               ],
@@ -384,14 +406,15 @@ class _OutgoingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     final name = MessagingService.peerName(data, myUid);
     return ListTile(
       leading: const Icon(Icons.hourglass_empty_rounded),
-      title: Text(name.isEmpty ? '承認待ち' : name),
-      subtitle: const Text('相手の承認を待っています'),
+      title: Text(name.isEmpty ? t('pending_approval') : name),
+      subtitle: Text(t('waiting_for_approval')),
       trailing: TextButton(
         onPressed: () => MessagingService.cancelOutgoing(docId),
-        child: const Text('取り消し'),
+        child: Text(t('cancel_request')),
       ),
     );
   }

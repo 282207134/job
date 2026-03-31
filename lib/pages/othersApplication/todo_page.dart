@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoEntry {
@@ -96,6 +98,7 @@ class _todo_pageState extends State<todo_page> {
   }
 
   Widget _buildList(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
     return Column(
       children: [
         Padding(
@@ -106,9 +109,9 @@ class _todo_pageState extends State<todo_page> {
               Expanded(
                 child: TextField(
                   controller: _controller,
-                  decoration: const InputDecoration(
-                    labelText: '新しいタスク',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: t('todo_new_task'),
+                    border: const OutlineInputBorder(),
                   ),
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _add(),
@@ -125,10 +128,10 @@ class _todo_pageState extends State<todo_page> {
         ),
         Expanded(
           child: _items.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'タスクがありません',
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    t('todo_empty'),
+                    style: const TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                 )
               : ListView.builder(
@@ -173,7 +176,9 @@ class _todo_pageState extends State<todo_page> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo'),
+        title: Text(
+          Provider.of<AppLanguageProvider>(context, listen: false).tr('todo'),
+        ),
       ),
       body: _buildList(context),
     );

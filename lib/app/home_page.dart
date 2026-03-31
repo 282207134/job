@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
+import 'package:kantankanri/providers/app_language_provider.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/contacts_messages_screen.dart';
 import 'package:kantankanri/screens/shared_calendar_sheet.dart';
@@ -47,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final langProvider = Provider.of<AppLanguageProvider>(context);
     final navIndex = currentPageIndex.clamp(0, _navLength - 1);
 
     return Scaffold(
@@ -60,9 +62,17 @@ class _HomePageState extends State<HomePage> {
         title: navIndex == 0
             ? ValueListenableBuilder<CalendarRoom>(
                 valueListenable: SharedCalendarService.selectedRoomNotifier,
-                builder: (context, room, _) => Text(room.titleText),
+                builder: (context, room, _) => Text(
+                  room.isPersonal
+                      ? langProvider.tr('my_calendar')
+                      : '${langProvider.tr('shared_calendar')}: ${room.name}',
+                ),
               )
-            : Text(navIndex == 2 ? '連絡先' : 'スケジュール管理'),
+            : Text(
+                navIndex == 2
+                    ? langProvider.tr('contacts')
+                    : langProvider.tr('title_schedule'),
+              ),
         actions: [
           if (navIndex == 2)
             IconButton(
@@ -88,20 +98,20 @@ class _HomePageState extends State<HomePage> {
         indicatorColor: Colors.grey.shade200,
         selectedIndex: navIndex,
         destinations: <Widget>[
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.calendar_month),
-            icon: Icon(Icons.calendar_month),
-            label: 'calendar',
+          NavigationDestination(
+            selectedIcon: const Icon(Icons.calendar_month),
+            icon: const Icon(Icons.calendar_month),
+            label: langProvider.tr('calendar'),
           ),
-          const NavigationDestination(
-            selectedIcon: Icon(Icons.task_alt),
-            icon: Icon(Icons.task_alt_outlined),
-            label: 'Todo',
+          NavigationDestination(
+            selectedIcon: const Icon(Icons.task_alt),
+            icon: const Icon(Icons.task_alt_outlined),
+            label: langProvider.tr('todo'),
           ),
           NavigationDestination(
             selectedIcon: const Icon(Icons.people_alt_rounded),
             icon: const _MessagesNavIcon(),
-            label: '連絡先',
+            label: langProvider.tr('contacts'),
           ),
         ],
       ),
@@ -137,13 +147,13 @@ class _HomePageState extends State<HomePage> {
               title: Text(
                 userProvider.userName.isNotEmpty
                     ? userProvider.userName
-                    : 'No name available',
+                    : langProvider.tr('no_name_available'),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
                 userProvider.userEmail.isNotEmpty
                     ? userProvider.userEmail
-                    : 'No email available',
+                    : langProvider.tr('no_email_available'),
               ),
             ),
             ListTile(
@@ -156,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               leading: const Icon(Icons.people),
-              title: const Text('個人情報'),
+              title: Text(langProvider.tr('profile')),
             ),
             ListTile(
               onTap: () async {
@@ -164,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                 await HolidaySettingsSheet.show(context);
               },
               leading: const Icon(Icons.celebration_outlined),
-              title: const Text('节日设置'),
+              title: Text(langProvider.tr('holiday_settings')),
             ),
             ListTile(
               onTap: () async {
@@ -172,7 +182,12 @@ class _HomePageState extends State<HomePage> {
                 await SharedCalendarSheet.show(context);
               },
               leading: const Icon(Icons.edit_calendar_outlined),
-              title: const Text('共享日历'),
+              title: Text(langProvider.tr('shared_calendar')),
+            ),
+            ListTile(
+              onTap: () => _showLanguageSheet(context, langProvider),
+              leading: const Icon(Icons.language),
+              title: Text(langProvider.tr('language_settings')),
             ),
             ListTile(
               onTap: () async {
@@ -187,8 +202,59 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
+              title: Text(langProvider.tr('logout')),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showLanguageSheet(
+    BuildContext context,
+    AppLanguageProvider langProvider,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<AppLanguage>(
+              value: AppLanguage.zh,
+              groupValue: langProvider.language,
+              title: Text(langProvider.tr('language_zh')),
+              onChanged: (v) async {
+                if (v == null) return;
+                await langProvider.setLanguage(v);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+            ),
+            RadioListTile<AppLanguage>(
+              value: AppLanguage.ja,
+              groupValue: langProvider.language,
+              title: Text(langProvider.tr('language_ja')),
+              onChanged: (v) async {
+                if (v == null) return;
+                await langProvider.setLanguage(v);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+            ),
+            RadioListTile<AppLanguage>(
+              value: AppLanguage.en,
+              groupValue: langProvider.language,
+              title: Text(langProvider.tr('language_en')),
+              onChanged: (v) async {
+                if (v == null) return;
+                await langProvider.setLanguage(v);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

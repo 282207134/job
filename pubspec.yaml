@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter # Flutter SDK
+  flutter_localizations:
+    sdk: flutter
   google_maps_flutter: ^2.10.0 # 更新谷歌地图插件
   geolocator: ^13.0.2 # 更新地理定位插件
   cupertino_icons: ^1.0.2 # iOS风格图标

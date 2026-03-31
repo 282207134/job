@@ -206,7 +206,7 @@ class MessagingService {
     if (names is Map && peer.isNotEmpty && names[peer] != null) {
       return '${names[peer]}';
     }
-    return peer.isNotEmpty ? 'ユーザー ($peer)' : '';
+    return peer;
   }
 
   /// 一覧用：最終メッセージのプレビュー文言
