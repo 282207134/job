@@ -28,7 +28,7 @@ class CalendarRoom {
   String get titleText {
     if (isPersonal) return name;
     final owner = ownerName.trim().isEmpty ? '未知用户' : ownerName.trim();
-    return '【$name】：由【$owner】共享';
+    return '共享日历$name:由$owner共享';
   }
 }
 
@@ -45,7 +45,6 @@ class SharedCalendarService {
       ownerName: '',
     ),
   );
-  static final roomInvalidNoticeNotifier = ValueNotifier<String?>(null);
 
   static String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
@@ -90,7 +89,6 @@ class SharedCalendarService {
       final members =
           List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
       if (!roomDoc.exists || !members.contains(uid)) {
-        roomInvalidNoticeNotifier.value = '该共享日历已被删除或你已被移出成员，已切回我的日历。';
         selectedRoomNotifier.value = CalendarRoom(
           id: personalId,
           name: '我的日历',
@@ -100,7 +98,6 @@ class SharedCalendarService {
         );
       }
     } catch (_) {
-      roomInvalidNoticeNotifier.value = '共享日历状态异常，已切回我的日历。';
       selectedRoomNotifier.value = CalendarRoom(
         id: personalId,
         name: '我的日历',
@@ -111,12 +108,23 @@ class SharedCalendarService {
     }
   }
 
-  static void clearRoomInvalidNotice() {
-    roomInvalidNoticeNotifier.value = null;
-  }
-
   static void selectRoom(CalendarRoom room) {
     selectedRoomNotifier.value = room;
+  }
+
+  static Future<void> selectRoomSafely(CalendarRoom room) async {
+    final uid = _uid;
+    if (uid == null) throw Exception('未登录');
+    if (room.isPersonal) {
+      selectRoom(room);
+      return;
+    }
+    final doc = await _db.collection('shared_calendars').doc(room.id).get();
+    final members = List<String>.from(doc.data()?['member_uids'] as List? ?? const []);
+    if (!doc.exists || !members.contains(uid)) {
+      throw Exception('改共享日历不存在');
+    }
+    selectRoom(room);
   }
 
   static Stream<List<CalendarRoom>> myRoomsStream() async* {
@@ -191,38 +199,57 @@ class SharedCalendarService {
   }) async {
     final uid = _uid;
     if (uid == null) throw Exception('未登录');
-    final q = email.trim().toLowerCase();
-    if (q.isEmpty) throw Exception('请输入邮箱');
-    final userSnap =
-        await _db.collection('users').where('email', isEqualTo: q).limit(1).get();
+    final raw = email.trim();
+    if (raw.isEmpty) throw Exception('请输入邮箱');
+    final q = raw.toLowerCase();
+    QuerySnapshot<Map<String, dynamic>> userSnap = await _db
+        .collection('users')
+        .where('email', isEqualTo: q)
+        .limit(1)
+        .get();
+    // 兼容旧数据：历史账号邮箱可能未小写化
+    if (userSnap.docs.isEmpty && raw != q) {
+      userSnap = await _db
+          .collection('users')
+          .where('email', isEqualTo: raw)
+          .limit(1)
+          .get();
+    }
     if (userSnap.docs.isEmpty) throw Exception('未找到该用户');
     final target = userSnap.docs.first;
     final toUid = target.id;
     final toName = '${target.data()['name'] ?? '用户'}';
     if (toUid == uid) throw Exception('不能邀请自己');
 
-    final roomDoc = await _db.collection('shared_calendars').doc(roomId).get();
-    if (!roomDoc.exists) throw Exception('共享日历不存在');
-    final members =
-        List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
-    if (members.contains(toUid)) throw Exception('该用户已在共享日历中');
+    try {
+      final roomDoc = await _db.collection('shared_calendars').doc(roomId).get();
+      if (!roomDoc.exists) throw Exception('改共享日历不存在');
+      final members =
+          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      if (members.contains(toUid)) throw Exception('该用户已在共享日历中');
 
-    final inviteId = '${roomId}_$toUid';
-    final existed = await _db.collection('calendar_invites').doc(inviteId).get();
-    if (existed.exists && existed.data()?['status'] == 'pending') {
-      throw Exception('邀请已发送');
+      final inviteId = '${roomId}_$toUid';
+      final existed = await _db.collection('calendar_invites').doc(inviteId).get();
+      if (existed.exists && existed.data()?['status'] == 'pending') {
+        throw Exception('邀请已发送');
+      }
+
+      await _db.collection('calendar_invites').doc(inviteId).set({
+        'room_id': roomId,
+        'room_name': roomName,
+        'from_uid': uid,
+        'from_name': fromName,
+        'to_uid': toUid,
+        'to_name': toName,
+        'status': 'pending',
+        'created_at': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw Exception('权限不足：请先在 Firebase 发布最新 firestore.rules');
+      }
+      throw Exception(e.message ?? e.code);
     }
-
-    await _db.collection('calendar_invites').doc(inviteId).set({
-      'room_id': roomId,
-      'room_name': roomName,
-      'from_uid': uid,
-      'from_name': fromName,
-      'to_uid': toUid,
-      'to_name': toName,
-      'status': 'pending',
-      'created_at': FieldValue.serverTimestamp(),
-    });
   }
 
   static Future<void> respondInvite({
@@ -263,7 +290,7 @@ class SharedCalendarService {
     if (uid == null) throw Exception('未登录');
     final roomRef = _db.collection('shared_calendars').doc(roomId);
     final roomDoc = await roomRef.get();
-    if (!roomDoc.exists) throw Exception('共享日历不存在');
+    if (!roomDoc.exists) throw Exception('改共享日历不存在');
     final ownerUid = '${roomDoc.data()?['owner_uid'] ?? ''}';
     if (ownerUid != uid) throw Exception('只有创建者可以删除');
 

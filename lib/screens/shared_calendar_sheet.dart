@@ -56,6 +56,9 @@ class SharedCalendarSheet extends StatelessWidget {
             StreamBuilder<List<CalendarRoom>>(
               stream: SharedCalendarService.myRoomsStream(),
               builder: (context, snap) {
+                if (snap.hasError) {
+                  return Text('读取日历房间失败: ${snap.error}');
+                }
                 final rooms = snap.data ?? const <CalendarRoom>[];
                 if (rooms.isEmpty) {
                   return const Text('暂无可用日历');
@@ -123,8 +126,25 @@ class SharedCalendarSheet extends StatelessWidget {
                             ],
                           ),
                           onTap: () {
-                            SharedCalendarService.selectRoom(r);
-                            Navigator.of(context).pop();
+                            SharedCalendarService.selectRoomSafely(r)
+                                .then((_) {
+                              if (context.mounted) Navigator.of(context).pop();
+                            }).catchError((e) {
+                              if (!context.mounted) return;
+                              showDialog<void>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('共享日历提示'),
+                                  content: Text('$e'.replaceFirst('Exception: ', '')),
+                                  actions: [
+                                    FilledButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text('知道了'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
                           },
                         );
                       }).toList(),
@@ -140,6 +160,9 @@ class SharedCalendarSheet extends StatelessWidget {
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: SharedCalendarService.pendingInvitesStream(),
               builder: (context, snap) {
+                if (snap.hasError) {
+                  return Text('读取邀请失败: ${snap.error}');
+                }
                 final docs = (snap.data?.docs ?? [])
                     .where((d) => d.data()['status'] == 'pending')
                     .toList();

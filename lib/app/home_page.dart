@@ -29,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    SharedCalendarService.roomInvalidNoticeNotifier.addListener(_onRoomInvalidNotice);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (currentPageIndex >= _navLength) {
@@ -42,31 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    SharedCalendarService.roomInvalidNoticeNotifier
-        .removeListener(_onRoomInvalidNotice);
     super.dispose();
-  }
-
-  void _onRoomInvalidNotice() {
-    final msg = SharedCalendarService.roomInvalidNoticeNotifier.value;
-    if (!mounted || msg == null || msg.isEmpty) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('共享日历提示'),
-          content: Text(msg),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('知道了'),
-            ),
-          ],
-        ),
-      );
-      SharedCalendarService.clearRoomInvalidNotice();
-    });
   }
 
   @override

@@ -49,6 +49,9 @@ class CreateEventPage extends StatelessWidget {
               final uid = me?.uid ?? '';
               final room = SharedCalendarService.selectedRoomNotifier.value;
               final actorName = me?.displayName ?? me?.email ?? 'me';
+              if (!room.isPersonal) {
+                await SharedCalendarService.selectRoomSafely(room);
+              }
               final oldMap = event?.event is Map
                   ? Map<String, dynamic>.from(event!.event as Map)
                   : <String, dynamic>{};
