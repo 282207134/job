@@ -705,6 +705,26 @@ class AppLanguageProvider extends ChangeNotifier {
         AppLanguage.ja: '選択',
         AppLanguage.en: 'Select',
       },
+      'search_events': {
+        AppLanguage.zh: '搜索活动',
+        AppLanguage.ja: 'イベントを検索',
+        AppLanguage.en: 'Search events',
+      },
+      'search_event_hint': {
+        AppLanguage.zh: '输入标题或描述',
+        AppLanguage.ja: 'タイトルまたは説明を入力',
+        AppLanguage.en: 'Search by title or description',
+      },
+      'search_no_results': {
+        AppLanguage.zh: '没有匹配的活动',
+        AppLanguage.ja: '一致するイベントがありません',
+        AppLanguage.en: 'No matching events',
+      },
+      'search_start_typing': {
+        AppLanguage.zh: '输入关键词开始搜索',
+        AppLanguage.ja: 'キーワードを入力して検索',
+        AppLanguage.en: 'Start typing to search',
+      },
     };
     return table[key]?[_language] ?? key;
   }

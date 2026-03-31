@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart';
+import 'package:kantankanri/pages/jobPage/calendarView/pages/event_details_page.dart';
 import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/app_language_provider.dart';
@@ -9,6 +11,7 @@ import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/contacts_messages_screen.dart';
 import 'package:kantankanri/screens/shared_calendar_sheet.dart';
 import 'package:kantankanri/services/messaging_service.dart';
+import 'package:kantankanri/services/holiday_service.dart';
 import 'package:kantankanri/services/shared_calendar_service.dart';
 import 'package:kantankanri/screens/profile_screen.dart';
 import 'package:kantankanri/screens/splash_screen.dart';
@@ -80,10 +83,10 @@ class _HomePageState extends State<HomePage> {
               onPressed: () =>
                   ContactsMessagesScreen.showAddFriendDialog(context),
             )
-          else
+          else if (navIndex == 0)
             IconButton(
               icon: const Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () => _showEventSearch(context, langProvider),
             ),
         ],
       ),
@@ -259,6 +262,177 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showEventSearch(
+    BuildContext context,
+    AppLanguageProvider langProvider,
+  ) async {
+    final selected = await showModalBottomSheet<CalendarEventData>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetCtx) {
+        final query = ValueNotifier<String>('');
+        final controller = TextEditingController();
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(sheetCtx).viewInsets.bottom + 12,
+            ),
+            child: SizedBox(
+              height: 460,
+              child: Column(
+                children: [
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: langProvider.tr('search_event_hint'),
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: (v) => query.value = v.trim().toLowerCase(),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('events')
+                          .snapshots(),
+                      builder: (context, snap) {
+                        if (snap.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (snap.hasError) {
+                          return Center(
+                            child: Text('${langProvider.tr('error')}: ${snap.error}'),
+                          );
+                        }
+                        final docs = snap.data?.docs ?? const [];
+                        final room = SharedCalendarService.selectedRoomNotifier.value;
+                        final myUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                        final events = docs
+                            .map(_eventFromDoc)
+                            .where(
+                              (e) => !_isHolidayEvent(e) && _inCurrentRoom(e, room, myUid),
+                            )
+                            .toList()
+                          ..sort((a, b) => b.date.compareTo(a.date));
+
+                        return ValueListenableBuilder<String>(
+                          valueListenable: query,
+                          builder: (context, q, _) {
+                            if (q.isEmpty) {
+                              return Center(
+                                child: Text(langProvider.tr('search_start_typing')),
+                              );
+                            }
+                            final matched = events.where((e) {
+                              final title = e.title.toLowerCase();
+                              final desc = (e.description ?? '').toLowerCase();
+                              return title.contains(q) || desc.contains(q);
+                            }).toList();
+                            if (matched.isEmpty) {
+                              return Center(
+                                child: Text(langProvider.tr('search_no_results')),
+                              );
+                            }
+                            return ListView.separated(
+                              itemCount: matched.length,
+                              separatorBuilder: (_, __) => const Divider(height: 1),
+                              itemBuilder: (context, i) {
+                                final e = matched[i];
+                                final dateText =
+                                    '${e.date.year}-${e.date.month.toString().padLeft(2, '0')}-${e.date.day.toString().padLeft(2, '0')}';
+                                return ListTile(
+                                  title: Text(e.title),
+                                  subtitle: Text(
+                                    e.description?.isNotEmpty == true
+                                        ? '${e.description} · $dateText'
+                                        : dateText,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right),
+                                  onTap: () => Navigator.of(sheetCtx).pop(e),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!context.mounted || selected == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DetailsPage(event: selected),
+      ),
+    );
+  }
+
+  CalendarEventData _eventFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final raw = doc.data() ?? const <String, dynamic>{};
+    DateTime? getDateTime(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is String && value.isNotEmpty) {
+        return DateTime.tryParse(value);
+      }
+      return null;
+    }
+
+    Color getColor(dynamic value) {
+      if (value is int) return Color(value);
+      if (value is String) {
+        final parsed = int.tryParse(value);
+        if (parsed != null) return Color(parsed);
+      }
+      return Colors.blue;
+    }
+
+    return CalendarEventData(
+      id: doc.id,
+      title: '${raw['title'] ?? ''}',
+      description: raw['description'] as String?,
+      date: getDateTime(raw['date']) ?? DateTime.now(),
+      startTime: getDateTime(raw['startTime']),
+      endTime: getDateTime(raw['endTime']),
+      color: getColor(raw['color']),
+      endDate: getDateTime(raw['endDate']) ?? getDateTime(raw['date']) ?? DateTime.now(),
+      event: raw,
+    );
+  }
+
+  bool _isHolidayEvent(CalendarEventData event) {
+    return HolidayService.isHolidayEventData(event);
+  }
+
+  bool _inCurrentRoom(CalendarEventData event, CalendarRoom room, String myUid) {
+    final map = event.event is Map<String, dynamic>
+        ? event.event as Map<String, dynamic>
+        : <String, dynamic>{};
+    final calendarId = '${map['calendar_id'] ?? ''}';
+    if (calendarId.isNotEmpty) {
+      return calendarId == room.id;
+    }
+    if (!room.isPersonal) return false;
+    final createdBy = '${map['created_by_uid'] ?? ''}';
+    return createdBy.isEmpty || createdBy == myUid;
   }
 }
 
