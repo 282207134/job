@@ -252,6 +252,52 @@ class SharedCalendarService {
     }
   }
 
+  static Future<void> inviteByUid({
+    required String roomId,
+    required String roomName,
+    required String fromName,
+    required String toUid,
+    required String toName,
+  }) async {
+    final uid = _uid;
+    if (uid == null) throw Exception('未登录');
+    final targetUid = toUid.trim();
+    if (targetUid.isEmpty) throw Exception('未找到该用户');
+    if (targetUid == uid) throw Exception('不能邀请自己');
+
+    try {
+      final roomDoc = await _db.collection('shared_calendars').doc(roomId).get();
+      if (!roomDoc.exists) throw Exception('改共享日历不存在');
+      final ownerUid = '${roomDoc.data()?['owner_uid'] ?? ''}';
+      if (ownerUid != uid) throw Exception('只有创建者可以邀请成员');
+      final members =
+          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      if (members.contains(targetUid)) throw Exception('该用户已在共享日历中');
+
+      final inviteId = '${roomId}_$targetUid';
+      final existed = await _db.collection('calendar_invites').doc(inviteId).get();
+      if (existed.exists && existed.data()?['status'] == 'pending') {
+        throw Exception('邀请已发送');
+      }
+
+      await _db.collection('calendar_invites').doc(inviteId).set({
+        'room_id': roomId,
+        'room_name': roomName,
+        'from_uid': uid,
+        'from_name': fromName,
+        'to_uid': targetUid,
+        'to_name': toName,
+        'status': 'pending',
+        'created_at': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw Exception('权限不足：请先在 Firebase 发布最新 firestore.rules');
+      }
+      throw Exception(e.message ?? e.code);
+    }
+  }
+
   static Future<void> respondInvite({
     required String inviteId,
     required bool accept,

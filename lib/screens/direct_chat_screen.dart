@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../providers/userProvider.dart';
 import '../services/chat_media_service.dart';
 import '../services/messaging_service.dart';
+import '../services/shared_calendar_service.dart';
 
 /// 1対1チャット（`directChats/{pairId}/messages`）
 class DirectChatScreen extends StatefulWidget {
@@ -108,6 +109,139 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
       _toast('画像の送信に失敗しました: $msg');
     } finally {
       if (mounted) setState(() => _uploading = false);
+    }
+  }
+
+  String _peerUid() {
+    final my = _currentUid(context);
+    final parts = widget.pairId.split('__');
+    if (parts.length != 2) return '';
+    return parts[0] == my ? parts[1] : parts[0];
+  }
+
+  Future<void> _sendCalendarInvite() async {
+    final myUid = FirebaseAuth.instance.currentUser?.uid;
+    if (myUid == null) {
+      _toast('未登录');
+      return;
+    }
+    final peerUid = _peerUid();
+    if (peerUid.isEmpty) {
+      _toast('无法识别好友');
+      return;
+    }
+
+    final roomsSnap = await FirebaseFirestore.instance
+        .collection('shared_calendars')
+        .where('owner_uid', isEqualTo: myUid)
+        .get();
+    if (!mounted) return;
+    if (roomsSnap.docs.isEmpty) {
+      _toast('你还没有创建共享日历');
+      return;
+    }
+
+    final items = roomsSnap.docs
+        .map((d) => (id: d.id, name: '${d.data()['name'] ?? '共享日历'}'))
+        .toList();
+    String selectedRoomId = items.first.id;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx2, setState) {
+            return AlertDialog(
+              title: Text('发送给 ${widget.peerName}'),
+              content: DropdownButtonFormField<String>(
+                value: selectedRoomId,
+                decoration: const InputDecoration(
+                  labelText: '选择共享日历',
+                  border: OutlineInputBorder(),
+                ),
+                items: items
+                    .map(
+                      (e) => DropdownMenuItem<String>(
+                        value: e.id,
+                        child: Text(e.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => selectedRoomId = v);
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx2).pop(),
+                  child: const Text('取消'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    try {
+                      final selected = items.firstWhere((e) => e.id == selectedRoomId);
+                      final myName =
+                          Provider.of<UserProvider>(context, listen: false).userName;
+                      await SharedCalendarService.inviteByUid(
+                        roomId: selected.id,
+                        roomName: selected.name,
+                        fromName: myName,
+                        toUid: peerUid,
+                        toName: widget.peerName,
+                      );
+                      if (!ctx2.mounted) return;
+                      Navigator.of(ctx2).pop();
+                      _toast('邀请已发送');
+                    } catch (e) {
+                      if (!ctx2.mounted) return;
+                      ScaffoldMessenger.of(ctx2).showSnackBar(
+                        SnackBar(content: Text('$e')),
+                      );
+                    }
+                  },
+                  child: const Text('发送'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _openPlusActions() async {
+    if (_uploading) return;
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.image_outlined),
+              title: const Text('发送图片'),
+              onTap: () => Navigator.of(ctx).pop('image'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_calendar_outlined),
+              title: const Text('发送日历'),
+              onTap: () => Navigator.of(ctx).pop('calendar'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+    if (action == 'image') {
+      await _pickAndSendImage();
+    } else if (action == 'calendar') {
+      await _sendCalendarInvite();
     }
   }
 
@@ -264,9 +398,9 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                     )
                   else
                     IconButton(
-                      icon: const Icon(Icons.image_outlined),
-                      onPressed: _pickAndSendImage,
-                      tooltip: '画像',
+                      icon: const Icon(Icons.add),
+                      onPressed: _openPlusActions,
+                      tooltip: '更多',
                     ),
                   Expanded(
                     child: TextField(
