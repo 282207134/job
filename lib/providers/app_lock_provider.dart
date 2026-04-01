@@ -41,7 +41,6 @@ class AppLockProvider extends ChangeNotifier {
     if (_activeUid == uid && _ready) return;
     _idleTimer?.cancel();
     _ready = false;
-    notifyListeners();
     _activeUid = uid;
     if (uid == null || uid.isEmpty) {
       _enabled = false;
@@ -85,6 +84,55 @@ class AppLockProvider extends ChangeNotifier {
     _ready = true;
     _armIdleTimerIfNeeded();
     notifyListeners();
+  }
+
+  /// Ensures the provider is synced with the given user ID.
+  /// This method avoids notifying listeners during build phase.
+  Future<void> ensureSynced(String? uid) async {
+    if (_activeUid == uid && _ready) return;
+    _idleTimer?.cancel();
+    _ready = false;
+    _activeUid = uid;
+    if (uid == null || uid.isEmpty) {
+      _enabled = false;
+      _password = '';
+      _idleMinutes = 0;
+      _unlocked = false;
+      _ready = true;
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final userEnabledKey = _k(_enabledKey);
+    final userPasswordKey = _k(_passwordKey);
+    final userIdleKey = _k(_idleMinutesKey);
+    final hasUserScoped = prefs.containsKey(userEnabledKey) ||
+        prefs.containsKey(userPasswordKey) ||
+        prefs.containsKey(userIdleKey);
+
+    if (hasUserScoped) {
+      _enabled = prefs.getBool(userEnabledKey) ?? false;
+      _password = prefs.getString(userPasswordKey) ?? '';
+      _idleMinutes = prefs.getInt(userIdleKey) ?? 0;
+    } else {
+      // Backward compatibility: migrate old global app-lock state to current user.
+      _enabled = prefs.getBool(_enabledKey) ?? false;
+      _password = prefs.getString(_passwordKey) ?? '';
+      _idleMinutes = prefs.getInt(_idleMinutesKey) ?? 0;
+      if (_password.isNotEmpty || _enabled || _idleMinutes > 0) {
+        await prefs.setBool(userEnabledKey, _enabled);
+        if (_password.isNotEmpty) {
+          await prefs.setString(userPasswordKey, _password);
+        }
+        await prefs.setInt(userIdleKey, _idleMinutes);
+      }
+    }
+    _unlocked = false;
+    if (_password.isEmpty) {
+      _enabled = false;
+    }
+    _ready = true;
+    _armIdleTimerIfNeeded();
   }
 
   Future<void> enableWithPassword(String password) async {

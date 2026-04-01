@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
             }
             if (snapshot.hasData) {
               return FutureBuilder<void>(
-                future: lock.syncWithUser(snapshot.data!.uid),
+                future: lock.ensureSynced(snapshot.data!.uid),
                 builder: (context, lockSnap) {
                   if (lockSnap.connectionState != ConnectionState.done ||
                       !lock.ready) {
