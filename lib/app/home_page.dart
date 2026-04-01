@@ -487,20 +487,14 @@ class _HomePageState extends State<HomePage> {
                       await lockActions.disable();
                       await lockActions.syncWithUser(uid);
                       setSheetState(() => sheetEnabled = lockActions.enabled);
-                      if (!ctx.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(langProvider.tr('app_lock_disabled'))),
-                      );
+                      if (mounted) setState(() {});
                       return;
                     }
                     if (sheetHasPassword) {
                       await lockActions.enable();
                       await lockActions.syncWithUser(uid);
                       setSheetState(() => sheetEnabled = lockActions.enabled);
-                      if (!ctx.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(langProvider.tr('app_lock_enabled_success'))),
-                      );
+                      if (mounted) setState(() {});
                       return;
                     }
                     final pass = await _showSetLockPasswordDialog(
@@ -517,10 +511,7 @@ class _HomePageState extends State<HomePage> {
                       sheetHasPassword = lockActions.hasPassword;
                       sheetEnabled = lockActions.enabled;
                     });
-                    if (!ctx.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(langProvider.tr('app_lock_enabled_success'))),
-                    );
+                    if (mounted) setState(() {});
                   },
                 ),
                 const SizedBox(height: 8),
@@ -540,10 +531,7 @@ class _HomePageState extends State<HomePage> {
                     await lockActions.updatePassword(pass);
                     await lockActions.syncWithUser(uid);
                     setSheetState(() => sheetHasPassword = lockActions.hasPassword);
-                    if (!ctx.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(langProvider.tr('lock_password_updated'))),
-                    );
+                    if (mounted) setState(() {});
                   },
                 ),
                 ListTile(
@@ -567,6 +555,7 @@ class _HomePageState extends State<HomePage> {
                     await lockActions.setIdleMinutes(selected);
                     await lockActions.syncWithUser(uid);
                     setSheetState(() => sheetIdleMinutes = lockActions.idleMinutes);
+                    if (mounted) setState(() {});
                   },
                 ),
                 const SizedBox(height: 8),
@@ -576,6 +565,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+    await lockActions.syncWithUser(uid);
+    if (mounted) setState(() {});
   }
 
   Future<String?> _showSetLockPasswordDialog(
