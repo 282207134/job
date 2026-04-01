@@ -6,7 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kantankanri/app/app_routes.dart';
 import 'package:kantankanri/app/home_page.dart';
 import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:kantankanri/providers/app_lock_provider.dart';
 import 'package:kantankanri/providers/userProvider.dart';
+import 'package:kantankanri/screens/app_lock_gate_screen.dart';
 import 'package:kantankanri/splashScreen/OnBoardingPageState.dart';
 import 'package:provider/provider.dart';
 
@@ -22,8 +24,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppLanguageProvider>(
-      builder: (context, lang, _) => MaterialApp(
+    return Consumer2<AppLanguageProvider, AppLockProvider>(
+      builder: (context, lang, lock, _) => Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => lock.recordActivity(),
+        child: MaterialApp(
         debugShowCheckedModeBanner: false,
         locale: lang.locale,
         supportedLocales: const [
@@ -43,8 +48,21 @@ class _MyAppState extends State<MyApp> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasData) {
-              return const HomePage();
+              return FutureBuilder<void>(
+                future: lock.syncWithUser(snapshot.data!.uid),
+                builder: (context, lockSnap) {
+                  if (lockSnap.connectionState != ConnectionState.done ||
+                      !lock.ready) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (lock.shouldRequireUnlock) {
+                    return const AppLockGateScreen();
+                  }
+                  return const HomePage();
+                },
+              );
             }
+            lock.syncWithUser(null);
             return FlutterSplashScreen.fadeIn(
               backgroundColor: Colors.cyan,
               duration: const Duration(seconds: 5),
@@ -63,6 +81,7 @@ class _MyAppState extends State<MyApp> {
         ),
         routes: buildAppRoutes(),
       ),
+      ),
     );
   }
 }
@@ -75,6 +94,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
+        ChangeNotifierProvider(create: (context) => AppLockProvider()),
       ],
       child: const MyApp(),
     ),

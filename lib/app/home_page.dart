@@ -7,6 +7,7 @@ import 'package:kantankanri/pages/jobPage/calendarView/pages/event_details_page.
 import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
 import 'package:kantankanri/pages/othersApplication/todo_page.dart';
 import 'package:kantankanri/providers/app_language_provider.dart';
+import 'package:kantankanri/providers/app_lock_provider.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/contacts_messages_screen.dart';
 import 'package:kantankanri/screens/shared_calendar_sheet.dart';
@@ -193,7 +194,20 @@ class _HomePageState extends State<HomePage> {
               title: Text(langProvider.tr('language_settings')),
             ),
             ListTile(
+              onTap: () => _showAppLockSheet(context, langProvider),
+              leading: const Icon(Icons.lock_outline),
+              title: Text(langProvider.tr('app_lock')),
+              subtitle: Consumer<AppLockProvider>(
+                builder: (_, lock, __) => Text(
+                  lock.enabled
+                      ? langProvider.tr('app_lock_status_enabled')
+                      : langProvider.tr('app_lock_status_disabled'),
+                ),
+              ),
+            ),
+            ListTile(
               onTap: () async {
+                Provider.of<AppLockProvider>(context, listen: false).lockSession();
                 await FirebaseAuth.instance.signOut();
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
@@ -433,6 +447,250 @@ class _HomePageState extends State<HomePage> {
     if (!room.isPersonal) return false;
     final createdBy = '${map['created_by_uid'] ?? ''}';
     return createdBy.isEmpty || createdBy == myUid;
+  }
+
+  Future<void> _showAppLockSheet(
+    BuildContext context,
+    AppLanguageProvider langProvider,
+  ) async {
+    final lockActions = Provider.of<AppLockProvider>(context, listen: false);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    await lockActions.syncWithUser(uid);
+    var sheetEnabled = lockActions.enabled;
+    var sheetHasPassword = lockActions.hasPassword;
+    var sheetIdleMinutes = lockActions.idleMinutes;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(ctx).viewInsets.bottom + 12,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  title: Text(langProvider.tr('app_lock_enabled')),
+                  value: sheetEnabled,
+                  onChanged: (v) async {
+                    setSheetState(() => sheetEnabled = v);
+                    if (!v) {
+                      await lockActions.disable();
+                      await lockActions.syncWithUser(uid);
+                      setSheetState(() => sheetEnabled = lockActions.enabled);
+                      if (!ctx.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(langProvider.tr('app_lock_disabled'))),
+                      );
+                      return;
+                    }
+                    if (sheetHasPassword) {
+                      await lockActions.enable();
+                      await lockActions.syncWithUser(uid);
+                      setSheetState(() => sheetEnabled = lockActions.enabled);
+                      if (!ctx.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(langProvider.tr('app_lock_enabled_success'))),
+                      );
+                      return;
+                    }
+                    final pass = await _showSetLockPasswordDialog(
+                      context,
+                      langProvider,
+                    );
+                    if (pass == null || pass.isEmpty) {
+                      setSheetState(() => sheetEnabled = false);
+                      return;
+                    }
+                    await lockActions.enableWithPassword(pass);
+                    await lockActions.syncWithUser(uid);
+                    setSheetState(() {
+                      sheetHasPassword = lockActions.hasPassword;
+                      sheetEnabled = lockActions.enabled;
+                    });
+                    if (!ctx.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(langProvider.tr('app_lock_enabled_success'))),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const Icon(Icons.password_outlined),
+                  title: Text(
+                    sheetHasPassword
+                        ? langProvider.tr('change_lock_password')
+                        : langProvider.tr('set_lock_password'),
+                  ),
+                  onTap: () async {
+                    final pass = await _showSetLockPasswordDialog(
+                      context,
+                      langProvider,
+                    );
+                    if (pass == null || pass.isEmpty) return;
+                    await lockActions.updatePassword(pass);
+                    await lockActions.syncWithUser(uid);
+                    setSheetState(() => sheetHasPassword = lockActions.hasPassword);
+                    if (!ctx.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(langProvider.tr('lock_password_updated'))),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.timer_outlined),
+                  title: Text(langProvider.tr('auto_lock_timeout')),
+                  subtitle: Text(
+                    sheetIdleMinutes <= 0
+                        ? langProvider.tr('auto_lock_disabled')
+                        : langProvider.tr('auto_lock_minutes').replaceFirst(
+                              '{n}',
+                              '$sheetIdleMinutes',
+                            ),
+                  ),
+                  onTap: () async {
+                    final selected = await _showAutoLockMinutesDialog(
+                      context,
+                      langProvider,
+                      sheetIdleMinutes,
+                    );
+                    if (selected == null) return;
+                    await lockActions.setIdleMinutes(selected);
+                    await lockActions.syncWithUser(uid);
+                    setSheetState(() => sheetIdleMinutes = lockActions.idleMinutes);
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<String?> _showSetLockPasswordDialog(
+    BuildContext context,
+    AppLanguageProvider langProvider,
+  ) async {
+    final p1 = TextEditingController();
+    final p2 = TextEditingController();
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(langProvider.tr('set_lock_password')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: p1,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: langProvider.tr('lock_password_hint'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: p2,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: langProvider.tr('confirm_lock_password_hint'),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(langProvider.tr('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                final v1 = p1.text.trim();
+                final v2 = p2.text.trim();
+                if (v1.length < 4) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(langProvider.tr('lock_password_too_short'))),
+                  );
+                  return;
+                }
+                if (v1 != v2) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(langProvider.tr('lock_password_mismatch'))),
+                  );
+                  return;
+                }
+                Navigator.of(ctx).pop(v1);
+              },
+              child: Text(langProvider.tr('save')),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      p1.dispose();
+      p2.dispose();
+    }
+  }
+
+  Future<int?> _showAutoLockMinutesDialog(
+    BuildContext context,
+    AppLanguageProvider langProvider,
+    int current,
+  ) async {
+    var selected = current;
+    const options = <int>[0, 1, 3, 5, 10, 15, 30];
+    return showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(langProvider.tr('auto_lock_timeout')),
+        content: StatefulBuilder(
+          builder: (ctx2, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: options
+                .map(
+                  (m) => RadioListTile<int>(
+                    value: m,
+                    groupValue: selected,
+                    onChanged: (v) {
+                      if (v == null) return;
+                      setState(() => selected = v);
+                    },
+                    title: Text(
+                      m == 0
+                          ? langProvider.tr('auto_lock_disabled')
+                          : langProvider.tr('auto_lock_minutes').replaceFirst(
+                                '{n}',
+                                '$m',
+                              ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(langProvider.tr('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(selected),
+            child: Text(langProvider.tr('save')),
+          ),
+        ],
+      ),
+    );
   }
 }
 

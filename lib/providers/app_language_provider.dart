@@ -725,6 +725,106 @@ class AppLanguageProvider extends ChangeNotifier {
         AppLanguage.ja: 'キーワードを入力して検索',
         AppLanguage.en: 'Start typing to search',
       },
+      'app_lock': {
+        AppLanguage.zh: '程序锁',
+        AppLanguage.ja: 'アプリロック',
+        AppLanguage.en: 'App Lock',
+      },
+      'app_lock_enabled': {
+        AppLanguage.zh: '启用程序锁',
+        AppLanguage.ja: 'アプリロックを有効化',
+        AppLanguage.en: 'Enable app lock',
+      },
+      'app_lock_enabled_success': {
+        AppLanguage.zh: '程序锁已启用',
+        AppLanguage.ja: 'アプリロックを有効にしました',
+        AppLanguage.en: 'App lock enabled',
+      },
+      'app_lock_disabled': {
+        AppLanguage.zh: '程序锁已停用',
+        AppLanguage.ja: 'アプリロックは無効です',
+        AppLanguage.en: 'App lock disabled',
+      },
+      'app_lock_status_enabled': {
+        AppLanguage.zh: '已启用',
+        AppLanguage.ja: '有効',
+        AppLanguage.en: 'Enabled',
+      },
+      'app_lock_status_disabled': {
+        AppLanguage.zh: '已停用',
+        AppLanguage.ja: '無効',
+        AppLanguage.en: 'Disabled',
+      },
+      'set_lock_password': {
+        AppLanguage.zh: '设置程序锁密码',
+        AppLanguage.ja: 'ロックパスワードを設定',
+        AppLanguage.en: 'Set lock password',
+      },
+      'change_lock_password': {
+        AppLanguage.zh: '修改程序锁密码',
+        AppLanguage.ja: 'ロックパスワードを変更',
+        AppLanguage.en: 'Change lock password',
+      },
+      'lock_password_hint': {
+        AppLanguage.zh: '输入密码（至少 4 位）',
+        AppLanguage.ja: 'パスワードを入力（4文字以上）',
+        AppLanguage.en: 'Enter password (at least 4 chars)',
+      },
+      'confirm_lock_password_hint': {
+        AppLanguage.zh: '再次输入密码',
+        AppLanguage.ja: 'パスワードを再入力',
+        AppLanguage.en: 'Confirm password',
+      },
+      'lock_password_too_short': {
+        AppLanguage.zh: '密码至少 4 位',
+        AppLanguage.ja: 'パスワードは4文字以上です',
+        AppLanguage.en: 'Password must be at least 4 chars',
+      },
+      'lock_password_mismatch': {
+        AppLanguage.zh: '两次密码不一致',
+        AppLanguage.ja: 'パスワードが一致しません',
+        AppLanguage.en: 'Passwords do not match',
+      },
+      'lock_password_updated': {
+        AppLanguage.zh: '程序锁密码已更新',
+        AppLanguage.ja: 'ロックパスワードを更新しました',
+        AppLanguage.en: 'Lock password updated',
+      },
+      'unlock_app': {
+        AppLanguage.zh: '解锁应用',
+        AppLanguage.ja: 'アプリをロック解除',
+        AppLanguage.en: 'Unlock App',
+      },
+      'enter_lock_password': {
+        AppLanguage.zh: '请输入程序锁密码',
+        AppLanguage.ja: 'ロックパスワードを入力してください',
+        AppLanguage.en: 'Enter lock password',
+      },
+      'wrong_lock_password': {
+        AppLanguage.zh: '密码错误',
+        AppLanguage.ja: 'パスワードが違います',
+        AppLanguage.en: 'Incorrect password',
+      },
+      'save': {
+        AppLanguage.zh: '保存',
+        AppLanguage.ja: '保存',
+        AppLanguage.en: 'Save',
+      },
+      'auto_lock_timeout': {
+        AppLanguage.zh: '自动锁定时间',
+        AppLanguage.ja: '自動ロック時間',
+        AppLanguage.en: 'Auto-lock timeout',
+      },
+      'auto_lock_disabled': {
+        AppLanguage.zh: '不自动锁定',
+        AppLanguage.ja: '自動ロックしない',
+        AppLanguage.en: 'Disabled',
+      },
+      'auto_lock_minutes': {
+        AppLanguage.zh: '{n} 分钟无操作后锁定',
+        AppLanguage.ja: '{n} 分操作なしでロック',
+        AppLanguage.en: 'Lock after {n} minutes idle',
+      },
     };
     return table[key]?[_language] ?? key;
   }
