@@ -1,8 +1,6 @@
 //示例文件的侧面栏和主界面
-import 'package:flutter/material.dart'; // 引入Flutter材料设计库
-import 'package:flutter/src/widgets/framework.dart'; // 引入Flutter框架基础库
-import 'package:flutter/src/widgets/placeholder.dart'; // 引入占位符库
-import 'package:firebase_auth/firebase_auth.dart'; // 引入Firebase认证库
+import 'package:flutter/material.dart'; // 引入 Flutter 材料设计库
+import 'package:firebase_auth/firebase_auth.dart'; // 引入 Firebase 认证库
 
 import 'package:cloud_firestore/cloud_firestore.dart'; // 引入Cloud Firestore库
 import 'package:kantankanri/screens/profile_screen.dart';
