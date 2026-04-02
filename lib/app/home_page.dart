@@ -573,65 +573,58 @@ class _HomePageState extends State<HomePage> {
     BuildContext context,
     AppLanguageProvider langProvider,
   ) async {
-    final p1 = TextEditingController();
-    final p2 = TextEditingController();
-    try {
-      return await showDialog<String>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(langProvider.tr('set_lock_password')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: p1,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: langProvider.tr('lock_password_hint'),
-                ),
+    String v1 = '';
+    String v2 = '';
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(langProvider.tr('set_lock_password')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: langProvider.tr('lock_password_hint'),
               ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: p2,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: langProvider.tr('confirm_lock_password_hint'),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(langProvider.tr('cancel')),
+              onChanged: (value) => v1 = value.trim(),
             ),
-            FilledButton(
-              onPressed: () {
-                final v1 = p1.text.trim();
-                final v2 = p2.text.trim();
-                if (v1.length < 4) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(langProvider.tr('lock_password_too_short'))),
-                  );
-                  return;
-                }
-                if (v1 != v2) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(langProvider.tr('lock_password_mismatch'))),
-                  );
-                  return;
-                }
-                Navigator.of(ctx).pop(v1);
-              },
-              child: Text(langProvider.tr('save')),
+            const SizedBox(height: 8),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: langProvider.tr('confirm_lock_password_hint'),
+              ),
+              onChanged: (value) => v2 = value.trim(),
             ),
           ],
         ),
-      );
-    } finally {
-      p1.dispose();
-      p2.dispose();
-    }
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(langProvider.tr('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (v1.length < 4) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(content: Text(langProvider.tr('lock_password_too_short'))),
+                );
+                return;
+              }
+              if (v1 != v2) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(content: Text(langProvider.tr('lock_password_mismatch'))),
+                );
+                return;
+              }
+              Navigator.of(ctx).pop(v1);
+            },
+            child: Text(langProvider.tr('save')),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<int?> _showAutoLockMinutesDialog(

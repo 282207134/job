@@ -62,20 +62,28 @@ class _MyAppState extends State<MyApp> {
                 },
               );
             }
-            lock.syncWithUser(null);
-            return FlutterSplashScreen.fadeIn(
-              backgroundColor: Colors.cyan,
-              duration: const Duration(seconds: 5),
-              animationDuration: const Duration(seconds: 10),
-              onInit: () => debugPrint('On Init'),
-              onEnd: () => debugPrint('On End'),
-              childWidget: SizedBox(
-                height: double.infinity,
-                width: double.infinity,
-                child: Image.asset('assets/0.jpg'),
-              ),
-              onAnimationEnd: () => debugPrint('On Fade In End'),
-              nextScreen: const OnBoardingPage(),
+            return FutureBuilder<void>(
+              future: lock.ensureSynced(null),
+              builder: (context, lockSnap) {
+                if (lockSnap.connectionState != ConnectionState.done ||
+                    !lock.ready) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return FlutterSplashScreen.fadeIn(
+                  backgroundColor: Colors.cyan,
+                  duration: const Duration(seconds: 5),
+                  animationDuration: const Duration(seconds: 10),
+                  onInit: () => debugPrint('On Init'),
+                  onEnd: () => debugPrint('On End'),
+                  childWidget: SizedBox(
+                    height: double.infinity,
+                    width: double.infinity,
+                    child: Image.asset('assets/0.jpg'),
+                  ),
+                  onAnimationEnd: () => debugPrint('On Fade In End'),
+                  nextScreen: const OnBoardingPage(),
+                );
+              },
             );
           },
         ),
