@@ -4,46 +4,46 @@ publish_to: 'none' # 不发布到pub.dev
 version: 1.0.0+1 # 版本号
 
 environment:
-  sdk: '>=3.5.0 <4.0.0' # SDK版本
+  sdk: '>=3.3.4 <4.0.0' # SDK版本
 
 dependencies:
   flutter:
     sdk: flutter # Flutter SDK
   flutter_localizations:
     sdk: flutter
-  google_maps_flutter: ^2.17.0 # 更新谷歌地图插件
-  geolocator: ^14.0.2 # 更新地理定位插件
-  cupertino_icons: ^1.0.9 # iOS风格图标
-  firebase_core: ^4.6.0 # Firebase核心
-  firebase_auth: ^6.3.0 # Firebase认证
-  cloud_firestore: ^6.2.0 # Firebase Firestore数据库
-  firebase_storage: ^13.2.0 # Firebase Storage（チャット画像など）
-  provider: ^6.1.5+1 # 状态管理
-  introduction_screen: ^4.0.0 # 引导页插件
+  google_maps_flutter: ^2.10.0 # 更新谷歌地图插件
+  geolocator: ^13.0.2 # 更新地理定位插件
+  cupertino_icons: ^1.0.2 # iOS风格图标
+  firebase_core: ^3.10.0 # Firebase核心
+  firebase_auth: ^5.4.0 # Firebase认证
+  cloud_firestore: ^5.6.1 # Firebase Firestore数据库
+  firebase_storage: ^12.4.0 # Firebase Storage（チャット画像など）
+  provider: ^6.1.1 # 状态管理
+  introduction_screen: ^3.1.14 # 引导页插件
   intl: ^0.20.1 # 更新国际化支持
   another_flutter_splash_screen: ^1.2.0 # 启动屏幕插件
   rflutter_alert: ^2.0.7 # 弹窗插件
-  audioplayers: ^6.6.0 # 更新音频播放插件
-  permission_handler: ^12.0.1 # 更新权限管理插件
+  audioplayers: ^6.1.0 # 更新音频播放插件
+  permission_handler: ^11.3.1 # 更新权限管理插件
   flutter_colorpicker: ^1.1.0 # 颜色选择器插件
-  shared_preferences: ^2.5.5 # 更新本地存储插件
-  sqflite: ^2.4.2 # 更新SQLite数据库插件
+  shared_preferences: ^2.3.5 # 与当前 Dart 3.8.x 兼容
+  sqflite: ^2.4.1 # 更新SQLite数据库插件
   path: ^1.9.0 # 更新路径管理插件
-  image_picker: ^1.2.1 # 更新获取手机文件照片的库
-  camera: ^0.12.0+1 # 更新摄像头插件
+  image_picker: ^1.1.2 # 更新获取手机文件照片的库
+  camera: ^0.11.0+2 # 与当前 Dart 3.8.x 兼容
   flutter_image_compress: ^2.4.0 # 更新图像压缩库
   path_provider: ^2.1.5 # 更新路径提供者插件
-  image_cropper: ^12.1.1 # 更新图片裁剪插件
+  image_cropper: ^8.1.0 # 更新图片裁剪插件
   excel: ^4.0.6 # Excel 操作库
-  http: ^1.6.0 # 节日 API 请求
-  adaptive_theme: ^3.7.2 # lib 内示例/主题（需作为正式依赖以满足分析器）
+  http: ^1.2.2 # 节日 API 请求
+  adaptive_theme: ^3.5.0 # lib 内示例/主题（需作为正式依赖以满足分析器）
 
 dev_dependencies:
   flutter_test:
     sdk: flutter # Flutter测试框架
-  flutter_lints: ^6.0.0 # Flutter代码规范检查
-  build_runner: ^2.13.1 # 代码生成器
-  build_web_compilers: ^4.4.17 # Web 编译器
+  flutter_lints: ^2.0.0 # Flutter代码规范检查
+  build_runner: ^2.0.6 # 代码生成器
+  build_web_compilers: ^3.0.0 # Web 编译器
 
 flutter:
   uses-material-design: true # 使用Material设计
