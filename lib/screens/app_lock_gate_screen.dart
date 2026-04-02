@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kantankanri/app/home_page.dart';
 import 'package:kantankanri/providers/app_language_provider.dart';
 import 'package:kantankanri/providers/app_lock_provider.dart';
 import 'package:provider/provider.dart';
@@ -36,10 +35,7 @@ class _AppLockGateScreenState extends State<AppLockGateScreen> {
           SnackBar(content: Text(lang.tr('wrong_lock_password'))),
         );
       } else {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute<void>(builder: (_) => const HomePage()),
-          (route) => false,
-        );
+        _controller.clear();
       }
     } finally {
       if (mounted) setState(() => _submitting = false);

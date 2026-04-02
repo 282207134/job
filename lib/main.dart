@@ -29,66 +29,73 @@ class _MyAppState extends State<MyApp> {
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => lock.recordActivity(),
         child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        locale: lang.locale,
-        supportedLocales: const [
-          Locale('zh'),
-          Locale('ja'),
-          Locale('en'),
-        ],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        home: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasData) {
+          debugShowCheckedModeBanner: false,
+          locale: lang.locale,
+          supportedLocales: const [
+            Locale('zh'),
+            Locale('ja'),
+            Locale('en'),
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            final hasUser = FirebaseAuth.instance.currentUser != null;
+            final showLockGate = hasUser && lock.ready && lock.shouldRequireUnlock;
+            return Stack(
+              children: [
+                if (child != null) child,
+                if (showLockGate) const Positioned.fill(child: AppLockGateScreen()),
+              ],
+            );
+          },
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasData) {
+                return FutureBuilder<void>(
+                  future: lock.ensureSynced(snapshot.data!.uid),
+                  builder: (context, lockSnap) {
+                    if (lockSnap.connectionState != ConnectionState.done ||
+                        !lock.ready) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return const HomePage();
+                  },
+                );
+              }
               return FutureBuilder<void>(
-                future: lock.ensureSynced(snapshot.data!.uid),
+                future: lock.ensureSynced(null),
                 builder: (context, lockSnap) {
                   if (lockSnap.connectionState != ConnectionState.done ||
                       !lock.ready) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (lock.shouldRequireUnlock) {
-                    return const AppLockGateScreen();
-                  }
-                  return const HomePage();
+                  return FlutterSplashScreen.fadeIn(
+                    backgroundColor: Colors.cyan,
+                    duration: const Duration(seconds: 5),
+                    animationDuration: const Duration(seconds: 10),
+                    onInit: () => debugPrint('On Init'),
+                    onEnd: () => debugPrint('On End'),
+                    childWidget: SizedBox(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: Image.asset('assets/0.jpg'),
+                    ),
+                    onAnimationEnd: () => debugPrint('On Fade In End'),
+                    nextScreen: const OnBoardingPage(),
+                  );
                 },
               );
-            }
-            return FutureBuilder<void>(
-              future: lock.ensureSynced(null),
-              builder: (context, lockSnap) {
-                if (lockSnap.connectionState != ConnectionState.done ||
-                    !lock.ready) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return FlutterSplashScreen.fadeIn(
-                  backgroundColor: Colors.cyan,
-                  duration: const Duration(seconds: 5),
-                  animationDuration: const Duration(seconds: 10),
-                  onInit: () => debugPrint('On Init'),
-                  onEnd: () => debugPrint('On End'),
-                  childWidget: SizedBox(
-                    height: double.infinity,
-                    width: double.infinity,
-                    child: Image.asset('assets/0.jpg'),
-                  ),
-                  onAnimationEnd: () => debugPrint('On Fade In End'),
-                  nextScreen: const OnBoardingPage(),
-                );
-              },
-            );
-          },
+            },
+          ),
+          routes: buildAppRoutes(),
         ),
-        routes: buildAppRoutes(),
-      ),
       ),
     );
   }
