@@ -47,5 +47,12 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>チャットに送信する画像を選ぶためにフォトライブラリにアクセスします。</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>開発時に同じネットワーク上のデバッグツールと接続するためにローカルネットワークを使用します。</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+		<string>_dartobservatory._tcp</string>
+	</array>
 </dict>
 </plist>
