@@ -33,10 +33,10 @@ class AppLanguageProvider extends ChangeNotifier {
       final sys = PlatformDispatcher.instance.locale.languageCode.toLowerCase();
       if (sys == 'ja') {
         _language = AppLanguage.ja;
-      } else if (sys == 'en') {
-        _language = AppLanguage.en;
-      } else {
+      } else if (sys == 'zh') {
         _language = AppLanguage.zh;
+      } else {
+        _language = AppLanguage.en;
       }
       notifyListeners();
       return;
