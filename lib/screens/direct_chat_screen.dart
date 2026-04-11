@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,9 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/userProvider.dart';
+import '../config/livekit_config.dart';
+import '../pages/direct_video_call_page.dart';
+import '../pages/direct_voice_call_page.dart';
 import '../providers/app_language_provider.dart';
+import '../providers/userProvider.dart';
 import '../services/chat_media_service.dart';
+import '../services/direct_call_signal_service.dart';
 import '../services/messaging_service.dart';
 import '../services/shared_calendar_service.dart';
 
@@ -39,6 +45,78 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
   void dispose() {
     _messageText.dispose();
     super.dispose();
+  }
+
+  Future<void> _startOutgoingCall(bool video) async {
+    if (_uploading) return;
+    if (!LiveKitConfig.isConfigured) {
+      _toast(_t('livekit_not_configured'));
+      return;
+    }
+    final myUid = FirebaseAuth.instance.currentUser?.uid ??
+        Provider.of<UserProvider>(context, listen: false).userId;
+    if (myUid.isEmpty) {
+      _toast(_t('not_logged_in'));
+      return;
+    }
+    final peerUid = _peerUid();
+    if (peerUid.isEmpty) {
+      _toast(_t('unknown_friend'));
+      return;
+    }
+    final senderName = Provider.of<UserProvider>(context, listen: false).userName;
+    try {
+      final ref = await DirectCallSignalService.createOutgoing(
+        pairId: widget.pairId,
+        fromUid: myUid,
+        toUid: peerUid,
+        fromName: senderName,
+        callType: video ? 'video' : 'voice',
+      );
+      if (!mounted) return;
+      final result = await showDialog<_CallOutcome>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => _OutgoingCallDialog(
+          signalRef: ref,
+          titleText: video ? _t('call_calling_video') : _t('call_calling_voice'),
+          tr: (k) =>
+              Provider.of<AppLanguageProvider>(ctx, listen: false).tr(k),
+        ),
+      );
+      if (!mounted) return;
+      if (result == _CallOutcome.accepted) {
+        final snap = await ref.get();
+        final room = snap.data()?['room_name'] as String?;
+        if (room == null) return;
+        if (!mounted) return;
+        final nav = Navigator.of(context);
+        final route = MaterialPageRoute<void>(
+          builder: (_) => video
+              ? DirectVideoCallPage(
+                  roomName: room,
+                  participantIdentity: myUid,
+                  peerLabel: widget.peerName,
+                  callSignalRef: ref,
+                  connectingHint: _t('call_connecting'),
+                  waitingPeerHint: _t('call_waiting_peer'),
+                )
+              : DirectVoiceCallPage(
+                  roomName: room,
+                  participantIdentity: myUid,
+                  peerLabel: widget.peerName,
+                  callSignalRef: ref,
+                  connectingHint: _t('call_connecting'),
+                  waitingPeerHint: _t('call_waiting_peer'),
+                ),
+        );
+        await nav.push(route);
+      } else if (result == _CallOutcome.rejected) {
+        _toast(_t('call_rejected'));
+      }
+    } catch (e) {
+      _toast('${_t('call_failed')}: $e');
+    }
   }
 
   void _toast(String msg) {
@@ -407,12 +485,23 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     )
-                  else
+                  else ...[
+                    IconButton(
+                      icon: const Icon(Icons.call),
+                      onPressed: () => _startOutgoingCall(false),
+                      tooltip: _t('call_voice_tooltip'),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.videocam_outlined),
+                      onPressed: () => _startOutgoingCall(true),
+                      tooltip: _t('call_video_tooltip'),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: _openPlusActions,
                       tooltip: _t('more'),
                     ),
+                  ],
                   Expanded(
                     child: TextField(
                       controller: _messageText,
@@ -434,6 +523,77 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+enum _CallOutcome { accepted, rejected, cancelled }
+
+/// 発信側：相手が accept / reject するまで待つダイアログ
+class _OutgoingCallDialog extends StatefulWidget {
+  const _OutgoingCallDialog({
+    required this.signalRef,
+    required this.titleText,
+    required this.tr,
+  });
+
+  final DocumentReference<Map<String, dynamic>> signalRef;
+  final String titleText;
+  final String Function(String key) tr;
+
+  @override
+  State<_OutgoingCallDialog> createState() => _OutgoingCallDialogState();
+}
+
+class _OutgoingCallDialogState extends State<_OutgoingCallDialog> {
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = widget.signalRef.snapshots().listen((doc) {
+      final s = doc.data()?['status'] as String?;
+      if (!mounted || s == null) return;
+      if (!context.mounted) return;
+      if (s == 'accepted') {
+        Navigator.of(context).pop(_CallOutcome.accepted);
+      } else if (s == 'rejected') {
+        Navigator.of(context).pop(_CallOutcome.rejected);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.titleText),
+      content: Row(
+        children: [
+          const SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: 16),
+          Expanded(child: Text(widget.tr('call_waiting_peer_answer'))),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            await DirectCallSignalService.markCancelled(widget.signalRef);
+            if (!context.mounted) return;
+            Navigator.of(context).pop(_CallOutcome.cancelled);
+          },
+          child: Text(widget.tr('cancel')),
+        ),
+      ],
     );
   }
 }

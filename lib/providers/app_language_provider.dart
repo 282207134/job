@@ -225,6 +225,139 @@ class AppLanguageProvider extends ChangeNotifier {
         AppLanguage.ja: 'メッセージを入力…',
         AppLanguage.en: 'Type a message…',
       },
+      'livekit_not_configured': {
+        AppLanguage.zh:
+            '未配置 LiveKit：请在项目根目录的 .env 中填写 LIVEKIT_URL、LIVEKIT_API_KEY、LIVEKIT_API_SECRET（也可使用 --dart-define 覆盖）',
+        AppLanguage.ja:
+            'LiveKit が未設定です。プロジェクト直下の .env に LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET を記入するか、--dart-define で上書きしてください。',
+        AppLanguage.en:
+            'LiveKit is not configured. Set LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET in the project root `.env`, or pass them via --dart-define.',
+      },
+      'call_voice_tooltip': {
+        AppLanguage.zh: '语音通话',
+        AppLanguage.ja: '音声通話',
+        AppLanguage.en: 'Voice call',
+      },
+      'call_video_tooltip': {
+        AppLanguage.zh: '视频通话',
+        AppLanguage.ja: 'ビデオ通話',
+        AppLanguage.en: 'Video call',
+      },
+      'call_incoming_voice': {
+        AppLanguage.zh: '邀请你语音通话',
+        AppLanguage.ja: '音声通話の招待',
+        AppLanguage.en: 'Incoming voice call',
+      },
+      'call_incoming_video': {
+        AppLanguage.zh: '邀请你视频通话',
+        AppLanguage.ja: 'ビデオ通話の招待',
+        AppLanguage.en: 'Incoming video call',
+      },
+      'call_calling_voice': {
+        AppLanguage.zh: '正在呼叫（语音）…',
+        AppLanguage.ja: '呼び出し中（音声）…',
+        AppLanguage.en: 'Calling (voice)…',
+      },
+      'call_calling_video': {
+        AppLanguage.zh: '正在呼叫（视频）…',
+        AppLanguage.ja: '呼び出し中（ビデオ）…',
+        AppLanguage.en: 'Calling (video)…',
+      },
+      'call_waiting_peer_answer': {
+        AppLanguage.zh: '等待对方接听…',
+        AppLanguage.ja: '相手の応答を待っています…',
+        AppLanguage.en: 'Waiting for answer…',
+      },
+      'call_rejected': {
+        AppLanguage.zh: '对方已拒绝',
+        AppLanguage.ja: '相手が拒否しました',
+        AppLanguage.en: 'Call declined',
+      },
+      'call_failed': {
+        AppLanguage.zh: '通话请求失败',
+        AppLanguage.ja: '通話リクエストに失敗しました',
+        AppLanguage.en: 'Call request failed',
+      },
+      'call_connecting': {
+        AppLanguage.zh: '正在连接…',
+        AppLanguage.ja: '接続中…',
+        AppLanguage.en: 'Connecting…',
+      },
+      'call_waiting_peer': {
+        AppLanguage.zh: '等待对方加入…',
+        AppLanguage.ja: '相手の参加を待っています…',
+        AppLanguage.en: 'Waiting for peer…',
+      },
+      'call_accept': {
+        AppLanguage.zh: '接听',
+        AppLanguage.ja: '応答',
+        AppLanguage.en: 'Accept',
+      },
+      'call_decline': {
+        AppLanguage.zh: '拒绝',
+        AppLanguage.ja: '拒否',
+        AppLanguage.en: 'Decline',
+      },
+      'call_incoming_minimize': {
+        AppLanguage.zh: '最小化',
+        AppLanguage.ja: '最小化',
+        AppLanguage.en: 'Minimize',
+      },
+      'call_incoming_restore': {
+        AppLanguage.zh: '展开来电',
+        AppLanguage.ja: '着信を展開',
+        AppLanguage.en: 'Expand',
+      },
+      'call_hide_self_preview': {
+        AppLanguage.zh: '隐藏自己的画面',
+        AppLanguage.ja: '自分の映像を隠す',
+        AppLanguage.en: 'Hide self preview',
+      },
+      'call_show_self_preview': {
+        AppLanguage.zh: '显示自己的画面',
+        AppLanguage.ja: '自分の映像を表示',
+        AppLanguage.en: 'Show self preview',
+      },
+      'call_voice_mic_on': {
+        AppLanguage.zh: '麦克风已开',
+        AppLanguage.ja: 'マイクオン',
+        AppLanguage.en: 'Mic on',
+      },
+      'call_voice_mic_off': {
+        AppLanguage.zh: '麦克风已关',
+        AppLanguage.ja: 'マイクオフ',
+        AppLanguage.en: 'Mic off',
+      },
+      'call_voice_speaker_on': {
+        AppLanguage.zh: '扬声器已开',
+        AppLanguage.ja: 'スピーカーオン',
+        AppLanguage.en: 'Speaker on',
+      },
+      'call_voice_speaker_off': {
+        AppLanguage.zh: '扬声器已关',
+        AppLanguage.ja: 'スピーカーオフ',
+        AppLanguage.en: 'Speaker off',
+      },
+      'call_voice_hang_up': {
+        AppLanguage.zh: '挂断',
+        AppLanguage.ja: '終了',
+        AppLanguage.en: 'Hang up',
+      },
+      'call_voice_minimize_hint': {
+        AppLanguage.zh: '当前版本请在通话界面内使用；结束请点挂断',
+        AppLanguage.ja: 'この版ではバックグラウンド最小化に未対応です。終了は「終了」から。',
+        AppLanguage.en: 'Minimize to background is not available in this build. Use Hang up to end.',
+      },
+      'call_voice_add_unsupported': {
+        AppLanguage.zh: '一对一通话暂不支持邀请更多人',
+        AppLanguage.ja: '1対1通話では追加招待に未対応です',
+        AppLanguage.en: 'Adding participants is not supported in 1:1 calls',
+      },
+      'call_retry': {
+        AppLanguage.zh: '重试',
+        AppLanguage.ja: '再試行',
+        AppLanguage.en: 'Retry',
+      },
       'contacts_login_required': {
         AppLanguage.zh: '需要先登录',
         AppLanguage.ja: 'ログインが必要です',
