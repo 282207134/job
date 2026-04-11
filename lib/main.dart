@@ -2,6 +2,7 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kantankanri/app/app_routes.dart';
 import 'package:kantankanri/app/home_page.dart';
@@ -9,6 +10,7 @@ import 'package:kantankanri/providers/app_language_provider.dart';
 import 'package:kantankanri/providers/app_lock_provider.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/app_lock_gate_screen.dart';
+import 'package:kantankanri/widgets/global_incoming_call_host.dart';
 import 'package:kantankanri/splashScreen/OnBoardingPageState.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +24,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  /// [MaterialApp.builder] 内のウィジェットは Navigator の子ではないため、
+  /// 着信 UI からルートを push するにはこのキーが必要。
+  final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<AppLanguageProvider, AppLockProvider>(
@@ -29,6 +35,7 @@ class _MyAppState extends State<MyApp> {
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => lock.recordActivity(),
         child: MaterialApp(
+          navigatorKey: _rootNavigatorKey,
           debugShowCheckedModeBanner: false,
           locale: lang.locale,
           supportedLocales: const [
@@ -48,6 +55,7 @@ class _MyAppState extends State<MyApp> {
               children: [
                 if (child != null) child,
                 if (showLockGate) const Positioned.fill(child: AppLockGateScreen()),
+                GlobalIncomingCallHost(navigatorKey: _rootNavigatorKey),
               ],
             );
           },
@@ -103,6 +111,11 @@ class _MyAppState extends State<MyApp> {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: '.env', isOptional: true);
+  } catch (e, st) {
+    debugPrint('dotenv: $e\n$st');
+  }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
