@@ -37,6 +37,7 @@ dependencies:
   excel: ^4.0.6 # Excel 操作库
   http: ^1.2.2 # 节日 API 请求
   adaptive_theme: ^3.5.0 # lib 内示例/主题（需作为正式依赖以满足分析器）
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
