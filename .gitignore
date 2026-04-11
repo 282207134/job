@@ -49,5 +49,8 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 
+# LiveKit 等本地密钥（使用根目录 .env.example 复制为 .env 后本地填写）
+.env
+
 # Firebase CLI local deploy cache (regenerated on deploy)
 .firebase/
