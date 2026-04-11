@@ -47,6 +47,10 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>チャットに送信する画像を選ぶためにフォトライブラリにアクセスします。</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>友だちとの音声・ビデオ通話のためにマイクを使用します。</string>
+	<key>NSCameraUsageDescription</key>
+	<string>友だちとのビデオ通話のためにカメラを使用します。</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>開発時に同じネットワーク上のデバッグツールと接続するためにローカルネットワークを使用します。</string>
 	<key>NSBonjourServices</key>
