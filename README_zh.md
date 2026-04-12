@@ -75,7 +75,7 @@
 
 添加好友后可共享日历。共享的日历实时同步，随时查看最新动态。
 
-![添加好友界面](https://github.com/user-attachments/assets/71147d8d-155b-4a0b-ba5d-08966c2a3da9)
+<img width="545" height="945" alt="image" src="https://github.com/user-attachments/assets/514b4e0d-d4b6-4173-9e9f-e5d9d5b31f82" />
 
 ![共享日历界面2](https://github.com/user-attachments/assets/fb29db3e-12f5-4b26-ab51-c0e78c400336)
 
@@ -98,6 +98,9 @@
   `LIVEKIT_URL`、`LIVEKIT_API_KEY`、`LIVEKIT_API_SECRET`。  
 - **安全提示**：将 `LIVEKIT_API_SECRET` 打进 Web/客户端等同于公开密钥；生产环境建议用 **Cloud Functions 等服务端签发 Token**，客户端只拿短期 token。
 
+<img width="543" height="978" alt="image" src="https://github.com/user-attachments/assets/944f40b6-c2eb-43b9-ae3a-1d9e4bfb1c79" />
+<img width="543" height="945" alt="image" src="https://github.com/user-attachments/assets/dbc0838e-6c91-4ca3-a41d-30ed5ad35bbf" />
+<img width="545" height="950" alt="image" src="https://github.com/user-attachments/assets/75233e6c-38f8-43f4-b3fc-7440b0f50ace" />
 ---
 
 ## 🔔 推送通知（面向 Android、iOS未实装）
