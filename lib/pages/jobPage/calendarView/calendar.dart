@@ -40,6 +40,7 @@ class calendar extends StatelessWidget {
         break;
     }
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       // 返回一个脚手架组件，提供基本的视觉结构
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         // 使用 StreamBuilder 监听 Firestore 数据流

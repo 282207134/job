@@ -33,96 +33,152 @@ class ContactsMessagesScreen extends StatelessWidget {
       return Center(child: Text(t('contacts_login_required')));
     }
 
-    return ColoredBox(
-      color: Colors.white,
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: MessagingService.friendLinksForUser(authUid),
-        builder: (context, snap) {
-          if (snap.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  '${t('contacts_load_error')}: ${snap.error}',
-                  textAlign: TextAlign.center,
-                ),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: MessagingService.friendLinksForUser(authUid),
+      builder: (context, snap) {
+        if (snap.hasError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                '${t('contacts_load_error')}: ${snap.error}',
+                textAlign: TextAlign.center,
               ),
-            );
-          }
-          if (snap.connectionState == ConnectionState.waiting &&
-              (snap.data?.docs ?? []).isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final allDocs = snap.data?.docs ?? [];
-          final pendingDocs = allDocs
-              .where((d) => d.data()['status'] == 'pending')
-              .toList();
-          final incoming = pendingDocs
-              .where((d) => d.data()['requested_by'] != authUid)
-              .toList();
-          final outgoing = pendingDocs
-              .where((d) => d.data()['requested_by'] == authUid)
-              .toList();
-          final activeDocs =
-              allDocs.where((d) => d.data()['status'] == 'active').toList();
-
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                  child: Text(
-                    t('contacts_section_requests_friends'),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ),
-                if (incoming.isNotEmpty) ...[
-                  _SectionTitle(t('contacts_incoming_requests')),
-                  ...incoming.map((d) => _IncomingTile(
-                        docId: d.id,
-                        data: d.data(),
-                      )),
-                ],
-                if (outgoing.isNotEmpty) ...[
-                  _SectionTitle(t('contacts_outgoing_pending')),
-                  ...outgoing.map((d) => _OutgoingTile(
-                        docId: d.id,
-                        data: d.data(),
-                        myUid: authUid,
-                      )),
-                ],
-                _SectionTitle(t('contacts_friends')),
-                if (activeDocs.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    child: Text(
-                      t('contacts_empty_friends_hint'),
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                  )
-                else
-                  ...activeDocs.map((d) {
-                    final data = d.data();
-                    final name = MessagingService.peerName(data, authUid);
-                    return _FriendChatListTile(
-                      pairId: d.id,
-                      peerName: name,
-                    );
-                  }),
-                const SizedBox(height: 32),
-              ],
             ),
           );
-        },
-      ),
+        }
+        if (snap.connectionState == ConnectionState.waiting &&
+            (snap.data?.docs ?? []).isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final allDocs = snap.data?.docs ?? [];
+        final pendingDocs =
+            allDocs.where((d) => d.data()['status'] == 'pending').toList();
+        final incoming = pendingDocs
+            .where((d) => d.data()['requested_by'] != authUid)
+            .toList();
+        final outgoing = pendingDocs
+            .where((d) => d.data()['requested_by'] == authUid)
+            .toList();
+        final activeDocs =
+            allDocs.where((d) => d.data()['status'] == 'active').toList();
+
+        final hasRequests = incoming.isNotEmpty || outgoing.isNotEmpty;
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: Text(
+                  t('contacts_section_requests_friends'),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Divider(height: 1),
+              ),
+              if (hasRequests) ...[
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _ContactsPanel(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (incoming.isNotEmpty) ...[
+                          _SectionTitle(t('contacts_incoming_requests')),
+                          for (var i = 0; i < incoming.length; i++) ...[
+                            if (i > 0)
+                              Divider(
+                                height: 1,
+                                indent: 16,
+                                endIndent: 16,
+                                color: Colors.grey.shade200,
+                              ),
+                            _IncomingTile(
+                              docId: incoming[i].id,
+                              data: incoming[i].data(),
+                            ),
+                          ],
+                        ],
+                        if (outgoing.isNotEmpty) ...[
+                          if (incoming.isNotEmpty)
+                            Divider(height: 1, color: Colors.grey.shade200),
+                          _SectionTitle(t('contacts_outgoing_pending')),
+                          ..._outgoingTilesWithDividers(outgoing, authUid),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Text(
+                  t('contacts_friends'),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              if (activeDocs.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  child: _ContactsPanel(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      child: Text(
+                        t('contacts_empty_friends_hint'),
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _ContactsPanel(
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < activeDocs.length; i++) ...[
+                          if (i > 0)
+                            Divider(
+                              height: 1,
+                              indent: 72,
+                              endIndent: 16,
+                              color: Colors.grey.shade200,
+                            ),
+                          _FriendChatListTile(
+                            pairId: activeDocs[i].id,
+                            peerName: MessagingService.peerName(
+                              activeDocs[i].data(),
+                              authUid,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 32),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -185,7 +241,9 @@ class _FriendChatListTile extends StatelessWidget {
     if (kind == 'image') {
       final cap = '${m['text'] ?? ''}'.trim();
       if (cap.isNotEmpty) {
-        return cap.length > 40 ? '${cap.substring(0, 40)}…' : '${t('image')}: $cap';
+        return cap.length > 40
+            ? '${cap.substring(0, 40)}…'
+            : '${t('image')}: $cap';
       }
       return t('image');
     }
@@ -246,7 +304,8 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
       );
       if (!mounted) return;
       if (err != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(err)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(t('request_sent'))),
@@ -310,6 +369,55 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
   }
 }
 
+class _ContactsPanel extends StatelessWidget {
+  const _ContactsPanel({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: child,
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _outgoingTilesWithDividers(
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  String myUid,
+) sync* {
+  for (var i = 0; i < docs.length; i++) {
+    if (i > 0) {
+      yield Divider(
+        height: 1,
+        indent: 16,
+        endIndent: 16,
+        color: Colors.grey.shade200,
+      );
+    }
+    yield _OutgoingTile(
+      docId: docs[i].id,
+      data: docs[i].data(),
+      myUid: myUid,
+    );
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
@@ -318,7 +426,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
       child: Text(
         text,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -347,47 +455,43 @@ class _IncomingTile extends StatelessWidget {
     var fromName = t('user_default');
     if (names is Map && names[from] != null) fromName = '${names[from]}';
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(fromName, style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      final err = await MessagingService.acceptRequest(docId);
-                      if (context.mounted) {
-                        if (err != null) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text(err)));
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(t('request_approved'))),
-                          );
-                        }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(fromName, style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () async {
+                    final err = await MessagingService.acceptRequest(docId);
+                    if (context.mounted) {
+                      if (err != null) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text(err)));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(t('request_approved'))),
+                        );
                       }
-                    },
-                    child: Text(t('approve')),
-                  ),
+                    }
+                  },
+                  child: Text(t('approve')),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () =>
-                        MessagingService.declineRequest(docId),
-                    child: Text(t('decline')),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextButton(
+                  onPressed: () => MessagingService.declineRequest(docId),
+                  child: Text(t('decline')),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

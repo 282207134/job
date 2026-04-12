@@ -26,7 +26,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   /// [MaterialApp.builder] 内のウィジェットは Navigator の子ではないため、
   /// 着信 UI からルートを push するにはこのキーが必要。
-  final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _rootNavigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,27 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp(
           navigatorKey: _rootNavigatorKey,
           debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF3949AB),
+              brightness: Brightness.light,
+            ),
+            scaffoldBackgroundColor: const Color(0xFFF2F4F7),
+            dividerTheme: DividerThemeData(
+              color: Colors.grey.shade300,
+              thickness: 1,
+              space: 1,
+            ),
+            cardTheme: CardThemeData(
+              color: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+            ),
+          ),
           locale: lang.locale,
           supportedLocales: const [
             Locale('zh'),
@@ -50,11 +72,13 @@ class _MyAppState extends State<MyApp> {
           ],
           builder: (context, child) {
             final hasUser = FirebaseAuth.instance.currentUser != null;
-            final showLockGate = hasUser && lock.ready && lock.shouldRequireUnlock;
+            final showLockGate =
+                hasUser && lock.ready && lock.shouldRequireUnlock;
             return Stack(
               children: [
                 if (child != null) child,
-                if (showLockGate) const Positioned.fill(child: AppLockGateScreen()),
+                if (showLockGate)
+                  const Positioned.fill(child: AppLockGateScreen()),
                 GlobalIncomingCallHost(navigatorKey: _rootNavigatorKey),
               ],
             );

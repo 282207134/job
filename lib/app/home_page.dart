@@ -55,14 +55,24 @@ class _HomePageState extends State<HomePage> {
     final langProvider = Provider.of<AppLanguageProvider>(context);
     final navIndex = currentPageIndex.clamp(0, _navLength - 1);
 
+    final appBarDivider = Divider(
+      height: 1,
+      thickness: 1,
+      color: Colors.grey.shade300,
+    );
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shadowColor: Colors.black12,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: appBarDivider,
+        ),
         title: navIndex == 0
             ? ValueListenableBuilder<CalendarRoom>(
                 valueListenable: SharedCalendarService.selectedRoomNotifier,
@@ -91,31 +101,41 @@ class _HomePageState extends State<HomePage> {
             ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.black12,
-        elevation: 1,
-        onDestinationSelected: (int index) {
-          setState(() => currentPageIndex = index);
-        },
-        indicatorColor: Colors.grey.shade200,
-        selectedIndex: navIndex,
-        destinations: <Widget>[
-          NavigationDestination(
-            selectedIcon: const Icon(Icons.calendar_month),
-            icon: const Icon(Icons.calendar_month),
-            label: langProvider.tr('calendar'),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Colors.grey.shade300,
           ),
-          NavigationDestination(
-            selectedIcon: const Icon(Icons.task_alt),
-            icon: const Icon(Icons.task_alt_outlined),
-            label: langProvider.tr('todo'),
-          ),
-          NavigationDestination(
-            selectedIcon: const Icon(Icons.people_alt_rounded),
-            icon: const _MessagesNavIcon(),
-            label: langProvider.tr('contacts'),
+          NavigationBar(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            shadowColor: Colors.black.withValues(alpha: 0.08),
+            elevation: 3,
+            onDestinationSelected: (int index) {
+              setState(() => currentPageIndex = index);
+            },
+            indicatorColor: Colors.grey.shade200,
+            selectedIndex: navIndex,
+            destinations: <Widget>[
+              NavigationDestination(
+                selectedIcon: const Icon(Icons.calendar_month),
+                icon: const Icon(Icons.calendar_month),
+                label: langProvider.tr('calendar'),
+              ),
+              NavigationDestination(
+                selectedIcon: const Icon(Icons.task_alt),
+                icon: const Icon(Icons.task_alt_outlined),
+                label: langProvider.tr('todo'),
+              ),
+              NavigationDestination(
+                selectedIcon: const Icon(Icons.people_alt_rounded),
+                icon: const _MessagesNavIcon(),
+                label: langProvider.tr('contacts'),
+              ),
+            ],
           ),
         ],
       ),
@@ -207,7 +227,8 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () async {
-                Provider.of<AppLockProvider>(context, listen: false).lockSession();
+                Provider.of<AppLockProvider>(context, listen: false)
+                    .lockSession();
                 await FirebaseAuth.instance.signOut();
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
@@ -322,20 +343,26 @@ class _HomePageState extends State<HomePage> {
                           .snapshots(),
                       builder: (context, snap) {
                         if (snap.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
                         if (snap.hasError) {
                           return Center(
-                            child: Text('${langProvider.tr('error')}: ${snap.error}'),
+                            child: Text(
+                                '${langProvider.tr('error')}: ${snap.error}'),
                           );
                         }
                         final docs = snap.data?.docs ?? const [];
-                        final room = SharedCalendarService.selectedRoomNotifier.value;
-                        final myUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                        final room =
+                            SharedCalendarService.selectedRoomNotifier.value;
+                        final myUid =
+                            FirebaseAuth.instance.currentUser?.uid ?? '';
                         final events = docs
                             .map(_eventFromDoc)
                             .where(
-                              (e) => !_isHolidayEvent(e) && _inCurrentRoom(e, room, myUid),
+                              (e) =>
+                                  !_isHolidayEvent(e) &&
+                                  _inCurrentRoom(e, room, myUid),
                             )
                             .toList()
                           ..sort((a, b) => b.date.compareTo(a.date));
@@ -345,7 +372,8 @@ class _HomePageState extends State<HomePage> {
                           builder: (context, q, _) {
                             if (q.isEmpty) {
                               return Center(
-                                child: Text(langProvider.tr('search_start_typing')),
+                                child: Text(
+                                    langProvider.tr('search_start_typing')),
                               );
                             }
                             final matched = events.where((e) {
@@ -355,12 +383,14 @@ class _HomePageState extends State<HomePage> {
                             }).toList();
                             if (matched.isEmpty) {
                               return Center(
-                                child: Text(langProvider.tr('search_no_results')),
+                                child:
+                                    Text(langProvider.tr('search_no_results')),
                               );
                             }
                             return ListView.separated(
                               itemCount: matched.length,
-                              separatorBuilder: (_, __) => const Divider(height: 1),
+                              separatorBuilder: (_, __) =>
+                                  const Divider(height: 1),
                               itemBuilder: (context, i) {
                                 final e = matched[i];
                                 final dateText =
@@ -427,7 +457,9 @@ class _HomePageState extends State<HomePage> {
       startTime: getDateTime(raw['startTime']),
       endTime: getDateTime(raw['endTime']),
       color: getColor(raw['color']),
-      endDate: getDateTime(raw['endDate']) ?? getDateTime(raw['date']) ?? DateTime.now(),
+      endDate: getDateTime(raw['endDate']) ??
+          getDateTime(raw['date']) ??
+          DateTime.now(),
       event: raw,
     );
   }
@@ -436,7 +468,8 @@ class _HomePageState extends State<HomePage> {
     return HolidayService.isHolidayEventData(event);
   }
 
-  bool _inCurrentRoom(CalendarEventData event, CalendarRoom room, String myUid) {
+  bool _inCurrentRoom(
+      CalendarEventData event, CalendarRoom room, String myUid) {
     final map = event.event is Map<String, dynamic>
         ? event.event as Map<String, dynamic>
         : <String, dynamic>{};
@@ -530,7 +563,8 @@ class _HomePageState extends State<HomePage> {
                     if (pass == null || pass.isEmpty) return;
                     await lockActions.updatePassword(pass);
                     await lockActions.syncWithUser(uid);
-                    setSheetState(() => sheetHasPassword = lockActions.hasPassword);
+                    setSheetState(
+                        () => sheetHasPassword = lockActions.hasPassword);
                     if (mounted) setState(() {});
                   },
                 ),
@@ -554,7 +588,8 @@ class _HomePageState extends State<HomePage> {
                     if (selected == null) return;
                     await lockActions.setIdleMinutes(selected);
                     await lockActions.syncWithUser(uid);
-                    setSheetState(() => sheetIdleMinutes = lockActions.idleMinutes);
+                    setSheetState(
+                        () => sheetIdleMinutes = lockActions.idleMinutes);
                     if (mounted) setState(() {});
                   },
                 ),
@@ -608,13 +643,16 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               if (v1.length < 4) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(content: Text(langProvider.tr('lock_password_too_short'))),
+                  SnackBar(
+                      content:
+                          Text(langProvider.tr('lock_password_too_short'))),
                 );
                 return;
               }
               if (v1 != v2) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(content: Text(langProvider.tr('lock_password_mismatch'))),
+                  SnackBar(
+                      content: Text(langProvider.tr('lock_password_mismatch'))),
                 );
                 return;
               }
