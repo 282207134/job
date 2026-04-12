@@ -42,7 +42,8 @@ class SharedCalendarSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     t('shared_calendar'),
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -59,7 +60,8 @@ class SharedCalendarSheet extends StatelessWidget {
               stream: SharedCalendarService.myRoomsStream(),
               builder: (context, snap) {
                 if (snap.hasError) {
-                  return Text('${t('read_calendar_rooms_failed')}: ${snap.error}');
+                  return Text(
+                      '${t('read_calendar_rooms_failed')}: ${snap.error}');
                 }
                 final rooms = snap.data ?? const <CalendarRoom>[];
                 if (rooms.isEmpty) {
@@ -81,8 +83,8 @@ class SharedCalendarSheet extends StatelessWidget {
                             r.isPersonal
                                 ? t('my_calendar')
                                 : (r.ownerName.trim().isEmpty
-                                      ? r.name
-                                      : '${r.ownerName.trim()} · ${r.name}'),
+                                    ? r.name
+                                    : '${r.ownerName.trim()} · ${r.name}'),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -90,7 +92,8 @@ class SharedCalendarSheet extends StatelessWidget {
                               if (selected)
                                 const Padding(
                                   padding: EdgeInsets.only(right: 6),
-                                  child: Icon(Icons.check_circle, color: Colors.green),
+                                  child: Icon(Icons.check_circle,
+                                      color: Colors.green),
                                 ),
                               if (!r.isPersonal)
                                 PopupMenuButton<String>(
@@ -104,15 +107,18 @@ class SharedCalendarSheet extends StatelessWidget {
                                           myName: prov.userName,
                                         );
                                       } else if (v == 'delete') {
-                                        await SharedCalendarService.deleteRoomAsOwner(
+                                        await SharedCalendarService
+                                            .deleteRoomAsOwner(
                                           roomId: r.id,
                                         );
                                       } else if (v == 'leave') {
-                                        await SharedCalendarService.leaveRoom(roomId: r.id);
+                                        await SharedCalendarService.leaveRoom(
+                                            roomId: r.id);
                                       }
                                     } catch (e) {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(content: Text('$e')),
                                         );
                                       }
@@ -128,7 +134,8 @@ class SharedCalendarSheet extends StatelessWidget {
                                         ),
                                         PopupMenuItem(
                                           value: 'delete',
-                                          child: Text(t('delete_shared_calendar')),
+                                          child:
+                                              Text(t('delete_shared_calendar')),
                                         ),
                                       ];
                                     }
@@ -143,8 +150,7 @@ class SharedCalendarSheet extends StatelessWidget {
                             ],
                           ),
                           onTap: () {
-                            SharedCalendarService.selectRoomSafely(r)
-                                .then((_) {
+                            SharedCalendarService.selectRoomSafely(r).then((_) {
                               if (context.mounted) Navigator.of(context).pop();
                             }).catchError((e) {
                               if (!context.mounted) return;
@@ -152,7 +158,8 @@ class SharedCalendarSheet extends StatelessWidget {
                                 context: context,
                                 builder: (ctx) => AlertDialog(
                                   title: Text(t('shared_calendar_notice')),
-                                  content: Text('$e'.replaceFirst('Exception: ', '')),
+                                  content: Text(
+                                      '$e'.replaceFirst('Exception: ', '')),
                                   actions: [
                                     FilledButton(
                                       onPressed: () => Navigator.of(ctx).pop(),
@@ -234,47 +241,10 @@ class SharedCalendarSheet extends StatelessWidget {
   }
 
   Future<void> _showCreateDialog(BuildContext context, String myName) async {
-    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
-    final ctrl = TextEditingController();
-    try {
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: Text(t('create_shared_calendar')),
-            content: TextField(
-              controller: ctrl,
-              decoration: InputDecoration(hintText: t('enter_room_name')),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(t('cancel')),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  try {
-                    await SharedCalendarService.createRoom(
-                      name: ctrl.text,
-                      ownerName: myName,
-                    );
-                    if (ctx.mounted) Navigator.of(ctx).pop();
-                  } catch (e) {
-                    if (ctx.mounted) {
-                      ScaffoldMessenger.of(ctx)
-                          .showSnackBar(SnackBar(content: Text('$e')));
-                    }
-                  }
-                },
-                child: Text(t('create_shared_calendar')),
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      ctrl.dispose();
-    }
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => _CreateSharedCalendarDialog(ownerName: myName),
+    );
   }
 
   Future<void> _showInviteDialog(
@@ -283,54 +253,150 @@ class SharedCalendarSheet extends StatelessWidget {
     required String roomName,
     required String myName,
   }) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => _InviteMemberDialog(
+        roomId: roomId,
+        roomName: roomName,
+        fromName: myName,
+      ),
+    );
+  }
+}
+
+/// 在路由真正卸载后再 dispose [TextEditingController]；不得在 `showDialog` 的 `finally` 里立刻 dispose，
+/// 否则关闭动画期间 TextField 仍会访问已释放的 controller，并可能连带触发 `_dependents.isEmpty`。
+class _CreateSharedCalendarDialog extends StatefulWidget {
+  const _CreateSharedCalendarDialog({required this.ownerName});
+
+  final String ownerName;
+
+  @override
+  State<_CreateSharedCalendarDialog> createState() =>
+      _CreateSharedCalendarDialogState();
+}
+
+class _CreateSharedCalendarDialogState extends State<_CreateSharedCalendarDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
-    final ctrl = TextEditingController();
-    try {
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: Text(t('invite_member')),
-            content: TextField(
-              controller: ctrl,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(hintText: t('enter_registered_email')),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(t('cancel')),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  try {
-                    await SharedCalendarService.inviteByEmail(
-                      roomId: roomId,
-                      roomName: roomName,
-                      fromName: myName,
-                      email: ctrl.text,
-                    );
-                    if (ctx.mounted) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(content: Text(t('invite_sent'))),
-                      );
-                      Navigator.of(ctx).pop();
-                    }
-                  } catch (e) {
-                    if (ctx.mounted) {
-                      ScaffoldMessenger.of(ctx)
-                          .showSnackBar(SnackBar(content: Text('$e')));
-                    }
-                  }
-                },
-                child: Text(t('send')),
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      ctrl.dispose();
-    }
+    return AlertDialog(
+      title: Text(t('create_shared_calendar')),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(hintText: t('enter_room_name')),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(t('cancel')),
+        ),
+        FilledButton(
+          onPressed: () async {
+            try {
+              await SharedCalendarService.createRoom(
+                name: _controller.text,
+                ownerName: widget.ownerName,
+              );
+              if (context.mounted) Navigator.of(context).pop();
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('$e')));
+              }
+            }
+          },
+          child: Text(t('create_shared_calendar')),
+        ),
+      ],
+    );
+  }
+}
+
+class _InviteMemberDialog extends StatefulWidget {
+  const _InviteMemberDialog({
+    required this.roomId,
+    required this.roomName,
+    required this.fromName,
+  });
+
+  final String roomId;
+  final String roomName;
+  final String fromName;
+
+  @override
+  State<_InviteMemberDialog> createState() => _InviteMemberDialogState();
+}
+
+class _InviteMemberDialogState extends State<_InviteMemberDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
+    return AlertDialog(
+      title: Text(t('invite_member')),
+      content: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(hintText: t('enter_registered_email')),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(t('cancel')),
+        ),
+        FilledButton(
+          onPressed: () async {
+            try {
+              await SharedCalendarService.inviteByEmail(
+                roomId: widget.roomId,
+                roomName: widget.roomName,
+                fromName: widget.fromName,
+                email: _controller.text,
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(t('invite_sent'))),
+                );
+                Navigator.of(context).pop();
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('$e')));
+              }
+            }
+          },
+          child: Text(t('send')),
+        ),
+      ],
+    );
   }
 }

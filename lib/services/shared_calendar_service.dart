@@ -85,9 +85,10 @@ class SharedCalendarService {
 
     // 若是共享房间，需确认当前账号确实已在成员中；否则切回个人日历
     try {
-      final roomDoc = await _db.collection('shared_calendars').doc(current.id).get();
-      final members =
-          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      final roomDoc =
+          await _db.collection('shared_calendars').doc(current.id).get();
+      final members = List<String>.from(
+          roomDoc.data()?['member_uids'] as List? ?? const []);
       if (!roomDoc.exists || !members.contains(uid)) {
         selectedRoomNotifier.value = CalendarRoom(
           id: personalId,
@@ -120,7 +121,8 @@ class SharedCalendarService {
       return;
     }
     final doc = await _db.collection('shared_calendars').doc(room.id).get();
-    final members = List<String>.from(doc.data()?['member_uids'] as List? ?? const []);
+    final members =
+        List<String>.from(doc.data()?['member_uids'] as List? ?? const []);
     if (!doc.exists || !members.contains(uid)) {
       throw Exception('改共享日历不存在');
     }
@@ -222,14 +224,16 @@ class SharedCalendarService {
     if (toUid == uid) throw Exception('不能邀请自己');
 
     try {
-      final roomDoc = await _db.collection('shared_calendars').doc(roomId).get();
+      final roomDoc =
+          await _db.collection('shared_calendars').doc(roomId).get();
       if (!roomDoc.exists) throw Exception('改共享日历不存在');
-      final members =
-          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      final members = List<String>.from(
+          roomDoc.data()?['member_uids'] as List? ?? const []);
       if (members.contains(toUid)) throw Exception('该用户已在共享日历中');
 
       final inviteId = '${roomId}_$toUid';
-      final existed = await _db.collection('calendar_invites').doc(inviteId).get();
+      final existed =
+          await _db.collection('calendar_invites').doc(inviteId).get();
       if (existed.exists && existed.data()?['status'] == 'pending') {
         throw Exception('邀请已发送');
       }
@@ -266,16 +270,18 @@ class SharedCalendarService {
     if (targetUid == uid) throw Exception('不能邀请自己');
 
     try {
-      final roomDoc = await _db.collection('shared_calendars').doc(roomId).get();
+      final roomDoc =
+          await _db.collection('shared_calendars').doc(roomId).get();
       if (!roomDoc.exists) throw Exception('改共享日历不存在');
       final ownerUid = '${roomDoc.data()?['owner_uid'] ?? ''}';
       if (ownerUid != uid) throw Exception('只有创建者可以邀请成员');
-      final members =
-          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      final members = List<String>.from(
+          roomDoc.data()?['member_uids'] as List? ?? const []);
       if (members.contains(targetUid)) throw Exception('该用户已在共享日历中');
 
       final inviteId = '${roomId}_$targetUid';
-      final existed = await _db.collection('calendar_invites').doc(inviteId).get();
+      final existed =
+          await _db.collection('calendar_invites').doc(inviteId).get();
       if (existed.exists && existed.data()?['status'] == 'pending') {
         throw Exception('邀请已发送');
       }
@@ -314,7 +320,8 @@ class SharedCalendarService {
       if (invite['status'] != 'pending') return;
 
       if (accept) {
-        final roomRef = _db.collection('shared_calendars').doc('${invite['room_id']}');
+        final roomRef =
+            _db.collection('shared_calendars').doc('${invite['room_id']}');
         // 直接尝试加入，规则会校验 pending 邀请
         tx.update(roomRef, {
           'member_uids': FieldValue.arrayUnion([uid]),
@@ -373,8 +380,8 @@ class SharedCalendarService {
       if (ownerUid == uid) {
         throw Exception('创建者不能退出，请使用删除功能');
       }
-      final members =
-          List<String>.from(roomDoc.data()?['member_uids'] as List? ?? const []);
+      final members = List<String>.from(
+          roomDoc.data()?['member_uids'] as List? ?? const []);
       if (!members.contains(uid)) return;
       tx.update(roomRef, {
         'member_uids': FieldValue.arrayRemove([uid]),

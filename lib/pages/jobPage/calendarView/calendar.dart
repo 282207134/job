@@ -39,16 +39,24 @@ class calendar extends StatelessWidget {
           ..addAll(const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
         break;
     }
-    return Scaffold( // 返回一个脚手架组件，提供基本的视觉结构
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>( // 使用 StreamBuilder 监听 Firestore 数据流
-        stream: FirebaseFirestore.instance.collection('events').snapshots(), // 监听 'events' 集合的快照
-        builder: (context, snapshot) { // 构建方法，根据快照状态更新 UI
-          if (snapshot.connectionState == ConnectionState.waiting) { // 如果连接状态是等待中
+    return Scaffold(
+      // 返回一个脚手架组件，提供基本的视觉结构
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        // 使用 StreamBuilder 监听 Firestore 数据流
+        stream: FirebaseFirestore.instance
+            .collection('events')
+            .snapshots(), // 监听 'events' 集合的快照
+        builder: (context, snapshot) {
+          // 构建方法，根据快照状态更新 UI
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // 如果连接状态是等待中
             return Center(child: CircularProgressIndicator()); // 显示加载指示器
           }
 
-          if (snapshot.hasError) { // 如果发生错误
-            return Center(child: Text('${t('error')}: ${snapshot.error}')); // 显示错误信息
+          if (snapshot.hasError) {
+            // 如果发生错误
+            return Center(
+                child: Text('${t('error')}: ${snapshot.error}')); // 显示错误信息
           }
 
           return ValueListenableBuilder<CalendarRoom>(
@@ -61,9 +69,11 @@ class calendar extends StatelessWidget {
                 final raw = doc.data();
                 // 日期时间转换函数
                 DateTime? getDateTime(dynamic value) {
-                  if (value is Timestamp) { // 如果值是 Timestamp 类型
+                  if (value is Timestamp) {
+                    // 如果值是 Timestamp 类型
                     return value.toDate(); // 转换为 DateTime
-                  } else if (value is String) { // 如果值是字符串
+                  } else if (value is String) {
+                    // 如果值是字符串
                     return DateTime.parse(value); // 解析为 DateTime
                   }
                   return null; // 否则返回 null
@@ -71,9 +81,11 @@ class calendar extends StatelessWidget {
 
                 // 颜色转换函数
                 Color getColor(dynamic value) {
-                  if (value is int) { // 如果值是整数
+                  if (value is int) {
+                    // 如果值是整数
                     return Color(value); // 根据整数值创建颜色
-                  } else if (value is String) { // 如果值是字符串
+                  } else if (value is String) {
+                    // 如果值是字符串
                     return Color(int.parse(value)); // 解析字符串为整数后创建颜色
                   }
                   return Colors.black; // 默认返回黑色
@@ -88,7 +100,7 @@ class calendar extends StatelessWidget {
                   startTime: getDateTime(raw['startTime']), // 获取开始时间
                   endTime: getDateTime(raw['endTime']), // 获取结束时间
                   color: getColor(raw['color']), // 获取颜色
-                  endDate: getDateTime(raw['endDate']),  // 确保结束日期被解析
+                  endDate: getDateTime(raw['endDate']), // 确保结束日期被解析
                   event: raw,
                 );
               }).where((e) {
@@ -108,12 +120,15 @@ class calendar extends StatelessWidget {
               // 传递事件数据给日历控制器
               return CalendarControllerProvider(
                 controller: EventController()..addAll(events), // 创建事件控制器并添加所有事件
-                child: MaterialApp( // 返回 Material 应用
+                child: MaterialApp(
+                  // 返回 Material 应用
                   // title: 'Flutter Calendar Page Demo', // 应用标题
                   debugShowCheckedModeBanner: false, // 不显示调试模式横幅
                   theme: ThemeData.light(), // 应用主题
-                  scrollBehavior: ScrollBehavior().copyWith( // 自定义滚动行为
-                    dragDevices: { // 支持的拖动设备
+                  scrollBehavior: ScrollBehavior().copyWith(
+                    // 自定义滚动行为
+                    dragDevices: {
+                      // 支持的拖动设备
                       PointerDeviceKind.trackpad, // 触控板
                       PointerDeviceKind.mouse, // 鼠标
                       PointerDeviceKind.touch, // 触摸屏
