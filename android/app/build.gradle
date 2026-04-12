@@ -23,6 +23,7 @@ android {
     compileSdk flutter.compileSdkVersion // 使用 Flutter 提供的编译 SDK 版本
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
@@ -54,8 +55,7 @@ flutter {
     source '../..' // 指向 Flutter SDK 的根目录
 }
 
-// 在此处添加任何依赖项
 dependencies {
-    // 示例依赖：
-    // implementation 'com.google.firebase:firebase-analytics-ktx:21.3.1' // 示例 Firebase 依赖
+    // flutter_local_notifications 等依赖需要 core library desugaring
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
