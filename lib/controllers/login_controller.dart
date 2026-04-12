@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart'; // 引入 Firebase 认证库
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'; // 引入 Flutter 材料设计库
 
 import '../screens/splash_screen.dart'; // 引入仪表板屏幕组件
+import '../services/push_notification_service.dart';
 
 class LoginController {
   // 定义一个静态方法login，用于处理登录操作
@@ -13,6 +15,10 @@ class LoginController {
       // 使用Firebase Auth进行邮箱和密码的验证
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+
+      if (!kIsWeb) {
+        await PushNotificationService.syncTokenNow();
+      }
 
       // 登录成功后，跳转到SplashScreen页面，并清除之前所有的路由栈
       Navigator.pushAndRemoveUntil(context,

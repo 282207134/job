@@ -40,6 +40,9 @@ dependencies:
   flutter_dotenv: ^6.0.0
   livekit_client: ^2.0.0
   crypto: ^3.0.3
+  firebase_messaging: ^15.2.10
+  flutter_local_notifications: ^21.0.0
+  onesignal_flutter: 5.5.1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +55,8 @@ flutter:
   uses-material-design: true # 使用Material设计
   assets: # 资源文件
     - .env
+    - assets/sounds/notify.wav
+    - assets/sounds/message.wav
     - assets/images/ # 图片资源
     - assets/piano/ # 钢琴音频资源
     - images/ # 图片资源

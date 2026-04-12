@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:characters/characters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,6 +36,35 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
   String? _listeningUid;
   QueryDocumentSnapshot<Map<String, dynamic>>? _pending;
   bool _minimized = false;
+  AudioPlayer? _ringtone;
+
+  Future<void> _syncRingtone(bool play) async {
+    if (!play) {
+      final p = _ringtone;
+      _ringtone = null;
+      if (p != null) {
+        try {
+          await p.stop();
+        } catch (_) {}
+        await p.dispose();
+      }
+      return;
+    }
+    if (_ringtone != null) return;
+    try {
+      final p = AudioPlayer();
+      _ringtone = p;
+      await p.setReleaseMode(ReleaseMode.loop);
+      await p.play(AssetSource('sounds/notify.wav'));
+    } catch (e, st) {
+      debugPrint('GlobalIncomingCallHost ringtone: $e\n$st');
+      final p = _ringtone;
+      _ringtone = null;
+      if (p != null) {
+        await p.dispose();
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -50,6 +80,7 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
 
   @override
   void dispose() {
+    unawaited(_syncRingtone(false));
     _authSub?.cancel();
     _teardownPairListeners();
     super.dispose();
@@ -67,6 +98,7 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
 
   void _attachIncomingIfNeeded(String? uid) {
     if (uid == null || uid.isEmpty) {
+      unawaited(_syncRingtone(false));
       _teardownPairListeners();
       _listeningUid = null;
       if (mounted && (_pending != null || _minimized)) {
@@ -155,6 +187,7 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
       _pending = best;
       if (best == null) _minimized = false;
     });
+    unawaited(_syncRingtone(best != null));
   }
 
   Future<void> _accept(QueryDocumentSnapshot<Map<String, dynamic>> doc) async {
@@ -180,6 +213,7 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
           ?.showSnackBar(SnackBar(content: Text('$t: $e')));
       return;
     }
+    await _syncRingtone(false);
     if (!mounted) return;
     final nav = widget.navigatorKey.currentState;
     if (nav == null) {
@@ -221,12 +255,16 @@ class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {
       await DirectCallSignalService.markRejected(doc.reference);
     } catch (_) {}
     if (mounted) {
+      final clear = _pending?.id == doc.id;
       setState(() {
-        if (_pending?.id == doc.id) {
+        if (clear) {
           _pending = null;
           _minimized = false;
         }
       });
+      if (clear) {
+        await _syncRingtone(false);
+      }
     }
   }
 

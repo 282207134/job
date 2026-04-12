@@ -1,6 +1,8 @@
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +12,9 @@ import 'package:kantankanri/providers/app_language_provider.dart';
 import 'package:kantankanri/providers/app_lock_provider.dart';
 import 'package:kantankanri/providers/userProvider.dart';
 import 'package:kantankanri/screens/app_lock_gate_screen.dart';
+import 'package:kantankanri/services/onesignal_push_service.dart';
+import 'package:kantankanri/services/push_notification_service.dart';
+import 'package:kantankanri/services/push_payload_router.dart';
 import 'package:kantankanri/widgets/global_incoming_call_host.dart';
 import 'package:kantankanri/splashScreen/OnBoardingPageState.dart';
 import 'package:provider/provider.dart';
@@ -23,11 +28,37 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   /// [MaterialApp.builder] 内のウィジェットは Navigator の子ではないため、
   /// 着信 UI からルートを push するにはこのキーが必要。
   final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    PushPayloadRouter.attachNavigator(_rootNavigatorKey);
+    // OneSignal 须在界面/Activity 就绪后再请求通知权限，否则控制台长期为 Permission Not Granted
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(const Duration(milliseconds: 400), () {
+        OneSignalPushService.promptForPushPermission();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      PushNotificationService.onAppResumed();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,6 +172,11 @@ Future<void> main() async {
     debugPrint('dotenv: $e\n$st');
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await PushNotificationService.initialize();
+    await OneSignalPushService.initialize();
+  }
   runApp(
     MultiProvider(
       providers: [

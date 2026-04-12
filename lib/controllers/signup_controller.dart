@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../screens/splash_screen.dart';
+import '../services/push_notification_service.dart';
 
 class SignupController {
   static Future<void> createAccount({
@@ -31,6 +33,10 @@ class SignupController {
         await db.collection('users').doc(userId).set(data);
       } catch (e) {
         debugPrint('$e');
+      }
+
+      if (!kIsWeb) {
+        await PushNotificationService.syncTokenNow();
       }
 
       if (!context.mounted) return;
