@@ -38,6 +38,24 @@ async function tokenForUser(uid) {
   return t;
 }
 
+/**
+ * OneSignal は HTTP 200 でも「購読者ゼロ」「external_id 不一致」等で id 空・errors ありになり得る。
+ * その場合に true を返し、FCM へフォールバックする。
+ */
+function oneSignalResponseLooksLikeNoDelivery(json, rawText) {
+  if (!json || typeof json !== "object") return false;
+  if (json.id === "" || json.id == null) return true;
+  const err = json.errors;
+  if (Array.isArray(err) && err.length > 0) return true;
+  if (err && typeof err === "object" && Object.keys(err).length > 0) return true;
+  const ia = json.invalid_aliases;
+  if (ia && typeof ia === "object" && Object.keys(ia).length > 0) return true;
+  if (typeof rawText === "string" && /not subscribed|no valid|invalid.*alias/i.test(rawText)) {
+    return true;
+  }
+  return false;
+}
+
 async function sendViaOneSignal(uid, title, body, dataFlat) {
   const appId = process.env.ONESIGNAL_APP_ID;
   const apiKey = process.env.ONESIGNAL_REST_API_KEY;
@@ -81,12 +99,41 @@ async function sendViaOneSignal(uid, title, body, dataFlat) {
       console.error("OneSignal HTTP", res.status, text);
       return false;
     }
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (_) {
+      console.log("OneSignal ok (non-JSON body)", uid, text.slice(0, 200));
+      return true;
+    }
+    if (oneSignalResponseLooksLikeNoDelivery(json, text)) {
+      console.warn(
+          "OneSignal no delivery / errors, will try FCM",
+          uid,
+          text.slice(0, 500),
+      );
+      return false;
+    }
     console.log("OneSignal ok", uid, text.slice(0, 200));
     return true;
   } catch (e) {
     console.error("OneSignal failed", uid, e.message || e);
     return false;
   }
+}
+
+function androidChannelIdForPayload(payloadData) {
+  if (payloadData && payloadData.type === "incoming_call") {
+    return "kantankanri_call_sfx";
+  }
+  return "kantankanri_msg_sfx";
+}
+
+function androidSoundForPayload(payloadData) {
+  if (payloadData && payloadData.type === "incoming_call") {
+    return "notify";
+  }
+  return "message";
 }
 
 async function sendViaFcm(uid, title, body, payloadData) {
@@ -101,6 +148,12 @@ async function sendViaFcm(uid, title, body, payloadData) {
       data: payloadData,
       android: {
         priority: "high",
+        notification: {
+          title,
+          body,
+          channelId: androidChannelIdForPayload(payloadData),
+          sound: androidSoundForPayload(payloadData),
+        },
       },
       apns: {
         headers: {
@@ -161,18 +214,31 @@ exports.onCalendarInviteNotify = onDocumentWritten(
     },
 );
 
-exports.onFriendRequestCreated = onDocumentCreated(
+// onCreate のみだと環境差で取りこぼす報告があるため onWrite に統一。
+// 同一 pending + 同一 requested_by の更新では再通知しない。
+exports.onFriendRequestNotify = onDocumentWritten(
     "friend_links/{pairId}",
     async (event) => {
-      const d = event.data?.data();
-      if (!d || d.status !== "pending") return;
-      const requestedBy = d.requested_by;
-      const uids = d.uids;
+      const after = event.data.after?.data();
+      if (!after || after.status !== "pending") return;
+      const before = event.data.before?.data();
+      if (before &&
+          before.status === "pending" &&
+          before.requested_by === after.requested_by) {
+        return;
+      }
+      const requestedBy = after.requested_by;
+      const uids = after.uids;
       if (!Array.isArray(uids) || uids.length < 2) return;
       const target = uids.find((u) => u !== requestedBy);
       if (!target) return;
-      const names = d.names || {};
+      const names = after.names || {};
       const fromName = names[requestedBy] || "Someone";
+      console.log("friend_links notify", {
+        pairId: event.params.pairId,
+        target,
+        requestedBy,
+      });
       await sendToUser(
           target,
           "Friend request",
