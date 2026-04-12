@@ -75,7 +75,7 @@ Flutter と Firebase を用いたアプリです。**カレンダー**、**Todo*
 
 友達を追加してカレンダーを共有できます。共有されたカレンダーはリアルタイムで同期され、いつでも最新の情報を確認できます。
 
-![友達追加画面](https://github.com/user-attachments/assets/71147d8d-155b-4a0b-ba5d-08966c2a3da9)
+<img width="545" height="945" alt="image" src="https://github.com/user-attachments/assets/514b4e0d-d4b6-4173-9e9f-e5d9d5b31f82" />
 
 ![カレンダー共有画面](https://github.com/user-attachments/assets/fb29db3e-12f5-4b26-ab51-c0e78c400336)
 
@@ -96,6 +96,10 @@ Flutter と Firebase を用いたアプリです。**カレンダー**、**Todo*
 - 友だちとの **LiveKit** 音声 / ビデオ通話。着信時はグローバル UI・着信音（モバイル）に対応。  
 - ルートの **`.env`**（リポジトリに含めない）またはビルド時 **`--dart-define`** で `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` を設定。  
 - **セキュリティ**：`LIVEKIT_API_SECRET` を Web / クライアントに埋め込むのは開発・検証向け。本番は **Cloud Functions 等でトークンのみ発行**することを推奨。
+
+<img width="543" height="978" alt="image" src="https://github.com/user-attachments/assets/944f40b6-c2eb-43b9-ae3a-1d9e4bfb1c79" />
+<img width="543" height="945" alt="image" src="https://github.com/user-attachments/assets/dbc0838e-6c91-4ca3-a41d-30ed5ad35bbf" />
+<img width="545" height="950" alt="image" src="https://github.com/user-attachments/assets/75233e6c-38f8-43f4-b3fc-7440b0f50ace" />
 
 ---
 
