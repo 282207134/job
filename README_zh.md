@@ -1,20 +1,23 @@
-# 日程管理应用(中/日/英)
+# 日程管理应用（中 / 日 / 英）
 
-> 基于 Flutter 与 Firebase 开发的日程管理应用程序。
+> 基于 Flutter 与 Firebase 开发的日程管理应用，含共享日历、好友与私信、通话与推送等。
 
 ---
 
 ## 📱 应用简介
 
-本应用使用 Flutter 和 Firebase 开发，涵盖日历管理、任务管理、好友共享等功能，全面满足日常日程管理的需求。
+本应用使用 Flutter 和 Firebase 开发，涵盖**日历**、**待办**、**共享日历**、**联系人 / 好友申请 / 一对一聊天**、**语音与视频通话（LiveKit）**、**推送通知**等功能，并支持 **iOS / Android / Web**。
 
 ---
 
 ## 🌐 Web 体验
 
-扫描以下二维码，即可在网页浏览器上体验应用功能。
+- **线上地址（Firebase Hosting）**：<https://job-test-b3034.web.app>  
+- 扫描以下二维码，也可在浏览器中打开 Web 版。
 
 ![二维码](https://github.com/282207134/job/assets/83965106/f1d11518-69c0-4eea-bb70-700d2877eb26)
+
+> **说明**：Web 构建产物需执行 `flutter build web` 后部署到 Hosting；根目录 `.env` 在构建时会被打进资源包（`.env` 勿提交仓库）。若无 `.env`，可用 `--dart-define=LIVEKIT_URL=...` 等注入 LiveKit 相关变量（详见下文「开发与部署」）。
 
 ---
 
@@ -78,6 +81,35 @@
 
 ---
 
+## 💬 联系人、好友申请与一对一聊天
+
+- **联系人**底部导航进入：查看「收到的申请 / 发出的申请（待通过）」与**好友列表**。  
+- **添加好友**：右上角「+」，输入对方**注册邮箱**；不能添加自己或不存在用户。  
+- **好友关系**：Firestore `friend_links`（pending / active）；双方同时申请时可自动变为已同意。  
+- **私信**：与好友进入一对一聊天（文本、图片等），数据在 `directChats/{pairId}/messages`。  
+- **删除好友**：好友行右侧 **⋮** 菜单 → 删除好友；会移除好友关系，并清理与该好友的聊天记录、通话信令及**本账号**在 Storage 中该会话下的聊天图片（对方 bucket 需对方侧或后端另行处理）。
+
+---
+
+## 📞 语音 / 视频通话（LiveKit）
+
+- 与好友发起 **LiveKit** 语音或视频通话；来电时支持全局接听界面与铃声（移动端）。  
+- 需在项目根目录配置 **`.env`**（不提交仓库）或构建时使用 **`--dart-define`** 传入：  
+  `LIVEKIT_URL`、`LIVEKIT_API_KEY`、`LIVEKIT_API_SECRET`。  
+- **安全提示**：将 `LIVEKIT_API_SECRET` 打进 Web/客户端等同于公开密钥；生产环境建议用 **Cloud Functions 等服务端签发 Token**，客户端只拿短期 token。
+
+---
+
+## 🔔 推送通知（面向 Android、iOS未实装）
+
+- **Firebase Cloud Messaging（FCM）**：令牌写入 `users/{uid}.fcm_token`，供服务端发数据消息。  
+- **本地通知**：`flutter_local_notifications`；Android 自定义渠道与短提示音（消息 / 来电）。  
+- **OneSignal（可选）**：在 `.env` 配置 `ONESIGNAL_APP_ID`；服务端 REST Key 放在 **Cloud Functions 环境变量**，勿提交仓库。配置后 Functions 优先走 OneSignal，失败再回退 FCM。  
+- **Cloud Functions（`functions/`）**：在 Firestore 事件上向对端推送，例如：好友申请、私信、**来电信令**、共享日历邀请等。部署：`firebase deploy --only functions`。  
+- **Web**：当前实现中部分推送逻辑对 Web 跳过或行为不同；Web 更依赖应用内 **Firestore 实时监听**。
+
+---
+
 ## 🔒 软件锁
 
 通过密码或生物识别（指纹/面容）保护应用访问的安全功能。保护个人隐私，防止他人查看您的日历内容。
@@ -88,9 +120,16 @@
 
 ## ⚙️ 设置界面
 
-统一管理应用全局设置的界面，支持通知提醒、主题外观、语言切换、账户信息等多项个性化配置。
+统一管理应用全局设置的界面，支持通知提醒、主题外观、**语言切换（中/日/英）**、账户信息等多项个性化配置。
 
 ![设置界面](https://github.com/user-attachments/assets/cb405e0d-5e90-46cf-b3cb-d6f5f6c32657)
+
+---
+
+## 🔐 登录与注册
+
+- 邮箱 + 密码注册与登录（Firebase Authentication）。  
+- 常见认证错误（如邮箱格式错误、密码错误、用户不存在等）会显示**本地化友好提示**，而非原始 Firebase 英文错误串。
 
 ---
 
@@ -99,8 +138,22 @@
 | 项目 | 内容 |
 |------|------|
 | 前端框架 | Flutter |
-| 后端服务 | Firebase |
+| 后端 / BaaS | Firebase（Auth、Firestore、Storage、**Cloud Functions**、**Hosting**） |
+| 实时音视频 | LiveKit（`livekit_client`） |
+| 推送 | FCM、`flutter_local_notifications`；可选 **OneSignal** |
 | 支持平台 | iOS / Android / Web |
+
+---
+
+## 🧰 开发与部署（摘要）
+
+| 步骤 | 说明 |
+|------|------|
+| 依赖 | 根目录 `flutter pub get`；Functions 目录 `npm install` |
+| 本地密钥 | 复制 `.env.example` 为 `.env`（若仓库提供），填写 OneSignal / LiveKit 等；**勿将 `.env` 提交 Git** |
+| Web 构建 | `flutter build web --release`（若工程输出在 `build_temp/web`，需同步到 `firebase.json` 中 `hosting.public` 所指目录，如 `build/web`） |
+| Hosting | `firebase deploy --only hosting` |
+| Functions | `firebase deploy --only functions`；OneSignal 密钥在 Firebase/Google Cloud 中为 Functions 配置环境变量 |
 
 ---
 
@@ -112,6 +165,11 @@
 - 自动显示日本・中国节假日
 - 创建共享日历并邀请好友
 - Todo 任务管理
-- 添加好友与日历共享
+- 添加好友、好友申请、删除好友（含清理会话数据）
+- 一对一聊天（文字 / 图片等）
+- LiveKit 语音 / 视频通话与来电处理
+- FCM + 本地通知；可选 OneSignal；Cloud Functions 触发推送
+- 登录 / 注册错误本地化提示
 - 软件锁（安全保护）
-- 可自定义的设置界面
+- 中 / 日 / 英界面语言
+- Firebase Hosting 发布 Web 版
