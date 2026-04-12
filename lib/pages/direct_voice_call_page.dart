@@ -271,41 +271,21 @@ class _DirectVoiceCallPageState extends State<DirectVoiceCallPage> {
     );
   }
 
-  Widget _topBar(AppLanguageProvider lang, String elapsedText) {
+  Widget _topBar(String elapsedText) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.picture_in_picture_alt_outlined,
-                color: Colors.white70),
-            onPressed: () {
-              ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-                SnackBar(content: Text(lang.tr('call_voice_minimize_hint'))),
-              );
-            },
+      child: SizedBox(
+        width: double.infinity,
+        child: Text(
+          elapsedText,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.5,
           ),
-          Expanded(
-            child: Text(
-              elapsedText,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white70),
-            onPressed: () {
-              ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-                SnackBar(content: Text(lang.tr('call_voice_add_unsupported'))),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -393,7 +373,7 @@ class _DirectVoiceCallPageState extends State<DirectVoiceCallPage> {
         SafeArea(
           child: Column(
             children: [
-              _topBar(lang, elapsed),
+              _topBar(elapsed),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
