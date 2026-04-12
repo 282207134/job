@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../firebase_options.dart';
@@ -62,6 +63,31 @@ class ChatMediaService {
   }
 
   /// 選択した画像をアップロードし、ダウンロード URL を返す。
+  /// 自分がアップロードした `directChats/{pairId}/{自分UID}/...` のみ削除（Storage ルール上、相手フォルダは削除不可）
+  static Future<void> tryDeleteMyChatFilesForPair(String pairId) async {
+    final me = FirebaseAuth.instance.currentUser?.uid;
+    if (me == null) return;
+    try {
+      final base =
+          _storage.ref().child('directChats').child(pairId).child(me);
+      await _deleteStorageRefRecursive(base);
+    } catch (e, st) {
+      debugPrint('tryDeleteMyChatFilesForPair $pairId: $e\n$st');
+    }
+  }
+
+  static Future<void> _deleteStorageRefRecursive(Reference ref) async {
+    final list = await ref.listAll();
+    for (final item in list.items) {
+      try {
+        await item.delete();
+      } catch (_) {}
+    }
+    for (final prefix in list.prefixes) {
+      await _deleteStorageRefRecursive(prefix);
+    }
+  }
+
   static Future<String> uploadChatImage({
     required String pairId,
     required XFile xFile,

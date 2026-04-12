@@ -8,6 +8,40 @@ import '../providers/userProvider.dart';
 import '../services/messaging_service.dart';
 import 'direct_chat_screen.dart';
 
+Future<void> _confirmRemoveFriend(
+  BuildContext context,
+  String pairId,
+) async {
+  final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(t('remove_friend')),
+      content: Text(t('remove_friend_confirm')),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(t('cancel')),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(t('remove_friend')),
+        ),
+      ],
+    ),
+  );
+  if (ok != true || !context.mounted) return;
+  final err = await MessagingService.removeFriendAndClearChat(pairId);
+  if (!context.mounted) return;
+  if (err != null) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t(err))));
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(t('friend_removed'))),
+    );
+  }
+}
+
 /// 友だち一覧・申請の受信/送信・メッセージへ遷移
 class ContactsMessagesScreen extends StatelessWidget {
   const ContactsMessagesScreen({super.key});
@@ -205,6 +239,17 @@ class _FriendChatListTile extends StatelessWidget {
         } else if (msgSnap.hasData && msgSnap.data!.docs.isNotEmpty) {
           subtitle = _previewFromMessage(msgSnap.data!.docs.first.data(), t);
         }
+        void openChat() {
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (context) => DirectChatScreen(
+                pairId: pairId,
+                peerName: peerName,
+              ),
+            ),
+          );
+        }
         return ListTile(
           leading: CircleAvatar(
             child: Text(peerName.isNotEmpty ? peerName[0] : '?'),
@@ -216,18 +261,41 @@ class _FriendChatListTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
-          trailing: const Icon(Icons.chat_bubble_outline_rounded),
-          onTap: () {
-            Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => DirectChatScreen(
-                  pairId: pairId,
-                  peerName: peerName,
+          trailing: PopupMenuButton<String>(
+            tooltip: t('contacts_friend_more'),
+            icon: Icon(
+              Icons.more_vert_rounded,
+              color: Colors.grey.shade700,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            onSelected: (value) {
+              if (value == 'remove') {
+                _confirmRemoveFriend(context, pairId);
+              }
+            },
+            itemBuilder: (ctx) => [
+              PopupMenuItem<String>(
+                value: 'remove',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.person_remove_outlined,
+                      color: Colors.red.shade700,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      t('remove_friend'),
+                      style: TextStyle(color: Colors.red.shade800),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
+            ],
+          ),
+          onTap: openChat,
         );
       },
     );
@@ -281,6 +349,18 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
       return;
     }
 
+    final auth = FirebaseAuth.instance.currentUser;
+    final inputLower = email.toLowerCase();
+    final myEmail = auth?.email?.trim().toLowerCase();
+    if (myEmail != null &&
+        myEmail.isNotEmpty &&
+        inputLower == myEmail) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t('add_friend_cannot_add_self'))),
+      );
+      return;
+    }
+
     setState(() => _busy = true);
     try {
       final userSnap = await MessagingService.findUserByEmail(email);
@@ -294,6 +374,14 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
       }
       final data = userSnap.data()!;
       final targetUid = userSnap.id;
+      if (auth != null && targetUid == auth.uid) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t('add_friend_cannot_add_self'))),
+          );
+        }
+        return;
+      }
       final targetName = '${data['name'] ?? t('user_default')}';
       if (!mounted) return;
       final prov = Provider.of<UserProvider>(context, listen: false);
@@ -304,8 +392,9 @@ class _AddFriendBottomSheetState extends State<_AddFriendBottomSheet> {
       );
       if (!mounted) return;
       if (err != null) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(err)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t(err))),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(t('request_sent'))),

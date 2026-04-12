@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+
+import 'chat_media_service.dart';
 
 /// Firestore:
 /// - `friend_links/{pairId}` — `uids`[2 sorted], `status`: pending|active, `requested_by`, `names` map
@@ -41,15 +44,16 @@ class MessagingService {
     return snap.docs.first;
   }
 
-  /// 友だち申請。相手から既に pending ならその場で active にする（相互承認）。
+  /// 友だち申請。戻り値は成功時 null、失敗時は [AppLanguageProvider.tr] 用キー。
+  /// 相手から既に pending ならその場で active にする（相互承認）。
   static Future<String?> sendFriendRequest({
     required String targetUid,
     required String targetName,
     required String myName,
   }) async {
     final me = _myUid;
-    if (me == null) return 'ログインが必要です';
-    if (me == targetUid) return '自分自身は追加できません';
+    if (me == null) return 'contacts_login_required';
+    if (me == targetUid) return 'add_friend_cannot_add_self';
 
     final sorted = [me, targetUid]..sort();
     final uids = sorted;
@@ -61,9 +65,9 @@ class MessagingService {
       if (doc.exists) {
         final d = doc.data()!;
         final status = d['status'] as String? ?? '';
-        if (status == 'active') return 'すでに友だちです';
+        if (status == 'active') return 'add_friend_already_friends';
         final by = d['requested_by'] as String? ?? '';
-        if (status == 'pending' && by == me) return 'すでに申請済みです';
+        if (status == 'pending' && by == me) return 'add_friend_already_sent';
         if (status == 'pending' && by != me) {
           await ref.update({
             'status': 'active',
@@ -82,7 +86,8 @@ class MessagingService {
       });
       return null;
     } on FirebaseException catch (e) {
-      return e.message ?? 'Firestore: ${e.code}';
+      debugPrint('sendFriendRequest: ${e.code} ${e.message}');
+      return 'add_friend_send_failed';
     }
   }
 
@@ -189,7 +194,7 @@ class MessagingService {
     return _db
         .collection('friend_links')
         .where('uids', arrayContains: myUid)
-        .snapshots();
+        .snapshots(includeMetadataChanges: true);
   }
 
   static String peerUid(Map<String, dynamic> data, String myUid) {
@@ -235,5 +240,50 @@ class MessagingService {
         .orderBy('timestamp', descending: true)
         .limit(1)
         .snapshots();
+  }
+
+  static Future<void> _deleteSubcollectionInBatches(
+    CollectionReference<Map<String, dynamic>> col,
+  ) async {
+    while (true) {
+      final snap = await col.limit(500).get();
+      if (snap.docs.isEmpty) break;
+      final batch = _db.batch();
+      for (final d in snap.docs) {
+        batch.delete(d.reference);
+      }
+      await batch.commit();
+    }
+  }
+
+  /// アクティブな友だちを解除し、`directChats/{pairDocId}` のメッセージ／通話シグナルとチャット文書を削除。
+  /// Storage はルールにより自分の `directChats/{pairId}/{自分UID}/...` のみベストエフォート削除。
+  /// 失敗時は `AppLanguageProvider.tr` 用キー文字列を返す。
+  static Future<String?> removeFriendAndClearChat(String pairDocId) async {
+    final me = _myUid;
+    if (me == null) return 'contacts_login_required';
+
+    final linkRef = _db.collection('friend_links').doc(pairDocId);
+    final linkSnap = await linkRef.get();
+    if (!linkSnap.exists) return 'contacts_remove_friend_not_found';
+    final d = linkSnap.data()!;
+    final uids = List<String>.from(d['uids'] as List? ?? []);
+    if (!uids.contains(me)) return 'contacts_remove_friend_forbidden';
+    if ((d['status'] as String? ?? '') != 'active') {
+      return 'contacts_remove_friend_forbidden';
+    }
+
+    try {
+      await ChatMediaService.tryDeleteMyChatFilesForPair(pairDocId);
+      final chatRef = _db.collection('directChats').doc(pairDocId);
+      await _deleteSubcollectionInBatches(chatRef.collection('messages'));
+      await _deleteSubcollectionInBatches(chatRef.collection('call_signals'));
+      await chatRef.delete();
+      await linkRef.delete();
+      return null;
+    } catch (e, st) {
+      debugPrint('removeFriendAndClearChat: $e\n$st');
+      return 'contacts_remove_friend_failed';
+    }
   }
 }
