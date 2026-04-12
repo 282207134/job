@@ -107,9 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               // 登录账号
                               await LoginController.login(
-                                  context: context,
-                                  email: email.text,
-                                  password: password.text);
+                                context: context,
+                                email: email.text,
+                                password: password.text,
+                                tr: t,
+                              );
 
                               isLoading = false; // 停止加载
                               setState(() {}); // 刷新UI

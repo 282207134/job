@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/splash_screen.dart';
 import '../services/push_notification_service.dart';
+import '../utils/firebase_auth_messages.dart';
 
 class SignupController {
   static Future<void> createAccount({
@@ -12,6 +13,7 @@ class SignupController {
     required String email,
     required String password,
     required String name,
+    required String Function(String key) tr,
   }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -48,15 +50,22 @@ class SignupController {
         (route) => false,
       );
       debugPrint('Account created successfully!');
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      if (!context.mounted) return;
+      final msg = tr(FirebaseAuthMessages.signupErrorKey(e));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red.shade700, content: Text(msg)),
+      );
+      debugPrint('Signup FirebaseAuthException: ${e.code}');
+    } catch (e, st) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red.shade700,
-          content: Text(e.toString()),
+          content: Text(tr('auth_signup_failed')),
         ),
       );
-      debugPrint('$e');
+      debugPrint('Signup error: $e\n$st');
     }
   }
 }

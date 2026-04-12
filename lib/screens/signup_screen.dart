@@ -80,11 +80,13 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _isLoading = true);
     try {
+      final t = Provider.of<AppLanguageProvider>(context, listen: false).tr;
       await SignupController.createAccount(
         context: context,
         email: _email.text.trim(),
         password: _password.text,
         name: _name.text.trim(),
+        tr: t,
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
