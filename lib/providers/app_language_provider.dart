@@ -418,6 +418,26 @@ class AppLanguageProvider extends ChangeNotifier {
         AppLanguage.ja: '送信しました',
         AppLanguage.en: 'Sent',
       },
+      'add_friend_cannot_add_self': {
+        AppLanguage.zh: '不能添加自己的账号',
+        AppLanguage.ja: '自分自身は追加できません',
+        AppLanguage.en: 'You cannot add your own account',
+      },
+      'add_friend_already_friends': {
+        AppLanguage.zh: '你们已经是好友',
+        AppLanguage.ja: 'すでに友だちです',
+        AppLanguage.en: 'You are already friends',
+      },
+      'add_friend_already_sent': {
+        AppLanguage.zh: '已发送过申请，请等待对方处理',
+        AppLanguage.ja: 'すでに申請済みです',
+        AppLanguage.en: 'Request already sent',
+      },
+      'add_friend_send_failed': {
+        AppLanguage.zh: '发送失败，请稍后重试',
+        AppLanguage.ja: '送信に失敗しました',
+        AppLanguage.en: 'Failed to send. Try again',
+      },
       'add_friend': {
         AppLanguage.zh: '添加好友',
         AppLanguage.ja: '友だちを追加',
@@ -637,6 +657,92 @@ class AppLanguageProvider extends ChangeNotifier {
         AppLanguage.zh: '点这里注册',
         AppLanguage.ja: 'こちらから登録',
         AppLanguage.en: 'Register here',
+      },
+      'auth_invalid_email': {
+        AppLanguage.zh: '邮箱格式不正确',
+        AppLanguage.ja: 'メール形式が正しくありません',
+        AppLanguage.en: 'Invalid email format',
+      },
+      'auth_wrong_credentials': {
+        AppLanguage.zh: '账号或密码错误，或用户不存在',
+        AppLanguage.ja: 'メールまたはパスワードが違うか、ユーザーが存在しません',
+        AppLanguage.en: 'Wrong email or password, or user does not exist',
+      },
+      'auth_too_many_requests': {
+        AppLanguage.zh: '尝试次数过多，请稍后再试',
+        AppLanguage.ja: '試行回数が多すぎます。しばらくしてからお試しください',
+        AppLanguage.en: 'Too many attempts. Try again later',
+      },
+      'auth_network_error': {
+        AppLanguage.zh: '网络异常，请检查连接后重试',
+        AppLanguage.ja: 'ネットワークエラーです。接続を確認してください',
+        AppLanguage.en: 'Network error. Check your connection',
+      },
+      'auth_login_failed': {
+        AppLanguage.zh: '登录失败，请稍后再试',
+        AppLanguage.ja: 'ログインに失敗しました。しばらくしてからお試しください',
+        AppLanguage.en: 'Sign-in failed. Try again later',
+      },
+      'auth_email_in_use': {
+        AppLanguage.zh: '该邮箱已被注册',
+        AppLanguage.ja: 'このメールは既に登録されています',
+        AppLanguage.en: 'This email is already registered',
+      },
+      'auth_weak_password': {
+        AppLanguage.zh: '密码强度不足，请使用更复杂的密码',
+        AppLanguage.ja: 'パスワードが弱すぎます。より強いパスワードにしてください',
+        AppLanguage.en: 'Password is too weak',
+      },
+      'auth_operation_not_allowed': {
+        AppLanguage.zh: '当前不允许该操作，请联系管理员',
+        AppLanguage.ja: 'この操作は許可されていません',
+        AppLanguage.en: 'This operation is not allowed',
+      },
+      'auth_signup_failed': {
+        AppLanguage.zh: '注册失败，请稍后再试',
+        AppLanguage.ja: '登録に失敗しました。しばらくしてからお試しください',
+        AppLanguage.en: 'Sign-up failed. Try again later',
+      },
+      'remove_friend': {
+        AppLanguage.zh: '删除好友',
+        AppLanguage.ja: '友だちを削除',
+        AppLanguage.en: 'Remove friend',
+      },
+      'remove_friend_confirm': {
+        AppLanguage.zh: '将删除好友关系，并清空与该好友的聊天记录（含图片等）。确定吗？',
+        AppLanguage.ja: '友だち関係を削除し、この相手とのチャット履歴（画像など）も消去します。よろしいですか？',
+        AppLanguage.en:
+            'Remove this friend and delete all chat history with them (including images). Continue?',
+      },
+      'friend_removed': {
+        AppLanguage.zh: '已删除好友并清空对话',
+        AppLanguage.ja: '友だちを削除し、会話を消去しました',
+        AppLanguage.en: 'Friend removed and chat cleared',
+      },
+      'contacts_open_chat': {
+        AppLanguage.zh: '打开聊天',
+        AppLanguage.ja: 'チャットを開く',
+        AppLanguage.en: 'Open chat',
+      },
+      'contacts_friend_more': {
+        AppLanguage.zh: '更多操作',
+        AppLanguage.ja: 'その他',
+        AppLanguage.en: 'More',
+      },
+      'contacts_remove_friend_not_found': {
+        AppLanguage.zh: '找不到好友记录',
+        AppLanguage.ja: '友だち情報が見つかりません',
+        AppLanguage.en: 'Friend link not found',
+      },
+      'contacts_remove_friend_forbidden': {
+        AppLanguage.zh: '无法删除该好友',
+        AppLanguage.ja: 'この友だちは削除できません',
+        AppLanguage.en: 'Cannot remove this friend',
+      },
+      'contacts_remove_friend_failed': {
+        AppLanguage.zh: '删除失败，请稍后再试',
+        AppLanguage.ja: '削除に失敗しました',
+        AppLanguage.en: 'Removal failed. Try again',
       },
       'create_account': {
         AppLanguage.zh: '创建账号',
