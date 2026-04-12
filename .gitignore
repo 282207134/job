@@ -54,3 +54,6 @@ app.*.map.json
 
 # Firebase CLI local deploy cache (regenerated on deploy)
 .firebase/
+
+# Cloud Functions（npm install で再生成）
+functions/node_modules/
