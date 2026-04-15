@@ -27,16 +27,16 @@ dependencies:
   permission_handler: ^11.3.1 # 更新权限管理插件
   flutter_colorpicker: ^1.1.0 # 颜色选择器插件
   shared_preferences: ^2.3.5 # 与当前 Dart 3.8.x 兼容
-  sqflite: ^2.4.1 # 更新SQLite数据库插件
-  path: ^1.9.0 # 更新路径管理插件
-  image_picker: ^1.1.2 # 更新获取手机文件照片的库
-  camera: ^0.11.0+2 # 与当前 Dart 3.8.x 兼容
-  flutter_image_compress: ^2.4.0 # 更新图像压缩库
-  path_provider: ^2.1.5 # 更新路径提供者插件
-  image_cropper: ^8.1.0 # 更新图片裁剪插件
+  sqflite: ^2.4.1 # SQLite数据库插件
+  path: ^1.9.0 # 路径管理插件
+  image_picker: ^1.1.2 # 获取手机文件照片的库
+  camera: ^0.11.0+2 # 相机访问
+  flutter_image_compress: ^2.4.0 # 图像压缩库
+  path_provider: ^2.1.5 # 路径提供者插件
+  image_cropper: ^8.1.0 # 图片裁剪插件
   excel: ^4.0.6 # Excel 操作库
   http: ^1.2.2 # 节日 API 请求
-  adaptive_theme: ^3.5.0 # lib 内示例/主题（需作为正式依赖以满足分析器）
+
   flutter_dotenv: ^6.0.0
   livekit_client: ^2.0.0
   crypto: ^3.0.3
@@ -58,11 +58,8 @@ flutter:
     - assets/sounds/notify.wav
     - assets/sounds/message.wav
     - assets/images/ # 图片资源
-    - assets/piano/ # 钢琴音频资源
     - images/ # 图片资源
-    - images/dice/ # 骰子图片资源
     - assets/ # 其他资源
-    - themes/ # 主题资源目录
 
   fonts: # 字体配置
     - family: Poppins
