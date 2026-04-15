@@ -1,54 +1,54 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 数据库库
+import 'package:firebase_auth/firebase_auth.dart'; // 导入 Firebase 认证库
+import 'package:flutter/foundation.dart'; // 导入 Flutter 基础工具库
 
-class CalendarRoom {
-  const CalendarRoom({
-    required this.id,
-    required this.name,
-    required this.isPersonal,
-    required this.ownerUid,
-    required this.ownerName,
+class CalendarRoom { // 日历房间类
+  const CalendarRoom({ // 构造函数
+    required this.id, // 必需:房间 ID
+    required this.name, // 必需:房间名称
+    required this.isPersonal, // 必需:是否为个人日历
+    required this.ownerUid, // 必需:所有者 UID
+    required this.ownerName, // 必需:所有者名称
   });
 
-  final String id;
-  final String name;
-  final bool isPersonal;
-  final String ownerUid;
-  final String ownerName;
+  final String id; // 房间 ID
+  final String name; // 房间名称
+  final bool isPersonal; // 是否为个人日历
+  final String ownerUid; // 所有者 UID
+  final String ownerName; // 所有者名称
 
-  bool isOwner(String uid) => ownerUid == uid;
+  bool isOwner(String uid) => ownerUid == uid; // 判断是否为所有者
 
-  String get displayName {
-    if (isPersonal) return name;
-    final owner = ownerName.trim();
-    return owner.isEmpty ? name : '$owner · $name';
+  String get displayName { // 获取显示名称
+    if (isPersonal) return name; // 如果是个人日历,直接返回名称
+    final owner = ownerName.trim(); // 获取所有者名称并去除空格
+    return owner.isEmpty ? name : '$owner · $name'; // 如果为空则返回名称,否则拼接
   }
 
-  String get titleText {
-    if (isPersonal) return name;
-    final owner = ownerName.trim().isEmpty ? '未知用户' : ownerName.trim();
-    return '共享日历$name:由$owner共享';
+  String get titleText { // 获取标题文本
+    if (isPersonal) return name; // 如果是个人日历,直接返回名称
+    final owner = ownerName.trim().isEmpty ? '未知用户' : ownerName.trim(); // 获取所有者名称
+    return '共享日历$name:由$owner共享'; // 返回格式化标题
   }
 }
 
-class SharedCalendarService {
-  SharedCalendarService._();
+class SharedCalendarService { // 共享日历服务类
+  SharedCalendarService._(); // 私有构造函数,防止实例化
 
-  static final _db = FirebaseFirestore.instance;
-  static final selectedRoomNotifier = ValueNotifier<CalendarRoom>(
-    const CalendarRoom(
-      id: '',
-      name: '我的日历',
-      isPersonal: true,
-      ownerUid: '',
-      ownerName: '',
+  static final _db = FirebaseFirestore.instance; // Firestore 实例
+  static final selectedRoomNotifier = ValueNotifier<CalendarRoom>( // 当前选中房间通知器
+    const CalendarRoom( // 默认个人日历
+      id: '', // ID 为空
+      name: '我的日历', // 名称
+      isPersonal: true, // 是个人日历
+      ownerUid: '', // 所有者 UID 为空
+      ownerName: '', // 所有者名称为空
     ),
   );
 
-  static String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+  static String? get _uid => FirebaseAuth.instance.currentUser?.uid; // 获取当前用户 ID
 
-  static String personalCalendarId(String uid) => 'personal_$uid';
+  static String personalCalendarId(String uid) => 'personal_$uid'; // 生成个人日历 ID
 
   static Future<void> ensurePersonalSelected() async {
     final uid = _uid;
