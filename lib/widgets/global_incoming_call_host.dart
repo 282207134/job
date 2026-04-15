@@ -1,29 +1,29 @@
-import 'dart:async';
-import 'dart:ui';
+import 'dart:async'; // 导入异步编程库
+import 'dart:ui'; // 导入 UI 底层库
 
-import 'package:audioplayers/audioplayers.dart';
-import 'package:characters/characters.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart'; // 导入音频播放库
+import 'package:characters/characters.dart'; // 导入字符处理库
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 库
+import 'package:firebase_auth/firebase_auth.dart'; // 导入 Firebase 认证库
+import 'package:flutter/material.dart'; // 导入 Flutter Material 组件库
+import 'package:provider/provider.dart'; // 导入 Provider 状态管理库
 
-import 'package:kantankanri/config/livekit_config.dart';
-import 'package:kantankanri/pages/direct_video_call_page.dart';
-import 'package:kantankanri/pages/direct_voice_call_page.dart';
-import 'package:kantankanri/providers/app_language_provider.dart';
-import 'package:kantankanri/services/direct_call_signal_service.dart';
-import 'package:kantankanri/services/messaging_service.dart';
+import 'package:kantankanri/config/livekit_config.dart'; // 导入 LiveKit 配置
+import 'package:kantankanri/pages/direct_video_call_page.dart'; // 导入视频通话页面
+import 'package:kantankanri/pages/direct_voice_call_page.dart'; // 导入语音通话页面
+import 'package:kantankanri/providers/app_language_provider.dart'; // 导入多语言提供者
+import 'package:kantankanri/services/direct_call_signal_service.dart'; // 导入直拨呼叫信号服务
+import 'package:kantankanri/services/messaging_service.dart'; // 导入消息服务
 
-/// アプリ全体で着信を全画面表示（最小化可能）
-class GlobalIncomingCallHost extends StatefulWidget {
-  const GlobalIncomingCallHost({super.key, required this.navigatorKey});
+/// 应用全局来电显示(全屏,可最小化)
+class GlobalIncomingCallHost extends StatefulWidget { // 全局来电宿主组件(有状态)
+  const GlobalIncomingCallHost({super.key, required this.navigatorKey}); // 构造函数
 
-  /// [MaterialApp] に渡したルート [Navigator] 用キー（builder 内では [Navigator.of] が使えない）
-  final GlobalKey<NavigatorState> navigatorKey;
+  /// [MaterialApp] 传递的根 [Navigator] 键(builder 内无法使用 [Navigator.of])
+  final GlobalKey<NavigatorState> navigatorKey; // 导航器全局键
 
-  @override
-  State<GlobalIncomingCallHost> createState() => _GlobalIncomingCallHostState();
+  @override // 重写父类方法
+  State<GlobalIncomingCallHost> createState() => _GlobalIncomingCallHostState(); // 创建状态对象
 }
 
 class _GlobalIncomingCallHostState extends State<GlobalIncomingCallHost> {

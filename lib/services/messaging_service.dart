@@ -1,93 +1,93 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 数据库库
+import 'package:firebase_auth/firebase_auth.dart'; // 导入 Firebase 认证库
+import 'package:flutter/foundation.dart'; // 导入 Flutter 基础工具库
 
-import 'chat_media_service.dart';
+import 'chat_media_service.dart'; // 导入聊天媒体服务
 
-/// Firestore:
-/// - `friend_links/{pairId}` — `uids`[2 sorted], `status`: pending|active, `requested_by`, `names` map
-/// - `directChats/{pairId}` — `participants`, `updated_at`
-/// - `directChats/{pairId}/messages/{id}` — `text` または `kind`+`image_url`、`sender_id`、`sender_name`、`timestamp`
-class MessagingService {
-  MessagingService._();
+/// Firestore 数据结构:
+/// - `friend_links/{pairId}` — 好友关系: `uids`[2个排序], `status`: pending|active, `requested_by`, `names` map
+/// - `directChats/{pairId}` — 私聊: `participants`, `updated_at`
+/// - `directChats/{pairId}/messages/{id}` — 消息: `text` 或 `kind`+`image_url`、`sender_id`、`sender_name`、`timestamp`
+class MessagingService { // 消息服务类
+  MessagingService._(); // 私有构造函数,防止实例化
 
-  static final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static final FirebaseFirestore _db = FirebaseFirestore.instance; // Firestore 实例
 
-  /// 2人の UID から常に同じドキュメント ID
-  static String pairId(String uidA, String uidB) {
-    final u = [uidA, uidB]..sort();
-    return '${u[0]}__${u[1]}';
+  /// 2人的 UID 从始终生成相同的文档 ID
+  static String pairId(String uidA, String uidB) { // 生成配对 ID
+    final u = [uidA, uidB]..sort(); // 排序两个 UID
+    return '${u[0]}__${u[1]}'; // 返回格式化的 ID
   }
 
-  static String? get _myUid => FirebaseAuth.instance.currentUser?.uid;
+  static String? get _myUid => FirebaseAuth.instance.currentUser?.uid; // 获取当前用户 ID
 
-  /// メールは登録時に小文字化される想定。古いデータで大文字混在の場合に備え二段で検索。
-  static Future<DocumentSnapshot<Map<String, dynamic>>?> findUserByEmail(
-    String email,
-  ) async {
-    final trimmed = email.trim();
-    if (trimmed.isEmpty) return null;
-    final lower = trimmed.toLowerCase();
-    QuerySnapshot<Map<String, dynamic>> snap = await _db
-        .collection('users')
-        .where('email', isEqualTo: lower)
-        .limit(1)
-        .get();
-    if (snap.docs.isEmpty && trimmed != lower) {
-      snap = await _db
-          .collection('users')
-          .where('email', isEqualTo: trimmed)
-          .limit(1)
-          .get();
+  /// 邮箱在注册时已转为小写。为兼容旧数据可能有大写字母,进行两次搜索。
+  static Future<DocumentSnapshot<Map<String, dynamic>>?> findUserByEmail( // 通过邮箱查找用户
+    String email, // 邮箱地址
+  ) async { // 异步方法
+    final trimmed = email.trim(); // 去除前后空格
+    if (trimmed.isEmpty) return null; // 如果为空,返回 null
+    final lower = trimmed.toLowerCase(); // 转为小写
+    QuerySnapshot<Map<String, dynamic>> snap = await _db // 查询 Firestore
+        .collection('users') // users 集合
+        .where('email', isEqualTo: lower) // 条件:邮箱等于小写值
+        .limit(1) // 限制 1 条
+        .get(); // 执行查询
+    if (snap.docs.isEmpty && trimmed != lower) { // 如果没找到且原始值不等于小写值
+      snap = await _db // 再次查询
+          .collection('users') // users 集合
+          .where('email', isEqualTo: trimmed) // 条件:邮箱等于原始值
+          .limit(1) // 限制 1 条
+          .get(); // 执行查询
     }
-    if (snap.docs.isEmpty) return null;
-    return snap.docs.first;
+    if (snap.docs.isEmpty) return null; // 如果没找到,返回 null
+    return snap.docs.first; // 返回第一个文档
   }
 
-  /// 友だち申請。戻り値は成功時 null、失敗時は [AppLanguageProvider.tr] 用キー。
-  /// 相手から既に pending ならその場で active にする（相互承認）。
-  static Future<String?> sendFriendRequest({
-    required String targetUid,
-    required String targetName,
-    required String myName,
-  }) async {
-    final me = _myUid;
-    if (me == null) return 'contacts_login_required';
-    if (me == targetUid) return 'add_friend_cannot_add_self';
+  /// 发送好友申请。成功时返回 null,失败时返回 [AppLanguageProvider.tr] 用密钥。
+  /// 如果对方已经 pending,则直接变为 active(相互确认)。
+  static Future<String?> sendFriendRequest({ // 发送好友申请
+    required String targetUid, // 目标用户 ID
+    required String targetName, // 目标用户名称
+    required String myName, // 我的名称
+  }) async { // 异步方法
+    final me = _myUid; // 获取当前用户 ID
+    if (me == null) return 'contacts_login_required'; // 如果未登录,返回错误
+    if (me == targetUid) return 'add_friend_cannot_add_self'; // 不能添加自己
 
-    final sorted = [me, targetUid]..sort();
-    final uids = sorted;
-    final pid = '${uids[0]}__${uids[1]}';
-    final ref = _db.collection('friend_links').doc(pid);
-    try {
-      final doc = await ref.get();
+    final sorted = [me, targetUid]..sort(); // 排序两个 UID
+    final uids = sorted; // 赋值给 uids
+    final pid = '${uids[0]}__${uids[1]}'; // 生成配对 ID
+    final ref = _db.collection('friend_links').doc(pid); // 引用 friend_links 文档
+    try { // 尝试执行
+      final doc = await ref.get(); // 获取文档
 
-      if (doc.exists) {
-        final d = doc.data()!;
-        final status = d['status'] as String? ?? '';
-        if (status == 'active') return 'add_friend_already_friends';
-        final by = d['requested_by'] as String? ?? '';
-        if (status == 'pending' && by == me) return 'add_friend_already_sent';
-        if (status == 'pending' && by != me) {
-          await ref.update({
-            'status': 'active',
-            'accepted_at': FieldValue.serverTimestamp(),
+      if (doc.exists) { // 如果文档存在
+        final d = doc.data()!; // 获取数据
+        final status = d['status'] as String? ?? ''; // 获取状态
+        if (status == 'active') return 'add_friend_already_friends'; // 已是好友
+        final by = d['requested_by'] as String? ?? ''; // 获取申请人
+        if (status == 'pending' && by == me) return 'add_friend_already_sent'; // 已发送申请
+        if (status == 'pending' && by != me) { // 如果对方已申请
+          await ref.update({ // 更新文档
+            'status': 'active', // 状态改为 active
+            'accepted_at': FieldValue.serverTimestamp(), // 接受时间
           });
-          return null;
+          return null; // 成功
         }
       }
 
-      await ref.set({
-        'uids': uids,
-        'status': 'pending',
-        'requested_by': me,
-        'names': {me: myName, targetUid: targetName},
-        'created_at': FieldValue.serverTimestamp(),
+      await ref.set({ // 创建新文档
+        'uids': uids, // 用户 ID 列表
+        'status': 'pending', // 状态:待处理
+        'requested_by': me, // 申请人
+        'names': {me: myName, targetUid: targetName}, // 名称映射
+        'created_at': FieldValue.serverTimestamp(), // 创建时间
       });
-      return null;
-    } on FirebaseException catch (e) {
-      debugPrint('sendFriendRequest: ${e.code} ${e.message}');
-      return 'add_friend_send_failed';
+      return null; // 成功
+    } on FirebaseException catch (e) { // 捕获 Firebase 异常
+      debugPrint('sendFriendRequest: ${e.code} ${e.message}'); // 打印错误
+      return 'add_friend_send_failed'; // 返回错误密钥
     }
   }
 

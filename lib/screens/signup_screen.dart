@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:kantankanri/providers/app_language_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart'; // 导入 Flutter Material Design 组件库
+import 'package:kantankanri/providers/app_language_provider.dart'; // 导入应用语言状态管理器
+import 'package:provider/provider.dart'; // 导入状态管理 Provider 包
 
-import '../controllers/signup_controller.dart';
+import '../controllers/signup_controller.dart'; // 导入注册控制器
 
-/// 新規登録（白ベース・カード型レイアウト）
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+/// 新用户注册界面(白色背景卡片式布局)
+class SignupScreen extends StatefulWidget { // 注册屏幕有状态组件类
+  const SignupScreen({super.key}); // 构造函数
 
-  @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  @override // 重写父类方法
+  State<SignupScreen> createState() => _SignupScreenState(); // 创建并返回状态对象
 }
 
 class _SignupScreenState extends State<SignupScreen> {

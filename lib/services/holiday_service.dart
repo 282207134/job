@@ -1,20 +1,20 @@
-import 'dart:convert';
+import 'dart:convert'; // 导入 JSON 编解码库
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:kantankanri/pages/jobPage/calendarView/src/calendar_event_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 库
+import 'package:flutter/foundation.dart'; // 导入 Flutter 基础工具库
+import 'package:http/http.dart' as http; // 导入 HTTP 请求库
+import 'package:kantankanri/pages/jobPage/calendarView/src/calendar_event_data.dart'; // 导入日历事件数据
+import 'package:shared_preferences/shared_preferences.dart'; // 导入本地存储库
 
-class HolidayService {
-  HolidayService._();
+class HolidayService { // 假期服务类
+  HolidayService._(); // 私有构造函数,防止实例化
 
-  static const String _countriesKey = 'holiday_country_codes';
-  static const String jp = 'JP';
-  static const String cn = 'CN';
-  static final ValueNotifier<int> selectionVersion = ValueNotifier<int>(0);
-  static Set<String> _selectedCountriesCache = <String>{jp};
-  static final Set<String> _importingYearCountry = <String>{};
+  static const String _countriesKey = 'holiday_country_codes'; // 国家代码的键名
+  static const String jp = 'JP'; // 日本代码
+  static const String cn = 'CN'; // 中国代码
+  static final ValueNotifier<int> selectionVersion = ValueNotifier<int>(0); // 选择版本通知器
+  static Set<String> _selectedCountriesCache = <String>{jp}; // 已选国家缓存(默认日本)
+  static final Set<String> _importingYearCountry = <String>{}; // 正在导入的国家年份集合
 
   static Future<Set<String>> getSelectedCountries() async {
     final prefs = await SharedPreferences.getInstance();

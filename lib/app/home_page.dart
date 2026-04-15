@@ -1,52 +1,52 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart';
-import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart';
-import 'package:kantankanri/pages/jobPage/calendarView/pages/event_details_page.dart';
-import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart';
-import 'package:kantankanri/pages/othersApplication/todo_page.dart';
-import 'package:kantankanri/providers/app_language_provider.dart';
-import 'package:kantankanri/providers/app_lock_provider.dart';
-import 'package:kantankanri/providers/userProvider.dart';
-import 'package:kantankanri/screens/contacts_messages_screen.dart';
-import 'package:kantankanri/screens/shared_calendar_sheet.dart';
-import 'package:kantankanri/services/messaging_service.dart';
-import 'package:kantankanri/services/holiday_service.dart';
-import 'package:kantankanri/services/shared_calendar_service.dart';
-import 'package:kantankanri/screens/profile_screen.dart';
-import 'package:kantankanri/screens/splash_screen.dart';
-import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 导入 Cloud Firestore 库
+import 'package:firebase_auth/firebase_auth.dart'; // 导入 Firebase 认证库
+import 'package:flutter/material.dart'; // 导入 Flutter Material Design 组件库
+import 'package:kantankanri/pages/jobPage/calendarView/calendar.dart'; // 导入日历页面
+import 'package:kantankanri/pages/jobPage/calendarView/calendar_view.dart'; // 导入日历视图
+import 'package:kantankanri/pages/jobPage/calendarView/pages/event_details_page.dart'; // 导入事件详情页面
+import 'package:kantankanri/pages/jobPage/calendarView/widgets/holiday_settings_sheet.dart'; // 导入假期设置面板
+import 'package:kantankanri/pages/othersApplication/todo_page.dart'; // 导入待办事项页面
+import 'package:kantankanri/providers/app_language_provider.dart'; // 导入应用语言状态管理器
+import 'package:kantankanri/providers/app_lock_provider.dart'; // 导入应用锁状态管理器
+import 'package:kantankanri/providers/userProvider.dart'; // 导入用户状态管理器
+import 'package:kantankanri/screens/contacts_messages_screen.dart'; // 导入联系人消息屏幕
+import 'package:kantankanri/screens/shared_calendar_sheet.dart'; // 导入共享日历面板
+import 'package:kantankanri/services/messaging_service.dart'; // 导入消息服务
+import 'package:kantankanri/services/holiday_service.dart'; // 导入假期服务
+import 'package:kantankanri/services/shared_calendar_service.dart'; // 导入共享日历服务
+import 'package:kantankanri/screens/profile_screen.dart'; // 导入个人资料屏幕
+import 'package:kantankanri/screens/splash_screen.dart'; // 导入启动屏幕
+import 'package:provider/provider.dart'; // 导入状态管理 Provider 包
 
-/// ログイン後のメインシェル（下部ナビ：カレンダー / Todo / 連絡先）
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+/// 登录后的主界面(底部导航:日历 / 待办 / 联系人)
+class HomePage extends StatefulWidget { // 主页有状态组件类
+  const HomePage({super.key}); // 构造函数
 
-  @override
-  State<HomePage> createState() => _HomePageState();
+  @override // 重写父类方法
+  State<HomePage> createState() => _HomePageState(); // 创建并返回状态对象
 }
 
-class _HomePageState extends State<HomePage> {
-  int currentPageIndex = 0;
+class _HomePageState extends State<HomePage> { // 主页的状态类
+  int currentPageIndex = 0; // 当前页面索引
 
-  static const int _navLength = 3;
+  static const int _navLength = 3; // 导航项数量
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (currentPageIndex >= _navLength) {
-        setState(() {
-          currentPageIndex = currentPageIndex.clamp(0, _navLength - 1);
+  @override // 重写 initState 生命周期方法
+  void initState() { // 初始化状态时调用
+    super.initState(); // 调用父类的 initState
+    WidgetsBinding.instance.addPostFrameCallback((_) { // 在帧绘制完成后执行回调
+      if (!mounted) return; // 如果组件未挂载,直接返回
+      if (currentPageIndex >= _navLength) { // 如果当前索引超出范围
+        setState(() { // 更新状态
+          currentPageIndex = currentPageIndex.clamp(0, _navLength - 1); // 将索引限制在有效范围内
         });
       }
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  @override // 重写 dispose 生命周期方法
+  void dispose() { // 组件销毁时调用
+    super.dispose(); // 调用父类的 dispose
   }
 
   @override
