@@ -1,3 +1,7 @@
 // Release.xcconfig
 #include "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
+
+// 可选：iOS 原生 Google Maps SDK 用（留空则不调用 GMSServices）
+GOOGLE_MAPS_IOS_KEY=
+

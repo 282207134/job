@@ -23,7 +23,10 @@ class OneSignalPushService {
     if (kIsWeb) return;
     if (_initialized) return;
 
-    final appId = dotenv.env['ONESIGNAL_APP_ID']?.trim() ?? '';
+    // dotenv.load が失敗すると isInitialized=false のまま env が使えない
+    final appId = dotenv.isInitialized
+        ? (dotenv.env['ONESIGNAL_APP_ID']?.trim() ?? '')
+        : '';
     if (appId.isEmpty) {
       debugPrint('OneSignal: ONESIGNAL_APP_ID 未配置，跳过（可在 .env 中填写）');
       return;

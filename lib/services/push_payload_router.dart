@@ -111,6 +111,17 @@ class PushPayloadRouter { // 推送载荷路由器类
     BuildContext context, // 构建上下文
     Map<String, String> data, // 载荷数据
   ) async { // 异步方法
+    try {
+      await _openForPayloadImpl(context, data);
+    } catch (e, st) {
+      debugPrint('PushPayloadRouter._openForPayload: $e\n$st');
+    }
+  }
+
+  static Future<void> _openForPayloadImpl(
+    BuildContext context,
+    Map<String, String> data,
+  ) async {
     final type = data['type']; // 获取类型
     if (type == null) return; // 如果类型为空,直接返回
 
@@ -153,3 +164,4 @@ class PushPayloadRouter { // 推送载荷路由器类
     }
   }
 }
+
