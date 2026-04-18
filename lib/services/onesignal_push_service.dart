@@ -29,46 +29,46 @@ class OneSignalPushService {
       return;
     }
 
-    _initialized = true;
-
-    if (kDebugMode) {
-      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    }
-
-    await OneSignal.initialize(appId);
-
-    // 与官方 example 一致：前台到达时显式 display，否则部分机型可能不展示
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      debugPrint('OneSignal foreground: ${event.notification.title}');
-      event.notification.display();
-    });
-    OneSignal.Notifications.addClickListener((event) {
-      final data = event.notification.additionalData;
-      debugPrint('OneSignal click: $data');
-      PushPayloadRouter.scheduleHandle(data);
-    });
-
-    // 禁止在 runApp 之前 requestPermission：无 Activity 时系统对话框无效，控制台会长期显示
-    // Never Subscribed / Permission Not Granted。
-    _sdkReady = true;
-
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      if (user != null) {
-        await OneSignal.login(user.uid);
-        debugPrint('OneSignal login external_id=${user.uid}');
-      } else {
-        await OneSignal.logout();
-        debugPrint('OneSignal logout');
+    try {
+      if (kDebugMode) {
+        OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
       }
-    });
 
-    await Future<void>.delayed(Duration.zero);
-    final u = FirebaseAuth.instance.currentUser;
-    if (u != null) {
-      await OneSignal.login(u.uid);
+      await OneSignal.initialize(appId);
+
+      // 与官方 example 一致：前台到达时显式 display，否则部分机型可能不展示
+      OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+        debugPrint('OneSignal foreground: ${event.notification.title}');
+        event.notification.display();
+      });
+      OneSignal.Notifications.addClickListener((event) {
+        final data = event.notification.additionalData;
+        debugPrint('OneSignal click: $data');
+        PushPayloadRouter.scheduleHandle(data);
+      });
+
+      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        if (user != null) {
+          await OneSignal.login(user.uid);
+          debugPrint('OneSignal login external_id=${user.uid}');
+        } else {
+          await OneSignal.logout();
+          debugPrint('OneSignal logout');
+        }
+      });
+
+      await Future<void>.delayed(Duration.zero);
+      final u = FirebaseAuth.instance.currentUser;
+      if (u != null) {
+        await OneSignal.login(u.uid);
+      }
+
+      _sdkReady = true;
+      _initialized = true;
+      debugPrint('OneSignal initialized (权限请在首帧后调用 promptForPushPermission)');
+    } catch (e, st) {
+      debugPrint('OneSignal: initialize failed (app continues): $e\n$st');
     }
-
-    debugPrint('OneSignal initialized (权限请在首帧后调用 promptForPushPermission)');
   }
 
   /// 在 [MaterialApp] 已挂载、具备 Activity 后再请求（例如在 [WidgetsBinding.instance.addPostFrameCallback] 内调用）。

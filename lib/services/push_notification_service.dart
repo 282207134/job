@@ -151,73 +151,87 @@ class PushNotificationService { // 推送通知服务类
   static bool _initialized = false; // 是否已初始化
 
   static Future<void> syncTokenNow() async { // 立即同步 Token
-    if (kIsWeb) return; // 如果是 Web,直接返回
-    await _syncTokenToFirestore(); // 同步 Token 到 Firestore
+    if (kIsWeb || !_initialized) return;
+    try {
+      await _syncTokenToFirestore();
+    } catch (e, st) {
+      debugPrint('PushNotificationService.syncTokenNow: $e\n$st');
+    }
   }
 
   static Future<void> onAppResumed() async { // 应用恢复时调用
     if (kIsWeb) return; // 如果是 Web,直接返回
-    await _syncTokenToFirestore(); // 同步 Token 到 Firestore
+    if (!_initialized) return; // 推送未就绪时跳过（避免未初始化路径抛错）
+    try {
+      await _syncTokenToFirestore(); // 同步 Token 到 Firestore
+    } catch (e, st) {
+      debugPrint('PushNotificationService.onAppResumed: $e\n$st');
+    }
   }
 
   static Future<void> initialize() async { // 初始化推送服务
     if (kIsWeb) return; // 如果是 Web,直接返回
     if (_initialized) return; // 如果已初始化,直接返回
-    _initialized = true; // 标记为已初始化
 
-    await _ensureLocalNotifications(); // 确保本地通知已初始化
+    try { // 缺权限、未配置、模拟器环境などでもアプリ本体は起動させる
+      await _ensureLocalNotifications(); // 确保本地通知已初始化
 
-    await _messaging.setForegroundNotificationPresentationOptions( // 设置前台通知展示选项
-      alert: true, // 显示警报
-      badge: true, // 显示角标
-      sound: true, // 播放声音
-    );
-
-    final settings = await _messaging.requestPermission( // 请求通知权限
-      alert: true, // 警报权限
-      announcement: false, // 公告权限
-      badge: true, // 角标权限
-      carPlay: false, // CarPlay 权限
-      criticalAlert: false, // 紧急警报权限
-      provisional: false, // 临时权限
-      sound: true, // 声音权限
-    );
-    debugPrint('FCM permission: ${settings.authorizationStatus}'); // 打印权限状态
-
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) { // 如果是 Android
-      var n = await Permission.notification.status; // 获取通知权限状态
-      if (!n.isGranted) { // 如果未授予
-        n = await Permission.notification.request(); // 请求通知权限
-      }
-      debugPrint( // 打印权限状态
-        'Android notification: status=$n granted=${n.isGranted} ' // 是否授予
-        'provisional=${n.isProvisional} limited=${n.isLimited}', // 是否临时或受限
+      await _messaging.setForegroundNotificationPresentationOptions( // 设置前台通知展示选项
+        alert: true, // 显示警报
+        badge: true, // 显示角标
+        sound: true, // 播放声音
       );
-      final bat = await Permission.ignoreBatteryOptimizations.status; // 获取忽略电池优化权限状态
-      if (!bat.isGranted) { // 如果未授予
-        final r = await Permission.ignoreBatteryOptimizations.request(); // 请求忽略电池优化权限
-        debugPrint('Android ignore battery optimizations: $r'); // 打印结果
+
+      final settings = await _messaging.requestPermission( // 请求通知权限
+        alert: true, // 警报权限
+        announcement: false, // 公告权限
+        badge: true, // 角标权限
+        carPlay: false, // CarPlay 权限
+        criticalAlert: false, // 紧急警报权限
+        provisional: false, // 临时权限
+        sound: true, // 声音权限
+      );
+      debugPrint('FCM permission: ${settings.authorizationStatus}'); // 打印权限状态
+
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) { // 如果是 Android
+        var n = await Permission.notification.status; // 获取通知权限状态
+        if (!n.isGranted) { // 如果未授予
+          n = await Permission.notification.request(); // 请求通知权限
+        }
+        debugPrint( // 打印权限状态
+          'Android notification: status=$n granted=${n.isGranted} ' // 是否授予
+          'provisional=${n.isProvisional} limited=${n.isLimited}', // 是否临时或受限
+        );
+        final bat = await Permission.ignoreBatteryOptimizations.status; // 获取忽略电池优化权限状态
+        if (!bat.isGranted) { // 如果未授予
+          final r = await Permission.ignoreBatteryOptimizations.request(); // 请求忽略电池优化权限
+          debugPrint('Android ignore battery optimizations: $r'); // 打印结果
+        }
       }
-    }
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) { // 监听认证状态变化
-      if (user != null) { // 如果用户已登录
-        _syncTokenToFirestore(); // 同步 Token 到 Firestore
+      FirebaseAuth.instance.authStateChanges().listen((User? user) { // 监听认证状态变化
+        if (user != null) { // 如果用户已登录
+          _syncTokenToFirestore(); // 同步 Token 到 Firestore
+        }
+      });
+
+      await Future<void>.delayed(Duration.zero); // 等待一帧
+      await _syncTokenToFirestore(); // 同步 Token 到 Firestore
+
+      FirebaseMessaging.instance.onTokenRefresh.listen(_persistToken); // 监听 Token 刷新事件
+
+      FirebaseMessaging.onMessage.listen(_showForegroundNotification); // 监听前台消息
+
+      FirebaseMessaging.onMessageOpenedApp.listen(_onOpened); // 监听消息打开事件
+
+      final initial = await _messaging.getInitialMessage(); // 获取初始消息(从通知启动)
+      if (initial != null) { // 如果有初始消息
+        _onOpened(initial); // 处理打开事件
       }
-    });
 
-    await Future<void>.delayed(Duration.zero); // 等待一帧
-    await _syncTokenToFirestore(); // 同步 Token 到 Firestore
-
-    FirebaseMessaging.instance.onTokenRefresh.listen(_persistToken); // 监听 Token 刷新事件
-
-    FirebaseMessaging.onMessage.listen(_showForegroundNotification); // 监听前台消息
-
-    FirebaseMessaging.onMessageOpenedApp.listen(_onOpened); // 监听消息打开事件
-
-    final initial = await _messaging.getInitialMessage(); // 获取初始消息(从通知启动)
-    if (initial != null) { // 如果有初始消息
-      _onOpened(initial); // 处理打开事件
+      _initialized = true; // 全程成功后才标记（中途抛错时仍可再次尝试 initialize）
+    } catch (e, st) {
+      debugPrint('PushNotificationService.initialize failed (app continues): $e\n$st');
     }
   }
 
@@ -287,18 +301,22 @@ class PushNotificationService { // 推送通知服务类
   }
 
   static Future<void> _showForegroundNotification(RemoteMessage message) async { // 显示前台通知
-    final t = _fcmTitle(message); // 获取标题
-    final title = t.isEmpty ? '通知' : t; // 如果标题为空,使用默认值
-    final body = _fcmBody(message); // 获取内容
-    final dataMap = Map<String, dynamic>.from(message.data); // 转换数据为映射
+    try {
+      final t = _fcmTitle(message); // 获取标题
+      final title = t.isEmpty ? '通知' : t; // 如果标题为空,使用默认值
+      final body = _fcmBody(message); // 获取内容
+      final dataMap = Map<String, dynamic>.from(message.data); // 转换数据为映射
 
-    await _local.show( // 显示本地通知
-      id: message.hashCode, // 通知 ID
-      title: title, // 标题
-      body: body, // 内容
-      notificationDetails: _notificationDetailsForPayload(dataMap), // 通知详情
-      payload: jsonEncode(message.data), // 载荷:JSON 编码的数据
-    );
+      await _local.show( // 显示本地通知
+        id: message.hashCode, // 通知 ID
+        title: title, // 标题
+        body: body, // 内容
+        notificationDetails: _notificationDetailsForPayload(dataMap), // 通知详情
+        payload: jsonEncode(message.data), // 载荷:JSON 编码的数据
+      );
+    } catch (e, st) {
+      debugPrint('_showForegroundNotification: $e\n$st');
+    }
   }
 
   static void _onOpened(RemoteMessage message) { // 消息打开处理

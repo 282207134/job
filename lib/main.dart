@@ -1,3 +1,5 @@
+import 'dart:async'; // unawaited 用
+
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart'; // 导入闪屏动画库
 import 'package:firebase_auth/firebase_auth.dart'; // 导入 Firebase 身份验证包
 import 'package:firebase_core/firebase_core.dart'; // 导入 Firebase 核心包
@@ -20,6 +22,21 @@ import 'package:kantankanri/splashScreen/OnBoardingPageState.dart'; // 导入引
 import 'package:provider/provider.dart'; // 导入 Provider 状态管理库
 
 import 'firebase_options.dart'; // 导入 Firebase 多平台配置文件
+
+/// FCM / 本地通知 / OneSignal は失敗しても UI を先に表示する（未設定・権限・端末差で落ちないようにする）
+Future<void> _initOptionalPushPlugins() async {
+  await Future<void>.delayed(Duration.zero);
+  try {
+    await PushNotificationService.initialize();
+  } catch (e, st) {
+    debugPrint('PushNotificationService.initialize: $e\n$st');
+  }
+  try {
+    await OneSignalPushService.initialize();
+  } catch (e, st) {
+    debugPrint('OneSignalPushService.initialize: $e\n$st');
+  }
+}
 
 /// [Consumer2] 再ビルドのたびに新しい [Future] が渡り [FutureBuilder] が待機に戻るのを防ぐ
 class _LockSyncedGate extends StatefulWidget {
@@ -231,10 +248,12 @@ Future<void> main() async { // 应用入口主函数
     debugPrint('dotenv: $e\n$st'); // 打印错误信息和堆栈跟踪
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); // 初始化 Firebase(根据当前平台自动选择配置)
-  if (!kIsWeb) { // 如果不是 Web 平台
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler); // 注册后台消息处理器
-    await PushNotificationService.initialize(); // 初始化推送通知服务(FCM + 本地通知)
-    await OneSignalPushService.initialize(); // 初始化 OneSignal 推送服务
+  if (!kIsWeb) {
+    try {
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    } catch (e, st) {
+      debugPrint('FCM onBackgroundMessage register: $e\n$st');
+    }
   }
   runApp( // 运行应用
     MultiProvider( // 多 Provider 包装器
@@ -246,4 +265,7 @@ Future<void> main() async { // 应用入口主函数
       child: const MyApp(), // 子组件:MyApp
     ),
   );
+  if (!kIsWeb) {
+    unawaited(_initOptionalPushPlugins());
+  }
 }
