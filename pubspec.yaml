@@ -65,3 +65,7 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/poppins.ttf # Poppins字体
+
+# 12.4.0 が isiOSAppOnVision で一部 Xcode / SDK と不整合になるため固定
+dependency_overrides:
+  device_info_plus: 12.3.0

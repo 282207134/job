@@ -1203,6 +1203,10 @@ PODS:
     - Firebase/Firestore (= 11.15.0)
     - firebase_core
     - Flutter
+  - connectivity_plus (0.0.1):
+    - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - Firebase/Auth (11.15.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 11.15.0)
@@ -1211,6 +1215,9 @@ PODS:
   - Firebase/Firestore (11.15.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 11.15.0)
+  - Firebase/Messaging (11.15.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 11.15.0)
   - Firebase/Storage (11.15.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 11.15.0)
@@ -1220,6 +1227,10 @@ PODS:
     - Flutter
   - firebase_core (3.15.2):
     - Firebase/CoreOnly (= 11.15.0)
+    - Flutter
+  - firebase_messaging (15.2.10):
+    - Firebase/Messaging (= 11.15.0)
+    - firebase_core
     - Flutter
   - firebase_storage (12.4.10):
     - Firebase/Storage (= 11.15.0)
@@ -1264,6 +1275,20 @@ PODS:
     - gRPC-Core (~> 1.69.0)
     - leveldb-library (~> 1.22)
     - nanopb (~> 3.30910.0)
+  - FirebaseInstallations (11.15.0):
+    - FirebaseCore (~> 11.15.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/UserDefaults (~> 8.1)
+    - PromisesObjC (~> 2.4)
+  - FirebaseMessaging (11.15.0):
+    - FirebaseCore (~> 11.15.0)
+    - FirebaseInstallations (~> 11.0)
+    - GoogleDataTransport (~> 10.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/Reachability (~> 8.1)
+    - GoogleUtilities/UserDefaults (~> 8.1)
+    - nanopb (~> 3.30910.0)
   - FirebaseSharedSwift (11.15.0)
   - FirebaseStorage (11.15.0):
     - FirebaseAppCheckInterop (~> 11.0)
@@ -1280,6 +1305,11 @@ PODS:
     - SDWebImageWebPCoder
   - flutter_keyboard_visibility (0.0.1):
     - Flutter
+  - flutter_local_notifications (0.0.1):
+    - Flutter
+  - flutter_webrtc (1.2.0):
+    - Flutter
+    - WebRTC-SDK (= 137.7151.04)
   - geolocator_apple (1.2.0):
     - Flutter
     - FlutterMacOS
@@ -1289,6 +1319,9 @@ PODS:
     - Flutter
     - Google-Maps-iOS-Utils (< 7.0, >= 5.0)
     - GoogleMaps (< 11.0, >= 8.4)
+  - GoogleDataTransport (10.1.0):
+    - nanopb (~> 3.30910.0)
+    - PromisesObjC (~> 2.4)
   - GoogleMaps (9.4.0):
     - GoogleMaps/Maps (= 9.4.0)
   - GoogleMaps/Maps (9.4.0)
@@ -1311,6 +1344,9 @@ PODS:
     - GoogleUtilities/Privacy
   - GoogleUtilities/Privacy (8.1.0)
   - GoogleUtilities/Reachability (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - "gRPC-C++ (1.69.0)":
@@ -1424,6 +1460,10 @@ PODS:
   - libwebp/sharpyuv (1.5.0)
   - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
+  - livekit_client (2.6.1):
+    - Flutter
+    - flutter_webrtc
+    - WebRTC-SDK (= 137.7151.04)
   - Mantle (2.2.0):
     - Mantle/extobjc (= 2.2.0)
   - Mantle/extobjc (2.2.0)
@@ -1432,11 +1472,61 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - onesignal_flutter (5.5.1):
+    - Flutter
+    - OneSignalXCFramework (= 5.5.0)
+  - OneSignalXCFramework (5.5.0):
+    - OneSignalXCFramework/OneSignalComplete (= 5.5.0)
+  - OneSignalXCFramework/OneSignal (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalExtension
+    - OneSignalXCFramework/OneSignalLiveActivities
+    - OneSignalXCFramework/OneSignalNotifications
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalOutcomes
+    - OneSignalXCFramework/OneSignalUser
+  - OneSignalXCFramework/OneSignalComplete (5.5.0):
+    - OneSignalXCFramework/OneSignal
+    - OneSignalXCFramework/OneSignalInAppMessages
+    - OneSignalXCFramework/OneSignalLocation
+  - OneSignalXCFramework/OneSignalCore (5.5.0)
+  - OneSignalXCFramework/OneSignalExtension (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalOutcomes
+  - OneSignalXCFramework/OneSignalInAppMessages (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalNotifications
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalOutcomes
+    - OneSignalXCFramework/OneSignalUser
+  - OneSignalXCFramework/OneSignalLiveActivities (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalUser
+  - OneSignalXCFramework/OneSignalLocation (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalNotifications
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalUser
+  - OneSignalXCFramework/OneSignalNotifications (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalExtension
+    - OneSignalXCFramework/OneSignalOutcomes
+  - OneSignalXCFramework/OneSignalOSCore (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+  - OneSignalXCFramework/OneSignalOutcomes (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+  - OneSignalXCFramework/OneSignalUser (5.5.0):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalNotifications
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalOutcomes
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
+  - PromisesObjC (2.4.0)
   - RecaptchaInterop (101.0.0)
   - SDWebImage (5.21.7):
     - SDWebImage/Core (= 5.21.7)
@@ -1451,21 +1541,29 @@ PODS:
     - Flutter
     - FlutterMacOS
   - TOCropViewController (2.7.4)
+  - WebRTC-SDK (137.7151.04)
 
 DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/darwin`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
   - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - livekit_client (from `.symlinks/plugins/livekit_client/ios`)
+  - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -1484,9 +1582,12 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseFirestore
     - FirebaseFirestoreInternal
+    - FirebaseInstallations
+    - FirebaseMessaging
     - FirebaseSharedSwift
     - FirebaseStorage
     - Google-Maps-iOS-Utils
+    - GoogleDataTransport
     - GoogleMaps
     - GoogleUtilities
     - "gRPC-C++"
@@ -1496,10 +1597,13 @@ SPEC REPOS:
     - libwebp
     - Mantle
     - nanopb
+    - OneSignalXCFramework
+    - PromisesObjC
     - RecaptchaInterop
     - SDWebImage
     - SDWebImageWebPCoder
     - TOCropViewController
+    - WebRTC-SDK
 
 EXTERNAL SOURCES:
   audioplayers_darwin:
@@ -1508,10 +1612,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_messaging:
+    :path: ".symlinks/plugins/firebase_messaging/ios"
   firebase_storage:
     :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
@@ -1520,6 +1630,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_image_compress_common/ios"
   flutter_keyboard_visibility:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_webrtc:
+    :path: ".symlinks/plugins/flutter_webrtc/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
   google_maps_flutter_ios:
@@ -1528,6 +1642,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  livekit_client:
+    :path: ".symlinks/plugins/livekit_client/ios"
+  onesignal_flutter:
+    :path: ".symlinks/plugins/onesignal_flutter/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
@@ -1543,9 +1661,12 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   camera_avfoundation: be3be85408cd4126f250386828e9b1dfa40ab436
   cloud_firestore: fdcc87898326e396d6ef6df543acf9b5c2034b95
+  connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
+  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_auth: 50af8366c87bb88c80ebeae62eb60189c7246b9b
   firebase_core: 995454a784ff288be5689b796deb9e9fa3601818
+  firebase_messaging: f4a41dd102ac18b840eba3f39d67e77922d3f707
   firebase_storage: 1144b3236855c52ff52741b12374862ee84d5a28
   FirebaseAppCheckInterop: 06fe5a3799278ae4667e6c432edd86b1030fa3df
   FirebaseAuth: a6575e5fbf46b046c58dc211a28a5fbdd8d4c83b
@@ -1555,14 +1676,19 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: 9afa45b1159304c963da48addb78275ef701c6b4
   FirebaseFirestore: 1e5fafdac2b2ef1ffc24034460b7b4821a15be96
   FirebaseFirestoreInternal: df9ab608a59a4e8eefd0796ed7652f3c1a88473a
+  FirebaseInstallations: 317270fec08a5d418fdbc8429282238cab3ac843
+  FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   FirebaseSharedSwift: e17c654ef1f1a616b0b33054e663ad1035c8fd40
   FirebaseStorage: 50fc9ee147392943e492467db6b52759b0447037
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_image_compress_common: 1697a328fd72bfb335507c6bca1a65fa5ad87df1
   flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
+  flutter_local_notifications: 643a3eda1ce1c0599413ca31672536d423dee214
+  flutter_webrtc: c3e21fc0dcd9d8eb246ae4d5256fcbeb2f5ecd22
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   Google-Maps-iOS-Utils: 0a484b05ed21d88c9f9ebbacb007956edd508a96
   google_maps_flutter_ios: 3213e1e5f5588b6134935cb8fc59acb4e6d88377
+  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMaps: 0608099d4870cac8754bdba9b6953db543432438
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
@@ -1572,16 +1698,21 @@ SPEC CHECKSUMS:
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
+  livekit_client: ee5503a79b5e1a5cbf6bbf741b4625d2531c8bb9
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  onesignal_flutter: e2e682f7c4b0604ddba445d4f8ea6e79c77dabe1
+  OneSignalXCFramework: 943852e7d70d719f73e9669d48620aeec1b93022
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
   SDWebImageWebPCoder: 0e06e365080397465cc73a7a9b472d8a3bd0f377
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
+  WebRTC-SDK: 40d4f5ba05cadff14e4db5614aec402a633f007e
 
 PODFILE CHECKSUM: 4d5f7bac44016363e1daaf143851ec4008fb835a
 
